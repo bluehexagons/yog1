@@ -1,0 +1,475 @@
+<html>
+<head>
+	<title>You Only Get 1s</title>
+	<style type="text/css">
+		body {
+			font-family: sans-serif;
+			font-size: 16pt;
+			background: black;
+		}
+		#wrapper {
+			width: 600pt;
+			margin-left: auto;
+			margin-right: auto;
+			height: 600px;
+			position: relative;
+		}
+		#menu {
+			height: 100%;
+			width: 120pt;
+			background: #d0d0d0;
+			float: left;
+			position: relative;
+			top: 6pt;
+			border-radius: 10px 0px 0px 10px;
+		}
+		#menu h1 {
+			text-align: center;
+		}
+		#start_buttons {
+			margin: 0px;
+			padding: 0px;
+		}
+		#start_buttons li {
+			border: 1px solid black;
+			border-radius: 3px;
+			cursor: pointer;
+			text-align: center;
+			list-style: none;
+			margin: 2px 4px 2px 4px;
+			background: #fff;
+		}
+		#start_buttons li.active {
+			border: 2px solid black;
+			background: #c0c0c0;
+			font-weight: bold;
+			margin: 0px 2px 0px 2px;
+		}
+		#game {
+			height: 100%;
+			width: 465pt;
+			padding: 8px;
+			background: #e0e0e0;
+			float: right;
+			border-radius: 8px;
+			overflow: auto;
+		}
+		#problem {
+			font-size: 24pt;
+			margin: 4pt 8pt 4pt 8pt;
+			position: relative;
+			left: 12pt;
+		}
+		#problem span.operator {
+			font-weight: bold;
+		}
+		#problem span.equals {
+			font-weight: bolder;
+		}
+		#problem span.number {
+			color: #003168;
+			font-size: 26pt;
+			border: 1px solid black;
+			border-radius: 2px;
+			padding: 0px 4px 0px 4px;
+			cursor: pointer;
+			display: inline-block;
+			text-align: center;
+			background: #fff;
+		}
+		#submit {
+			background: #fff;
+			font-weight: bold;
+			font-size: 22pt;
+		}
+		#problem span.hint {
+			color: #ca8863;
+			border-color: #633307;
+		}
+		#problem span.flipped {
+			color: #6399cc;
+		}
+		#flips span.number {
+			font-weight: bold;
+			font-size: 22pt;
+			border: 1px solid #ccc;
+			border-radius: 4px;
+			background: #fff;
+			padding: 0px 4pt 0px 4pt;
+		}
+		#tutorial {
+			border-bottom: 1px solid #555;
+			margin-bottom: 8pt;
+		}
+		#history_text {
+			font-size: 16pt;
+			margin-top: 8pt;
+			border-top: 1px solid #888;
+			border-radius: 16pt 16pt 0px 0px;
+			text-align: center;
+		}
+		#history {
+			margin: 0px;
+			padding: 0px;
+		}
+		#history li {
+			border-left: 1px solid #444;
+			padding: 1px 4px 1px 4px;
+			display: block;
+			border-radius: 6px;
+			text-align: left;
+			list-style: none;
+			margin: 2px 4px 2px 4px;
+			text-shadow: white 0px 0px 4px;
+		}
+		#history li.correct {
+			color: #20e040;
+		}
+		#history li.incorrect {
+			color: #f07080;
+		}
+	</style>
+</head>
+<body>
+	<div id="wrapper">
+		<div id="menu">
+			<h1>You Only Get 1s</h1>
+			<ul id="start_buttons">
+				<!-- <li data-difficulty="0" data-tutorial="1">Tutorial</li> -->
+				<li data-difficulty="0" class="active">Easy</li>
+				<li data-difficulty="15">Normal</li>
+				<li data-difficulty="30">Hard</li>
+			</ul>
+		</div>
+		<div id="game">
+			<div id="tutorial">Click a number to flip it to a 1, and make the equation correct.</div>
+			<div id="flips"><span class="number">0</span> <span>1s remaining</span></div>
+			<div id="problem"></div>
+			<button id="submit">Submit</button>
+			<div id="history_text">Problem History</div>
+			<ul id="history"></ul>
+		</div>
+	</div>
+<script type="text/javascript">
+(function () {
+	'use strict';
+	var ui = (function (data) {
+			var key, found;
+			for (key in data) {
+				found = document.querySelectorAll(data[key]);
+				data[key] = found.length <= 1 ? found[0] : found;
+			}
+			return data;
+		}({
+			menu: '#menu',
+			game: '#game',
+			problem: '#problem',
+			flips: '#flips',
+			startButtons: '#start_buttons li',
+			submit: '#submit',
+			history: '#history'
+		})),
+		score,
+		difficulty,
+		modeDifficulty = 0,
+		challenge,
+		currentProblem,
+		slack,
+		flipsRemaining,
+		hideAll = function () {
+
+		},
+		showMenu = function () {
+			ui.menu.style.display = 'block';
+		},
+		NumberNode = function NumberNode(value) {
+			var defaultValue = value,
+				currentValue = value,
+				span = document.createElement('span'),
+				toggled = false,
+				showValue = function () {
+					span.className = 'number hint';
+					//more compatible than classList, even if classList is better
+					span.firstChild.textContent = defaultValue;
+				},
+				hideValue = function () {
+					span.className = 'number flipped';
+					span.firstChild.textContent = currentValue;
+				},
+				click = function () {
+					if (toggled) {
+						currentValue = defaultValue;
+						span.className = 'number';
+						span.removeEventListener('mouseover', showValue, false);
+						span.removeEventListener('mouseout', hideValue, false);
+						flipsRemaining++;
+						updateFlips();
+						toggled = false;
+					} else {
+						if (flipsRemaining) {
+							flipsRemaining--;
+							updateFlips();
+							currentValue = 1;
+							span.className = 'number flipped';
+							span.style.width = span.offsetWidth - 10 + 'px'; //keep button the same size
+							span.addEventListener('mouseover', showValue, false);
+							span.addEventListener('mouseout', hideValue, false);
+							toggled = true;
+						}
+					}
+					span.firstChild.textContent = currentValue;
+				};
+			this.toString = function () {
+				return '' + currentValue;
+			};
+			this.span = span;
+			this.build = function () {
+				span.appendChild(document.createTextNode(currentValue));
+				span.className = 'number';
+				span.addEventListener('click', click, false);
+				return span;
+			}
+		},
+		calculateDifficulty = function(problem) {
+			var i = problem.length,
+				difficulty = 0;
+			while (i--) {
+				difficulty += problem[i].length / 2;
+			}
+			difficulty *= problem.length + 2;
+			return difficulty;
+		},
+		operationStrings = {
+			0: ' + ',
+			1: ' - ',
+			2: ' * ',
+			3: ' / '
+		},
+		makeOne = function (n) {
+			var operation = Math.random() * 2 | 0,
+				n1, opStr, n2;
+			switch (operation) {
+				case 0: //addition
+					if (Math.random() < 0.5) {
+						n1 = 1;
+						n2 = n - 1;
+					} else {
+						n1 = n - 1;
+						n2 = 1;
+					}
+
+					return ['(', n1, operationStrings[operation], n2, ')'];
+				case 1: //subtraction
+					n1 = n + 1;
+					n2 = 1;
+
+					return ['(', n1, operationStrings[operation], n2, ')'];
+				default:
+					break;
+			}
+		},
+		splitNumber = function (n) {
+			var operation = Math.random() * 2 | 0,
+				n1, opStr, n2, nSwap;
+			if (n <= 3) {
+				operation = 1;
+			}
+			switch (operation) {
+				case 0: //addition
+					n1 = Math.random() * (n - 3) + 2 | 0;
+					n2 = n - n1;
+
+					return ['(', n1, operationStrings[operation], n2, ')'];
+				case 1: //subtraction
+					n1 = Math.random() * n * 2.3 + n + 2 | 0;
+					n2 = n1 - n;
+
+					return ['(', n1, operationStrings[operation], n2, ')'];
+				default:
+					break;
+			}
+		},
+		getRandomValIndex = function (arr) {
+			var vals = [],
+				i = arr.length;
+			while (i--) {
+				if (typeof arr[i] === 'number') {
+					vals.push(i);
+				}
+			}
+			return vals[vals.length * Math.random() | 0];
+		},
+		generateProblem = function (baseDifficulty, useSlack) {
+			var numSides = 2,
+				difficulty = baseDifficulty,
+				currentDifficulty = 0,
+				decision,
+				startEqual = (Math.random() * Math.pow(difficulty, 0.25) | 0) * 5 + 5 + (Math.random() * 6 - 3 | 0),
+				sides = [],
+				i,
+				modVal,
+				modSide,
+				modIndex,
+				split,
+				spliceArgs;
+			
+			i = numSides;
+			while (i--) {
+				sides[i] = [startEqual];
+			}
+			while (currentDifficulty < difficulty) {
+				modSide = Math.random() * numSides | 0;
+				modVal = getRandomValIndex(sides[modSide]);
+				split = splitNumber(sides[modSide][modVal]);
+				split.unshift(modVal, 1);
+				Array.prototype.splice.apply(sides[modSide], split);
+				//sides[modSide].splice(modVal, 1, split[0], split[1], split[2]);
+				currentDifficulty = calculateDifficulty(sides);
+			}
+
+			modSide = Math.random() * numSides | 0;
+			modVal = getRandomValIndex(sides[modSide]);
+			split = makeOne(sides[modSide][modVal]);
+			split.unshift(modVal, 1);
+			Array.prototype.splice.apply(sides[modSide], split);
+			//sides[modSide].splice(modVal, 1, split[0], split[1], split[2]);
+
+			return sides;
+		},
+		unsolveProblem = function (problem, difficulty) {
+			var i = problem.length,
+				j, sides, nodes;
+			sides = [];
+			while (i--) {
+				nodes = [];
+				sides[i] = nodes;
+				j = problem[i].length;
+				while (j--) {
+					if (typeof problem[i][j] === 'number' && problem[i][j] === 1) {
+						nodes[j] = (Math.random() * Math.pow(difficulty, 0.25) | 0) * 5 + 5 + (Math.random() * 6 - 3 | 0);
+					} else {
+						nodes[j] = problem[i][j];
+					}
+				}
+			}
+			return sides;
+		},
+		problemToNodes = function (problem) {
+			var i, j, sides, nodes;
+			sides = [];
+			i = problem.length;
+			while (i--) {
+				nodes = [];
+				sides[i] = nodes;
+				j = problem[i].length;
+				while (j--) {
+					if (typeof problem[i][j] === 'number') {
+						nodes[j] = new NumberNode(problem[i][j]);
+					} else {
+						nodes[j] = problem[i][j];
+					}
+				}
+			}
+			return sides;
+		},
+		textElement = function (type, content, className) {
+			var e = document.createElement(type);
+			e.appendChild(document.createTextNode(content));
+			if (className) {
+				e.className = className;
+			}
+			return e;
+		},
+		buildProblemElements = function (problem) {
+			var i, j, container = document.createElement('span');
+			for (i = 0; i < problem.length; i++) {
+				for (j = 0; j < problem[i].length; j++) {
+					if (problem[i][j] instanceof NumberNode) {
+						container.appendChild(problem[i][j].build());
+					} else {
+						container.appendChild(textElement('span', problem[i][j], 'operator'));
+					}
+				}
+				if (i + 1 < problem.length) {
+					container.appendChild(textElement('span', ' = ', 'equals'));
+				}
+			}
+			return container;
+		},
+		updateFlips = function () {
+			ui.flips.firstChild.firstChild.textContent = flipsRemaining;
+			ui.flips.lastChild.firstChild.textContent = flipsRemaining === 1 ? 'flip remaining' : 'flips remaining';
+		},
+		ProblemData = (function () {
+			var ProblemData = function (difficulty) {
+				this.solved = generateProblem(difficulty);
+				this.problem = unsolveProblem(this.solved);
+				this.nodes = problemToNodes(this.problem);
+				this.elements = buildProblemElements(this.nodes);
+			};
+			ProblemData.prototype.checkSolved = function () {
+				var totals = [], i;
+				for (i = 0; i < this.nodes.length; i++) {
+					totals[i] = eval(this.nodes[i].join(''));
+				}
+				for (i = 1; i < totals.length; i++) {
+					if (totals[i] !== totals[0]) {
+						return false;
+					}
+				}
+				return true;
+			};
+			return ProblemData;
+		}()),
+		startRound = function () {
+			score = 0;
+			difficulty = modeDifficulty;
+			challenge = 0;
+			flipsRemaining = 1;
+			slack = Math.sqrt(difficulty * 0.1);
+			currentProblem = new ProblemData(difficulty);
+			if (ui.problem.firstChild) {
+				ui.problem.replaceChild(currentProblem.elements, ui.problem.firstChild);
+			} else {
+				ui.problem.appendChild(currentProblem.elements);
+			}
+			updateFlips();
+		},
+		clickDifficulty = function (e) {
+			var i;
+			modeDifficulty = e.target.dataset ? +e.target.dataset.difficulty : +e.target.getAttribute('data-difficulty');
+			startRound();
+			i = ui.startButtons.length;
+			while (i--) {
+				ui.startButtons[i].className = '';
+			}
+			e.target.className = 'active';
+		},
+		clickSubmit = function () {
+			var li;
+			li = document.createElement('li');
+			li.appendChild(currentProblem.elements);
+			li.className = currentProblem.checkSolved() ? 'correct' : 'incorrect';
+			if (!ui.history.firstChild) {
+				ui.history.appendChild(li);
+			} else {
+				ui.history.insertBefore(li, ui.history.firstChild);
+			}
+			startRound();
+		};
+	(function () {
+		var i = ui.startButtons.length;
+		while (i--) {
+			ui.startButtons[i].addEventListener('click', clickDifficulty, false);
+		}
+		ui.submit.addEventListener('click', clickSubmit, false);
+	}());
+	window.addEventListener('selectstart', function (e) {
+		e.preventDefault();
+	}, false);
+	startRound();
+	window.generateProblem = generateProblem;
+}());
+</script>
+</body>
+</html>
