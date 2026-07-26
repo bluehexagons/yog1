@@ -214,7 +214,7 @@
             <div id="problem"></div>
             <button id="submit" type="button">Submit</button>
             <div id="history_text">Problem History</div>
-            <ul id="history"></ul>
+            <ul id="history" aria-live="polite"></ul>
         </div>
     </div>
 <script>
@@ -536,8 +536,14 @@
 
     function clickSubmit() {
         const li = document.createElement('li');
-        li.appendChild(currentProblem.elements);
-        li.classList.add(currentProblem.checkSolved() ? 'correct' : 'incorrect');
+        const isSolved = currentProblem.checkSolved();
+        const snapshot = currentProblem.elements.cloneNode(true);
+        for (const number of snapshot.querySelectorAll('.number')) {
+            number.removeAttribute('tabindex');
+        }
+        li.appendChild(textElement('strong', isSolved ? 'Correct: ' : 'Incorrect: '));
+        li.appendChild(snapshot);
+        li.classList.add(isSolved ? 'correct' : 'incorrect');
         if (!ui.history.firstChild) {
             ui.history.appendChild(li);
         } else {
