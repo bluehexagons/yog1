@@ -334,10 +334,11 @@
             }
             #start_buttons {
                 display: flex;
+                flex-wrap: wrap;
                 gap: 6px;
             }
             #start_buttons button {
-                flex: 1;
+                flex: 1 1 calc(50% - 3px);
                 margin: 0;
                 padding: 8px 4px;
                 text-align: center;
@@ -371,7 +372,7 @@
 </head>
 <body>
     <div id="wrapper">
-        <div id="menu">
+        <aside id="menu">
             <div class="jam-label">LD28 / 2013</div>
             <h1>You Only Get 1s</h1>
             <p class="tagline">One move. Make it count.</p>
@@ -382,9 +383,9 @@
                 <button type="button" data-difficulty="15" aria-pressed="false">Normal</button>
                 <button type="button" data-difficulty="30" aria-pressed="false">Hard</button>
             </div>
-        </div>
-        <div id="game">
-            <div id="tutorial" aria-live="polite">
+        </aside>
+        <main id="game">
+            <div id="tutorial" role="status" aria-live="polite" aria-atomic="true">
                 <strong id="tutorial_title">How to play</strong>
                 <span id="tutorial_text">Turn one number into a 1 so both sides of the equation have the same value.</span>
             </div>
@@ -399,9 +400,9 @@
                     <button id="submit" type="button">Check equation</button>
                 </div>
             </div>
-            <div id="history_text">Problem History <span>Newest first</span></div>
-            <ul id="history" aria-live="polite"></ul>
-        </div>
+            <h2 id="history_text">Problem History <span>Newest first</span></h2>
+            <ul id="history"></ul>
+        </main>
     </div>
 <script>
 (function () {
@@ -465,14 +466,16 @@
                 }
                 this.span.removeEventListener('mouseover', this.showValueBound, false);
                 this.span.removeEventListener('mouseout', this.hideValueBound, false);
+                this.span.removeEventListener('focus', this.showValueBound, false);
+                this.span.removeEventListener('blur', this.hideValueBound, false);
                 flipsRemaining++;
-                updateFlips();
                 this.toggled = false;
+                this.span.setAttribute('aria-label', 'Change ' + this.defaultValue + ' to 1');
                 this.span.setAttribute('aria-pressed', 'false');
+                updateFlips();
             } else {
                 if (flipsRemaining) {
                     flipsRemaining--;
-                    updateFlips();
                     this.currentValue = 1;
                     this.span.classList.add('flipped');
                     this.span.classList.remove('hint');
@@ -482,8 +485,12 @@
                     this.span.style.minWidth = this.originalWidth + 'px';
                     this.span.addEventListener('mouseover', this.showValueBound, false);
                     this.span.addEventListener('mouseout', this.hideValueBound, false);
+                    this.span.addEventListener('focus', this.showValueBound, false);
+                    this.span.addEventListener('blur', this.hideValueBound, false);
                     this.toggled = true;
+                    this.span.setAttribute('aria-label', 'Restore ' + this.defaultValue);
                     this.span.setAttribute('aria-pressed', 'true');
+                    updateFlips();
                 } else {
                     this.span.classList.remove('blocked');
                     ui.flips.classList.remove('notice');
@@ -687,6 +694,16 @@
     function updateFlips() {
         ui.flipCount.textContent = flipsRemaining;
         ui.flipText.textContent = flipsRemaining === 1 ? 'flip remaining' : 'flips remaining';
+        if (!currentProblem) {
+            return;
+        }
+        for (const side of currentProblem.nodes) {
+            for (const node of side) {
+                if (node instanceof NumberNode) {
+                    node.span.setAttribute('aria-disabled', flipsRemaining === 0 && !node.toggled ? 'true' : 'false');
+                }
+            }
+        }
     }
 
     function setHelp(title, message) {
@@ -707,7 +724,40 @@
         }
     }
 
-    // FIXME: Replace eval() with a proper arithmetic evaluator
+    function evaluateTokens(tokens) {
+        let position = 0;
+
+        function parseValue() {
+            const token = tokens[position++];
+            if (token instanceof NumberNode) {
+                return token.currentValue;
+            }
+            if (token !== '(') {
+                throw new Error('Invalid expression');
+            }
+
+            const left = parseValue();
+            const operator = tokens[position++].trim();
+            const right = parseValue();
+            if (tokens[position++] !== ')') {
+                throw new Error('Invalid expression');
+            }
+            if (operator === '+') {
+                return left + right;
+            }
+            if (operator === '-') {
+                return left - right;
+            }
+            throw new Error('Invalid operator');
+        }
+
+        const result = parseValue();
+        if (position !== tokens.length) {
+            throw new Error('Invalid expression');
+        }
+        return result;
+    }
+
     class ProblemData {
         constructor(difficulty, problem) {
             this.solved = problem ? null : generateProblem(difficulty);
@@ -719,7 +769,7 @@
         checkSolved() {
             const totals = [];
             for (let i = 0; i < this.nodes.length; i++) {
-                totals[i] = eval(this.nodes[i].join(''));
+                totals[i] = evaluateTokens(this.nodes[i]);
             }
             for (let i = 1; i < totals.length; i++) {
                 if (totals[i] !== totals[0]) {
@@ -775,12 +825,22 @@
         const isSolved = currentProblem.checkSolved();
         const wasTutorial = tutorialMode;
         const snapshot = currentProblem.elements.cloneNode(true);
-        for (const number of snapshot.querySelectorAll('.number')) {
+        const snapshotNumbers = snapshot.querySelectorAll('.number');
+        let numberIndex = 0;
+        for (const side of currentProblem.nodes) {
+            for (const node of side) {
+                if (node instanceof NumberNode) {
+                    snapshotNumbers[numberIndex++].textContent = node.currentValue;
+                }
+            }
+        }
+        for (const number of snapshotNumbers) {
             number.removeAttribute('tabindex');
             number.removeAttribute('role');
             number.removeAttribute('aria-label');
             number.removeAttribute('aria-pressed');
-            number.classList.remove('tutorial-target', 'blocked');
+            number.removeAttribute('aria-disabled');
+            number.classList.remove('tutorial-target', 'blocked', 'hint');
         }
         li.appendChild(textElement('strong', isSolved ? 'Correct: ' : 'Incorrect: '));
         li.appendChild(snapshot);
@@ -789,6 +849,9 @@
             ui.history.appendChild(li);
         } else {
             ui.history.insertBefore(li, ui.history.firstChild);
+        }
+        while (ui.history.children.length > 20) {
+            ui.history.removeChild(ui.history.lastChild);
         }
 
         if (wasTutorial && isSolved) {
@@ -815,10 +878,6 @@
         }
         ui.submit.addEventListener('click', clickSubmit, false);
     }());
-
-    window.addEventListener('selectstart', function (e) {
-        e.preventDefault();
-    }, false);
 
     startRound();
 }());
