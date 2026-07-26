@@ -1,474 +1,564 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-	<title>You Only Get 1s</title>
-	<style type="text/css">
-		body {
-			font-family: sans-serif;
-			font-size: 16pt;
-			background: black;
-		}
-		#wrapper {
-			width: 600pt;
-			margin-left: auto;
-			margin-right: auto;
-			height: 600px;
-			position: relative;
-		}
-		#menu {
-			height: 100%;
-			width: 120pt;
-			background: #d0d0d0;
-			float: left;
-			position: relative;
-			top: 6pt;
-			border-radius: 10px 0px 0px 10px;
-		}
-		#menu h1 {
-			text-align: center;
-		}
-		#start_buttons {
-			margin: 0px;
-			padding: 0px;
-		}
-		#start_buttons li {
-			border: 1px solid black;
-			border-radius: 3px;
-			cursor: pointer;
-			text-align: center;
-			list-style: none;
-			margin: 2px 4px 2px 4px;
-			background: #fff;
-		}
-		#start_buttons li.active {
-			border: 2px solid black;
-			background: #c0c0c0;
-			font-weight: bold;
-			margin: 0px 2px 0px 2px;
-		}
-		#game {
-			height: 100%;
-			width: 465pt;
-			padding: 8px;
-			background: #e0e0e0;
-			float: right;
-			border-radius: 8px;
-			overflow: auto;
-		}
-		#problem {
-			font-size: 24pt;
-			margin: 4pt 8pt 4pt 8pt;
-			position: relative;
-			left: 12pt;
-		}
-		#problem span.operator {
-			font-weight: bold;
-		}
-		#problem span.equals {
-			font-weight: bolder;
-		}
-		#problem span.number {
-			color: #003168;
-			font-size: 26pt;
-			border: 1px solid black;
-			border-radius: 2px;
-			padding: 0px 4px 0px 4px;
-			cursor: pointer;
-			display: inline-block;
-			text-align: center;
-			background: #fff;
-		}
-		#submit {
-			background: #fff;
-			font-weight: bold;
-			font-size: 22pt;
-		}
-		#problem span.hint {
-			color: #ca8863;
-			border-color: #633307;
-		}
-		#problem span.flipped {
-			color: #6399cc;
-		}
-		#flips span.number {
-			font-weight: bold;
-			font-size: 22pt;
-			border: 1px solid #ccc;
-			border-radius: 4px;
-			background: #fff;
-			padding: 0px 4pt 0px 4pt;
-		}
-		#tutorial {
-			border-bottom: 1px solid #555;
-			margin-bottom: 8pt;
-		}
-		#history_text {
-			font-size: 16pt;
-			margin-top: 8pt;
-			border-top: 1px solid #888;
-			border-radius: 16pt 16pt 0px 0px;
-			text-align: center;
-		}
-		#history {
-			margin: 0px;
-			padding: 0px;
-		}
-		#history li {
-			border-left: 1px solid #444;
-			padding: 1px 4px 1px 4px;
-			display: block;
-			border-radius: 6px;
-			text-align: left;
-			list-style: none;
-			margin: 2px 4px 2px 4px;
-			text-shadow: white 0px 0px 4px;
-		}
-		#history li.correct {
-			color: #20e040;
-		}
-		#history li.incorrect {
-			color: #f07080;
-		}
-	</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>You Only Get 1s</title>
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+        :root {
+            --bg: #000;
+            --menu-bg: #d0d0d0;
+            --game-bg: #e0e0e0;
+            --number-bg: #fff;
+            --number-color: #003168;
+            --hint-color: #ca8863;
+            --hint-border: #633307;
+            --flipped-color: #6399cc;
+            --correct: #20e040;
+            --incorrect: #f07080;
+            --button-active-bg: #c0c0c0;
+            --border-color: #000;
+        }
+        body {
+            font-family: sans-serif;
+            font-size: 16pt;
+            background: var(--bg);
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+        }
+        #wrapper {
+            width: 600pt;
+            max-width: 95vw;
+            min-height: 600px;
+            display: flex;
+            margin-top: 6pt;
+        }
+        #menu {
+            width: 120pt;
+            flex-shrink: 0;
+            background: var(--menu-bg);
+            border-radius: 10px 0 0 10px;
+        }
+        #menu h1 {
+            text-align: center;
+            font-size: 1.2rem;
+        }
+        #start_buttons {
+            margin: 0;
+            padding: 0;
+        }
+        #start_buttons button {
+            display: block;
+            width: calc(100% - 8px);
+            padding: 0;
+            border: 1px solid var(--border-color);
+            border-radius: 3px;
+            cursor: pointer;
+            text-align: center;
+            margin: 2px 4px;
+            background: var(--number-bg);
+            font: inherit;
+        }
+        #start_buttons button.active {
+            border: 2px solid var(--border-color);
+            background: var(--button-active-bg);
+            font-weight: bold;
+            width: calc(100% - 4px);
+            margin: 0 2px;
+        }
+        #game {
+            flex: 1;
+            padding: 8px;
+            background: var(--game-bg);
+            border-radius: 8px;
+            overflow: auto;
+            margin-left: 6px;
+        }
+        #problem {
+            font-size: 24pt;
+            margin: 4pt 8pt;
+            padding-left: 12pt;
+        }
+        #problem span.operator {
+            font-weight: bold;
+        }
+        #problem span.equals {
+            font-weight: bolder;
+        }
+        #problem span.number {
+            color: var(--number-color);
+            font-size: 26pt;
+            border: 1px solid var(--border-color);
+            border-radius: 2px;
+            padding: 0 4px;
+            cursor: pointer;
+            display: inline-block;
+            text-align: center;
+            background: var(--number-bg);
+        }
+        #problem span.number:focus {
+            outline: 2px solid var(--number-color);
+            outline-offset: 1px;
+        }
+        #submit {
+            background: var(--number-bg);
+            font-weight: bold;
+            font-size: 22pt;
+            cursor: pointer;
+            border: 1px solid var(--border-color);
+            border-radius: 3px;
+        }
+        #problem span.hint {
+            color: var(--hint-color);
+            border-color: var(--hint-border);
+        }
+        #problem span.flipped {
+            color: var(--flipped-color);
+        }
+        #flips span.number {
+            font-weight: bold;
+            font-size: 22pt;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background: var(--number-bg);
+            padding: 0 4pt;
+        }
+        #tutorial {
+            border-bottom: 1px solid #555;
+            margin-bottom: 8pt;
+        }
+        #history_text {
+            font-size: 16pt;
+            margin-top: 8pt;
+            border-top: 1px solid #888;
+            border-radius: 16pt 16pt 0 0;
+            text-align: center;
+        }
+        #history {
+            margin: 0;
+            padding: 0;
+        }
+        #history li {
+            border-left: 1px solid #444;
+            padding: 1px 4px;
+            display: block;
+            border-radius: 6px;
+            text-align: left;
+            list-style: none;
+            margin: 2px 4px;
+            text-shadow: white 0 0 4px;
+        }
+        #history li.correct {
+            color: var(--correct);
+        }
+        #history li.incorrect {
+            color: var(--incorrect);
+        }
+
+        @media (max-width: 640px) {
+            body {
+                font-size: 12pt;
+            }
+            #wrapper {
+                flex-direction: column;
+                min-height: auto;
+            }
+            #menu {
+                width: 100%;
+                border-radius: 10px 10px 0 0;
+            }
+            #start_buttons {
+                display: flex;
+                justify-content: center;
+            }
+            #start_buttons button {
+                flex: 1;
+                max-width: 120px;
+            }
+            #game {
+                margin-left: 0;
+                margin-top: 6px;
+                border-radius: 0 0 8px 8px;
+            }
+            #problem {
+                font-size: 18pt;
+            }
+            #problem span.number {
+                font-size: 20pt;
+            }
+        }
+    </style>
 </head>
 <body>
-	<div id="wrapper">
-		<div id="menu">
-			<h1>You Only Get 1s</h1>
-			<ul id="start_buttons">
-				<!-- <li data-difficulty="0" data-tutorial="1">Tutorial</li> -->
-				<li data-difficulty="0" class="active">Easy</li>
-				<li data-difficulty="15">Normal</li>
-				<li data-difficulty="30">Hard</li>
-			</ul>
-		</div>
-		<div id="game">
-			<div id="tutorial">Click a number to flip it to a 1, and make the equation correct.</div>
-			<div id="flips"><span class="number">0</span> <span>1s remaining</span></div>
-			<div id="problem"></div>
-			<button id="submit">Submit</button>
-			<div id="history_text">Problem History</div>
-			<ul id="history"></ul>
-		</div>
-	</div>
-<script type="text/javascript">
+    <div id="wrapper">
+        <div id="menu">
+            <h1>You Only Get 1s</h1>
+            <div id="start_buttons" role="group" aria-label="Difficulty">
+                <!-- TODO: Tutorial mode
+                <button type="button" data-difficulty="0" data-tutorial="1">Tutorial</button>
+                -->
+                <button type="button" data-difficulty="0" class="active" aria-pressed="true">Easy</button>
+                <button type="button" data-difficulty="15" aria-pressed="false">Normal</button>
+                <button type="button" data-difficulty="30" aria-pressed="false">Hard</button>
+            </div>
+        </div>
+        <div id="game">
+            <div id="tutorial">Click a number to flip it to a 1, and make the equation correct.</div>
+            <div id="flips"><span class="number">0</span> <span>1s remaining</span></div>
+            <div id="problem"></div>
+            <button id="submit" type="button">Submit</button>
+            <div id="history_text">Problem History</div>
+            <ul id="history"></ul>
+        </div>
+    </div>
+<script>
 (function () {
-	'use strict';
-	var ui = (function (data) {
-			var key, found;
-			for (key in data) {
-				found = document.querySelectorAll(data[key]);
-				data[key] = found.length <= 1 ? found[0] : found;
-			}
-			return data;
-		}({
-			menu: '#menu',
-			game: '#game',
-			problem: '#problem',
-			flips: '#flips',
-			startButtons: '#start_buttons li',
-			submit: '#submit',
-			history: '#history'
-		})),
-		score,
-		difficulty,
-		modeDifficulty = 0,
-		challenge,
-		currentProblem,
-		slack,
-		flipsRemaining,
-		hideAll = function () {
+    'use strict';
 
-		},
-		showMenu = function () {
-			ui.menu.style.display = 'block';
-		},
-		NumberNode = function NumberNode(value) {
-			var defaultValue = value,
-				currentValue = value,
-				span = document.createElement('span'),
-				toggled = false,
-				showValue = function () {
-					span.className = 'number hint';
-					//more compatible than classList, even if classList is better
-					span.firstChild.textContent = defaultValue;
-				},
-				hideValue = function () {
-					span.className = 'number flipped';
-					span.firstChild.textContent = currentValue;
-				},
-				click = function () {
-					if (toggled) {
-						currentValue = defaultValue;
-						span.className = 'number';
-						span.removeEventListener('mouseover', showValue, false);
-						span.removeEventListener('mouseout', hideValue, false);
-						flipsRemaining++;
-						updateFlips();
-						toggled = false;
-					} else {
-						if (flipsRemaining) {
-							flipsRemaining--;
-							updateFlips();
-							currentValue = 1;
-							span.className = 'number flipped';
-							span.style.width = span.offsetWidth - 10 + 'px'; //keep button the same size
-							span.addEventListener('mouseover', showValue, false);
-							span.addEventListener('mouseout', hideValue, false);
-							toggled = true;
-						}
-					}
-					span.firstChild.textContent = currentValue;
-				};
-			this.toString = function () {
-				return '' + currentValue;
-			};
-			this.span = span;
-			this.build = function () {
-				span.appendChild(document.createTextNode(currentValue));
-				span.className = 'number';
-				span.addEventListener('click', click, false);
-				return span;
-			}
-		},
-		calculateDifficulty = function(problem) {
-			var i = problem.length,
-				difficulty = 0;
-			while (i--) {
-				difficulty += problem[i].length / 2;
-			}
-			difficulty *= problem.length + 2;
-			return difficulty;
-		},
-		operationStrings = {
-			0: ' + ',
-			1: ' - ',
-			2: ' * ',
-			3: ' / '
-		},
-		makeOne = function (n) {
-			var operation = Math.random() * 2 | 0,
-				n1, opStr, n2;
-			switch (operation) {
-				case 0: //addition
-					if (Math.random() < 0.5) {
-						n1 = 1;
-						n2 = n - 1;
-					} else {
-						n1 = n - 1;
-						n2 = 1;
-					}
+    const ui = (function (data) {
+        for (const key in data) {
+            const found = document.querySelectorAll(data[key]);
+            data[key] = found.length <= 1 ? found[0] : found;
+        }
+        return data;
+    }({
+        menu: '#menu',
+        game: '#game',
+        problem: '#problem',
+        flips: '#flips',
+        startButtons: '#start_buttons button',
+        submit: '#submit',
+        history: '#history'
+    }));
 
-					return ['(', n1, operationStrings[operation], n2, ')'];
-				case 1: //subtraction
-					n1 = n + 1;
-					n2 = 1;
+    let modeDifficulty = 0;
+    let flipsRemaining;
+    let currentProblem;
 
-					return ['(', n1, operationStrings[operation], n2, ')'];
-				default:
-					break;
-			}
-		},
-		splitNumber = function (n) {
-			var operation = Math.random() * 2 | 0,
-				n1, opStr, n2, nSwap;
-			if (n <= 3) {
-				operation = 1;
-			}
-			switch (operation) {
-				case 0: //addition
-					n1 = Math.random() * (n - 3) + 2 | 0;
-					n2 = n - n1;
+    class NumberNode {
+        constructor(value) {
+            this.defaultValue = value;
+            this.currentValue = value;
+            this.toggled = false;
+            this.span = null;
+            this.originalWidth = null;
+        }
 
-					return ['(', n1, operationStrings[operation], n2, ')'];
-				case 1: //subtraction
-					n1 = Math.random() * n * 2.3 + n + 2 | 0;
-					n2 = n1 - n;
+        showValue() {
+            this.span.classList.add('hint');
+            this.span.classList.remove('flipped');
+            this.span.firstChild.textContent = this.defaultValue;
+        }
 
-					return ['(', n1, operationStrings[operation], n2, ')'];
-				default:
-					break;
-			}
-		},
-		getRandomValIndex = function (arr) {
-			var vals = [],
-				i = arr.length;
-			while (i--) {
-				if (typeof arr[i] === 'number') {
-					vals.push(i);
-				}
-			}
-			return vals[vals.length * Math.random() | 0];
-		},
-		generateProblem = function (baseDifficulty, useSlack) {
-			var numSides = 2,
-				difficulty = baseDifficulty,
-				currentDifficulty = 0,
-				decision,
-				startEqual = (Math.random() * Math.pow(difficulty, 0.25) | 0) * 5 + 5 + (Math.random() * 6 - 3 | 0),
-				sides = [],
-				i,
-				modVal,
-				modSide,
-				modIndex,
-				split,
-				spliceArgs;
-			
-			i = numSides;
-			while (i--) {
-				sides[i] = [startEqual];
-			}
-			while (currentDifficulty < difficulty) {
-				modSide = Math.random() * numSides | 0;
-				modVal = getRandomValIndex(sides[modSide]);
-				split = splitNumber(sides[modSide][modVal]);
-				split.unshift(modVal, 1);
-				Array.prototype.splice.apply(sides[modSide], split);
-				//sides[modSide].splice(modVal, 1, split[0], split[1], split[2]);
-				currentDifficulty = calculateDifficulty(sides);
-			}
+        hideValue() {
+            this.span.classList.remove('hint');
+            if (this.toggled) {
+                this.span.classList.add('flipped');
+            }
+            this.span.firstChild.textContent = this.currentValue;
+        }
 
-			modSide = Math.random() * numSides | 0;
-			modVal = getRandomValIndex(sides[modSide]);
-			split = makeOne(sides[modSide][modVal]);
-			split.unshift(modVal, 1);
-			Array.prototype.splice.apply(sides[modSide], split);
-			//sides[modSide].splice(modVal, 1, split[0], split[1], split[2]);
+        handleClick() {
+            if (this.toggled) {
+                this.currentValue = this.defaultValue;
+                this.span.classList.remove('flipped', 'hint');
+                if (this.originalWidth !== null) {
+                    this.span.style.minWidth = '';
+                    this.originalWidth = null;
+                }
+                this.span.removeEventListener('mouseover', this.showValueBound, false);
+                this.span.removeEventListener('mouseout', this.hideValueBound, false);
+                flipsRemaining++;
+                updateFlips();
+                this.toggled = false;
+            } else {
+                if (flipsRemaining) {
+                    flipsRemaining--;
+                    updateFlips();
+                    this.currentValue = 1;
+                    this.span.classList.add('flipped');
+                    this.span.classList.remove('hint');
+                    if (this.originalWidth === null) {
+                        this.originalWidth = this.span.offsetWidth;
+                    }
+                    this.span.style.minWidth = this.originalWidth + 'px';
+                    this.span.addEventListener('mouseover', this.showValueBound, false);
+                    this.span.addEventListener('mouseout', this.hideValueBound, false);
+                    this.toggled = true;
+                }
+            }
+            this.span.firstChild.textContent = this.currentValue;
+        }
 
-			return sides;
-		},
-		unsolveProblem = function (problem, difficulty) {
-			var i = problem.length,
-				j, sides, nodes;
-			sides = [];
-			while (i--) {
-				nodes = [];
-				sides[i] = nodes;
-				j = problem[i].length;
-				while (j--) {
-					if (typeof problem[i][j] === 'number' && problem[i][j] === 1) {
-						nodes[j] = (Math.random() * Math.pow(difficulty, 0.25) | 0) * 5 + 5 + (Math.random() * 6 - 3 | 0);
-					} else {
-						nodes[j] = problem[i][j];
-					}
-				}
-			}
-			return sides;
-		},
-		problemToNodes = function (problem) {
-			var i, j, sides, nodes;
-			sides = [];
-			i = problem.length;
-			while (i--) {
-				nodes = [];
-				sides[i] = nodes;
-				j = problem[i].length;
-				while (j--) {
-					if (typeof problem[i][j] === 'number') {
-						nodes[j] = new NumberNode(problem[i][j]);
-					} else {
-						nodes[j] = problem[i][j];
-					}
-				}
-			}
-			return sides;
-		},
-		textElement = function (type, content, className) {
-			var e = document.createElement(type);
-			e.appendChild(document.createTextNode(content));
-			if (className) {
-				e.className = className;
-			}
-			return e;
-		},
-		buildProblemElements = function (problem) {
-			var i, j, container = document.createElement('span');
-			for (i = 0; i < problem.length; i++) {
-				for (j = 0; j < problem[i].length; j++) {
-					if (problem[i][j] instanceof NumberNode) {
-						container.appendChild(problem[i][j].build());
-					} else {
-						container.appendChild(textElement('span', problem[i][j], 'operator'));
-					}
-				}
-				if (i + 1 < problem.length) {
-					container.appendChild(textElement('span', ' = ', 'equals'));
-				}
-			}
-			return container;
-		},
-		updateFlips = function () {
-			ui.flips.firstChild.firstChild.textContent = flipsRemaining;
-			ui.flips.lastChild.firstChild.textContent = flipsRemaining === 1 ? 'flip remaining' : 'flips remaining';
-		},
-		ProblemData = (function () {
-			var ProblemData = function (difficulty) {
-				this.solved = generateProblem(difficulty);
-				this.problem = unsolveProblem(this.solved);
-				this.nodes = problemToNodes(this.problem);
-				this.elements = buildProblemElements(this.nodes);
-			};
-			ProblemData.prototype.checkSolved = function () {
-				var totals = [], i;
-				for (i = 0; i < this.nodes.length; i++) {
-					totals[i] = eval(this.nodes[i].join(''));
-				}
-				for (i = 1; i < totals.length; i++) {
-					if (totals[i] !== totals[0]) {
-						return false;
-					}
-				}
-				return true;
-			};
-			return ProblemData;
-		}()),
-		startRound = function () {
-			score = 0;
-			difficulty = modeDifficulty;
-			challenge = 0;
-			flipsRemaining = 1;
-			slack = Math.sqrt(difficulty * 0.1);
-			currentProblem = new ProblemData(difficulty);
-			if (ui.problem.firstChild) {
-				ui.problem.replaceChild(currentProblem.elements, ui.problem.firstChild);
-			} else {
-				ui.problem.appendChild(currentProblem.elements);
-			}
-			updateFlips();
-		},
-		clickDifficulty = function (e) {
-			var i;
-			modeDifficulty = e.target.dataset ? +e.target.dataset.difficulty : +e.target.getAttribute('data-difficulty');
-			startRound();
-			i = ui.startButtons.length;
-			while (i--) {
-				ui.startButtons[i].className = '';
-			}
-			e.target.className = 'active';
-		},
-		clickSubmit = function () {
-			var li;
-			li = document.createElement('li');
-			li.appendChild(currentProblem.elements);
-			li.className = currentProblem.checkSolved() ? 'correct' : 'incorrect';
-			if (!ui.history.firstChild) {
-				ui.history.appendChild(li);
-			} else {
-				ui.history.insertBefore(li, ui.history.firstChild);
-			}
-			startRound();
-		};
-	(function () {
-		var i = ui.startButtons.length;
-		while (i--) {
-			ui.startButtons[i].addEventListener('click', clickDifficulty, false);
-		}
-		ui.submit.addEventListener('click', clickSubmit, false);
-	}());
-	window.addEventListener('selectstart', function (e) {
-		e.preventDefault();
-	}, false);
-	startRound();
-	window.generateProblem = generateProblem;
+        handleKeydown(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                this.handleClick();
+            }
+        }
+
+        build() {
+            this.span = document.createElement('span');
+            this.span.appendChild(document.createTextNode(this.currentValue));
+            this.span.classList.add('number');
+            this.span.tabIndex = 0;
+
+            this.showValueBound = this.showValue.bind(this);
+            this.hideValueBound = this.hideValue.bind(this);
+            this.clickBound = this.handleClick.bind(this);
+            this.keydownBound = this.handleKeydown.bind(this);
+
+            this.span.addEventListener('click', this.clickBound, false);
+            this.span.addEventListener('keydown', this.keydownBound, false);
+            return this.span;
+        }
+
+        toString() {
+            return '' + this.currentValue;
+        }
+    }
+
+    function calculateDifficulty(problem) {
+        let i = problem.length;
+        let diff = 0;
+        while (i--) {
+            diff += problem[i].length / 2;
+        }
+        diff *= problem.length + 2;
+        return diff;
+    }
+
+    const operationStrings = {
+        0: ' + ',
+        1: ' - '
+    };
+
+    function makeOne(n) {
+        // 2 = 1 + 1 would require two flips after both 1s are disguised.
+        const operation = n === 2 ? 1 : Math.random() * 2 | 0;
+        let n1, n2;
+        switch (operation) {
+            case 0:
+                if (Math.random() < 0.5) {
+                    n1 = 1;
+                    n2 = n - 1;
+                } else {
+                    n1 = n - 1;
+                    n2 = 1;
+                }
+                return ['(', n1, operationStrings[operation], n2, ')'];
+            case 1:
+                n1 = n + 1;
+                n2 = 1;
+                return ['(', n1, operationStrings[operation], n2, ')'];
+        }
+    }
+
+    function splitNumber(n) {
+        let operation = Math.random() * 2 | 0;
+        let n1, n2;
+        if (n <= 3) {
+            operation = 1;
+        }
+        switch (operation) {
+            case 0:
+                n1 = Math.random() * (n - 3) + 2 | 0;
+                n2 = n - n1;
+                return ['(', n1, operationStrings[operation], n2, ')'];
+            case 1:
+                n1 = Math.random() * n * 2.3 + n + 2 | 0;
+                n2 = n1 - n;
+                return ['(', n1, operationStrings[operation], n2, ')'];
+        }
+    }
+
+    function getRandomValIndex(arr) {
+        const vals = [];
+        let i = arr.length;
+        while (i--) {
+            if (typeof arr[i] === 'number') {
+                vals.push(i);
+            }
+        }
+        return vals[vals.length * Math.random() | 0];
+    }
+
+    function generateProblem(baseDifficulty) {
+        const numSides = 2;
+        const difficulty = baseDifficulty;
+        let currentDifficulty = 0;
+        const startEqual = (Math.random() * Math.pow(difficulty, 0.25) | 0) * 5 + 5 + (Math.random() * 6 - 3 | 0);
+        const sides = [];
+        let i;
+
+        i = numSides;
+        while (i--) {
+            sides[i] = [startEqual];
+        }
+        while (currentDifficulty < difficulty) {
+            const modSide = Math.random() * numSides | 0;
+            const modVal = getRandomValIndex(sides[modSide]);
+            const split = splitNumber(sides[modSide][modVal]);
+            split.unshift(modVal, 1);
+            sides[modSide].splice(...split);
+            currentDifficulty = calculateDifficulty(sides);
+        }
+
+        const modSide = Math.random() * numSides | 0;
+        const modVal = getRandomValIndex(sides[modSide]);
+        const split = makeOne(sides[modSide][modVal]);
+        split.unshift(modVal, 1);
+        sides[modSide].splice(...split);
+
+        return sides;
+    }
+
+    function unsolveProblem(problem, difficulty) {
+        let i = problem.length;
+        const sides = [];
+        while (i--) {
+            const nodes = [];
+            sides[i] = nodes;
+            let j = problem[i].length;
+            while (j--) {
+                if (typeof problem[i][j] === 'number' && problem[i][j] === 1) {
+                    nodes[j] = (Math.random() * Math.pow(difficulty, 0.25) | 0) * 5 + 5 + (Math.random() * 6 - 3 | 0);
+                } else {
+                    nodes[j] = problem[i][j];
+                }
+            }
+        }
+        return sides;
+    }
+
+    function problemToNodes(problem) {
+        const sides = [];
+        let i = problem.length;
+        while (i--) {
+            const nodes = [];
+            sides[i] = nodes;
+            let j = problem[i].length;
+            while (j--) {
+                if (typeof problem[i][j] === 'number') {
+                    nodes[j] = new NumberNode(problem[i][j]);
+                } else {
+                    nodes[j] = problem[i][j];
+                }
+            }
+        }
+        return sides;
+    }
+
+    function textElement(type, content, className) {
+        const e = document.createElement(type);
+        e.appendChild(document.createTextNode(content));
+        if (className) {
+            e.classList.add(className);
+        }
+        return e;
+    }
+
+    function buildProblemElements(problem) {
+        const container = document.createElement('span');
+        for (let i = 0; i < problem.length; i++) {
+            for (let j = 0; j < problem[i].length; j++) {
+                if (problem[i][j] instanceof NumberNode) {
+                    container.appendChild(problem[i][j].build());
+                } else {
+                    container.appendChild(textElement('span', problem[i][j], 'operator'));
+                }
+            }
+            if (i + 1 < problem.length) {
+                container.appendChild(textElement('span', ' = ', 'equals'));
+            }
+        }
+        return container;
+    }
+
+    function updateFlips() {
+        ui.flips.firstChild.firstChild.textContent = flipsRemaining;
+        ui.flips.lastChild.firstChild.textContent = flipsRemaining === 1 ? 'flip remaining' : 'flips remaining';
+    }
+
+    // FIXME: Replace eval() with a proper arithmetic evaluator
+    class ProblemData {
+        constructor(difficulty) {
+            this.solved = generateProblem(difficulty);
+            this.problem = unsolveProblem(this.solved, difficulty);
+            this.nodes = problemToNodes(this.problem);
+            this.elements = buildProblemElements(this.nodes);
+        }
+
+        checkSolved() {
+            const totals = [];
+            for (let i = 0; i < this.nodes.length; i++) {
+                totals[i] = eval(this.nodes[i].join(''));
+            }
+            for (let i = 1; i < totals.length; i++) {
+                if (totals[i] !== totals[0]) {
+                    return false;
+                }
+            }
+            return true;
+        }
+    }
+
+    function startRound() {
+        flipsRemaining = 1;
+        const difficulty = modeDifficulty;
+        currentProblem = new ProblemData(difficulty);
+        if (ui.problem.firstChild) {
+            ui.problem.replaceChild(currentProblem.elements, ui.problem.firstChild);
+        } else {
+            ui.problem.appendChild(currentProblem.elements);
+        }
+        updateFlips();
+    }
+
+    function clickDifficulty(e) {
+        const target = e.target;
+        modeDifficulty = target.dataset ? +target.dataset.difficulty : +target.getAttribute('data-difficulty');
+        startRound();
+        let i = ui.startButtons.length;
+        while (i--) {
+            ui.startButtons[i].classList.remove('active');
+            ui.startButtons[i].setAttribute('aria-pressed', 'false');
+        }
+        target.classList.add('active');
+        target.setAttribute('aria-pressed', 'true');
+    }
+
+    function clickSubmit() {
+        const li = document.createElement('li');
+        li.appendChild(currentProblem.elements);
+        li.classList.add(currentProblem.checkSolved() ? 'correct' : 'incorrect');
+        if (!ui.history.firstChild) {
+            ui.history.appendChild(li);
+        } else {
+            ui.history.insertBefore(li, ui.history.firstChild);
+        }
+        startRound();
+    }
+
+    (function () {
+        let i = ui.startButtons.length;
+        while (i--) {
+            ui.startButtons[i].addEventListener('click', clickDifficulty, false);
+        }
+        ui.submit.addEventListener('click', clickSubmit, false);
+    }());
+
+    window.addEventListener('selectstart', function (e) {
+        e.preventDefault();
+    }, false);
+
+    startRound();
 }());
 </script>
 </body>
