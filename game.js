@@ -108,13 +108,23 @@
     let history = load(KEYS.history, []);
     let stats = load(KEYS.stats, {});
     let achievementState = load(KEYS.achievements, { unlocked: [], operations: [], solved: 0 });
-    let settings = load(KEYS.settings, {
+    const defaultSettings = {
         sound: false, largeText: false, contrast: false, reducedClutter: false
-    });
+    };
+    let settings = load(KEYS.settings, defaultSettings);
     let dailyResults = load(KEYS.daily, {});
     if (!Array.isArray(history)) history = [];
+    if (!stats || typeof stats !== 'object' || Array.isArray(stats)) stats = {};
     if (!achievementState || !Array.isArray(achievementState.unlocked)) {
         achievementState = { unlocked: [], operations: [], solved: 0 };
+    }
+    if (!Array.isArray(achievementState.operations)) achievementState.operations = [];
+    if (!Number.isFinite(achievementState.solved)) achievementState.solved = 0;
+    if (!settings || typeof settings !== 'object' || Array.isArray(settings)) {
+        settings = defaultSettings;
+    }
+    if (!dailyResults || typeof dailyResults !== 'object' || Array.isArray(dailyResults)) {
+        dailyResults = {};
     }
 
     let mode = 'tutorial';
@@ -328,8 +338,11 @@
         ui.feedback.replaceChildren();
     }
 
-    function showExplanation(revealSolution) {
-        const details = core.solutionDetails(currentProblem.sides, currentValues);
+    function showExplanation(revealSolution, attemptedValues) {
+        const details = core.solutionDetails(
+            currentProblem.sides,
+            attemptedValues === undefined ? currentValues : attemptedValues
+        );
         const current = text('p', 'Your totals: ' + details.currentTotals.join(' and ') + '.');
         ui.feedback.replaceChildren(current);
         if (revealSolution) {
@@ -387,6 +400,9 @@
     function getStat(id) {
         if (!stats[id] || typeof stats[id] !== 'object') {
             stats[id] = { attempts: 0, correct: 0, bestStreak: 0, streak: 0, bestScore: 0 };
+        }
+        for (const key of ['attempts', 'correct', 'bestStreak', 'streak', 'bestScore']) {
+            if (!Number.isFinite(stats[id][key])) stats[id][key] = 0;
         }
         return stats[id];
     }
@@ -523,9 +539,10 @@
     }
 
     function incorrectAnswer() {
+        const attemptedValues = currentValues;
         recordAttempt(false);
         playSound('incorrect');
-        showExplanation(false);
+        showExplanation(false, attemptedValues);
         selectedId = null;
         currentValues = {};
         drawProblem();
@@ -534,7 +551,7 @@
             renderSession();
             if (session.lives <= 0) {
                 finishSession('Run over', 'You solved ' + session.solved + ' puzzles before running out of lives.');
-                showExplanation(true);
+                showExplanation(true, attemptedValues);
                 return;
             }
         }
@@ -777,6 +794,8 @@
         } else if (navigator.clipboard) {
             navigator.clipboard.writeText(value).then(function () {
                 setMessage('Copied', 'The puzzle link and result are ready to paste.');
+            }).catch(function () {
+                window.prompt('Copy this puzzle link:', value);
             });
         } else {
             window.prompt('Copy this puzzle link:', value);
@@ -788,6 +807,10 @@
         const Audio = window.AudioContext || window.webkitAudioContext;
         if (!Audio) return;
         if (!audioContext) audioContext = new Audio();
+        if (audioContext.state === 'suspended') {
+            const resume = audioContext.resume();
+            if (resume && resume.catch) resume.catch(function () {});
+        }
         const patterns = {
             flip: [[220, 0, 0.04, 'square']],
             correct: [[440, 0, 0.08, 'sine'], [660, 0.08, 0.12, 'sine']],
@@ -862,9 +885,10 @@
     });
 
     ui.hint.addEventListener('click', function () {
-        if (!currentProblem || awaitingAdvance || session.finished) return;
+        if (!currentProblem || awaitingAdvance || session.finished || hintLevel >= 2) return;
         hintLevel = Math.min(2, hintLevel + 1);
         session.hints++;
+        ui.hint.disabled = hintLevel >= 2;
         drawProblem();
         setMessage(hintLevel === 1 ? 'Hint: choose a side' : 'Hint: the number',
             hintLevel === 1 ? 'The outlined side contains the intended flip.' :
@@ -889,11 +913,13 @@
             return;
         }
         if (mode === 'endless') {
-            session.lives--;
-            renderSession();
-            if (session.lives <= 0) {
-                finishSession('Run over', 'The revealed puzzle used your final life.');
-                return;
+            if (attemptsOnPuzzle === 1) {
+                session.lives--;
+                renderSession();
+                if (session.lives <= 0) {
+                    finishSession('Run over', 'The revealed puzzle used your final life.');
+                    return;
+                }
             }
         }
         setMessage('Solution revealed', 'This puzzle counts as incorrect. Review it, then continue.');
@@ -910,6 +936,13 @@
         const chosen = customSettings();
         if (!chosen.operations.length) {
             setMessage('Choose an operation', 'Custom games need at least one mathematical operation.');
+            return;
+        }
+        if (!chosen.operations.some(function (operation) {
+            return ['add', 'subtract', 'multiply', 'divide', 'power'].includes(operation);
+        })) {
+            setMessage('Choose an identity operation',
+                'Include +, −, ×, ÷, or powers so the one-flip solution can use only your selected operations.');
             return;
         }
         if (chosen.min > chosen.max) {
@@ -1020,11 +1053,12 @@
             return;
         }
         if (seed) {
+            const safeSeed = seed.slice(0, 160);
             const requested = params.get('difficulty');
             if (requested === 'custom') {
                 const button = ui.mode_buttons.querySelector('[data-mode="custom"]');
                 activateMode('custom', button, {
-                    seed: seed,
+                    seed: safeSeed,
                     round: Math.max(1, Number(params.get('round')) || 1)
                 });
                 const requestedOperations = (params.get('ops') || '').split(',').filter(function (key) {
@@ -1039,13 +1073,14 @@
                 ui.custom_max.value = Math.max(Number(ui.custom_min.value),
                     Math.min(100, Number(params.get('max')) || 35));
                 ui.custom_form.requestSubmit();
+                if (!activeCustomSettings) return;
                 setMessage('Shared custom puzzle', 'This custom puzzle is reproduced from a shared link.');
                 return;
             }
             const difficulty = core.DIFFICULTIES[requested] ? requested : 'normal';
             const button = ui.mode_buttons.querySelector('[data-mode="' + difficulty + '"]');
             activateMode(difficulty, button, {
-                seed: seed,
+                seed: safeSeed,
                 round: Math.max(1, Number(params.get('round')) || 1)
             });
             setMessage('Shared seeded puzzle', 'This puzzle is reproduced from a shared link.');

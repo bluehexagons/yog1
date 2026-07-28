@@ -79,7 +79,7 @@
         .primary { padding: 9px 14px; font: bold .85rem "Courier New", monospace; text-transform: uppercase; }
         details.panel { margin-top: 22px; border-top: 2px solid var(--ink); }
         details.panel > summary { padding: 10px 3px; cursor: pointer; font: bold .83rem "Courier New", monospace; letter-spacing: .08em; text-transform: uppercase; }
-        .panel-body { padding: 8px 3px 18px; }
+        .panel-body { padding: 8px 3px 18px; overflow-x: auto; }
         .difficulty-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 7px; }
         .difficulty-grid article { padding: 9px; border: 1px solid var(--line); background: #eeeDE6; font-size: .72rem; }
         .difficulty-grid h3 { margin: 0 0 5px; font: bold .78rem "Courier New", monospace; }
@@ -89,6 +89,7 @@
         #custom_form fieldset { margin: 0; border: 1px solid var(--line); }
         #custom_form legend { font: bold .75rem "Courier New", monospace; text-transform: uppercase; }
         #custom_operations { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; font-size: .78rem; }
+        .field-note { margin: 8px 0 0; color: var(--muted); font-size: .7rem; }
         .custom-fields { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
         .custom-fields label { display: grid; gap: 3px; font-size: .75rem; }
         input[type="number"] { width: 100%; padding: 5px; border: 1px solid var(--ink); background: var(--paper); }
@@ -101,7 +102,7 @@
         .history-controls { display: flex; gap: 8px; align-items: center; margin-top: 10px; }
         #history_page { margin-right: auto; font-size: .72rem; color: var(--muted); }
         .secondary, .small-button { padding: 5px 9px; font-size: .72rem; }
-        table { width: 100%; border-collapse: collapse; font-size: .78rem; }
+        table { width: 100%; min-width: 610px; border-collapse: collapse; font-size: .78rem; }
         th, td { padding: 7px; border-bottom: 1px solid var(--line); text-align: left; }
         .stats-actions { margin-top: 10px; text-align: right; }
         #session_summary { display: grid; grid-template-columns: repeat(4, auto 1fr); gap: 4px 8px; align-items: baseline; }
@@ -115,7 +116,7 @@
         body.large-text { font-size: 19px; }
         body.high-contrast { --game: #fff; --menu: #fff; --paper: #fff; --line: #333; --muted: #333; --blue: #003b6f; }
         body.high-contrast #message, body.high-contrast #mode_info, body.high-contrast #custom_panel { background: #fff; }
-        body.reduced-clutter details.panel:not(.settings-panel), body.reduced-clutter footer { display: none; }
+        body.reduced-clutter details.panel:not(.settings-panel) { display: none; }
         footer { margin-top: 22px; padding-top: 12px; border-top: 1px solid var(--line); color: var(--muted); font-size: .75rem; text-align: center; }
         [hidden] { display: none !important; }
         @media (max-width: 760px) {
@@ -164,7 +165,11 @@
 
         <section id="custom_panel" hidden>
             <form id="custom_form">
-                <fieldset><legend>Operations</legend><div id="custom_operations"></div></fieldset>
+                <fieldset>
+                    <legend>Operations</legend>
+                    <div id="custom_operations"></div>
+                    <p class="field-note">Include +, −, ×, ÷, or powers to support the one-flip identity.</p>
+                </fieldset>
                 <div class="custom-fields">
                     <label>Problem length: <strong><span id="custom_length_value">5</span> operations</strong>
                         <input id="custom_length" type="range" min="2" max="12" value="5">

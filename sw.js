@@ -1,6 +1,6 @@
 'use strict';
 
-const CACHE = 'yog1-v3';
+const CACHE = 'yog1-v4';
 const FILES = [
     './yog1.htm',
     './game-core.js',
@@ -31,13 +31,23 @@ self.addEventListener('activate', function (event) {
 
 self.addEventListener('fetch', function (event) {
     if (event.request.method !== 'GET') return;
-    event.respondWith(caches.match(event.request).then(function (cached) {
+    if (new URL(event.request.url).origin !== self.location.origin) return;
+    event.respondWith(caches.match(event.request, {
+        ignoreSearch: event.request.mode === 'navigate'
+    }).then(function (cached) {
         return cached || fetch(event.request).then(function (response) {
             const copy = response.clone();
-            caches.open(CACHE).then(function (cache) {
-                cache.put(event.request, copy);
-            });
+            if (response.ok) {
+                caches.open(CACHE).then(function (cache) {
+                    cache.put(event.request, copy);
+                });
+            }
             return response;
+        }).catch(function () {
+            if (event.request.mode === 'navigate') {
+                return caches.match('./yog1.htm');
+            }
+            throw new Error('Offline and resource was not cached');
         });
     }));
 });

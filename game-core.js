@@ -57,6 +57,17 @@
         return values[Math.floor(random() * values.length)];
     }
 
+    function shuffle(random, values) {
+        const result = values.slice();
+        for (let i = result.length - 1; i > 0; i--) {
+            const index = randomInt(random, 0, i);
+            const value = result[i];
+            result[i] = result[index];
+            result[index] = value;
+        }
+        return result;
+    }
+
     function hashSeed(value) {
         let hash = 2166136261;
         const text = String(value);
@@ -78,8 +89,12 @@
         };
     }
 
-    function number(value, solution) {
-        return { type: 'number', value: value, solution: !!solution };
+    function number(value, solution, decoyValue) {
+        const result = { type: 'number', value: value, solution: !!solution };
+        if (decoyValue !== undefined) {
+            result.decoyValue = decoyValue;
+        }
+        return result;
     }
 
     function binary(operation, left, right) {
@@ -191,9 +206,8 @@
         switch (operation) {
             case 'add':
                 left = randomInt(random, 2, Math.max(2, value - 2));
-                if (value < 4) {
-                    left = randomInt(random, value + 2, Math.min(maxNumber, value + 10));
-                    return binary('subtract', number(left), number(left - value));
+                if (value <= 4) {
+                    return binary('add', number(value), number(0));
                 }
                 return binary('add', number(left), number(value - left));
             case 'subtract':
@@ -282,10 +296,25 @@
         if (!candidates.length) {
             return false;
         }
-        candidates = candidates.slice().sort(function () { return random() - 0.5; });
+        candidates = shuffle(random, candidates);
         for (const target of candidates) {
-            const shuffled = operations.slice().sort(function () { return random() - 0.5; });
+            const shuffled = shuffle(random, operations);
             for (const operation of shuffled) {
+                const hasNonAddIdentity = operations.some(function (candidate) {
+                    return ['subtract', 'multiply', 'divide', 'power'].includes(candidate);
+                });
+                if (operation === 'add' && target.value <= 4 && hasNonAddIdentity) {
+                    continue;
+                }
+                if (operation === 'root') {
+                    const solutionCandidates = solutionNodes(sides[0]).concat(solutionNodes(sides[1]));
+                    if (solutionCandidates.length <= 1 ||
+                        (!hasNonAddIdentity &&
+                            solutionCandidates.filter(function (node) { return node.value > 2; }).length <= 1 &&
+                            target.value > 2)) {
+                        continue;
+                    }
+                }
                 const replacement = replacementFor(target.value, operation, random, maxNumber);
                 if (replacement) {
                     sides[sideIndex] = replaceNode(sides[sideIndex], target, replacement);
@@ -297,34 +326,36 @@
     }
 
     function addSolution(sides, operations, random) {
-        let sideIndex = randomInt(random, 0, 1);
-        let candidates = solutionNodes(sides[sideIndex]);
-        if (!candidates.length) {
-            sideIndex = 1 - sideIndex;
-            candidates = solutionNodes(sides[sideIndex]);
-        }
-        if (!candidates.length) {
-            sides[sideIndex] = binary('multiply', sides[sideIndex], number(1, true));
-            return;
-        }
-        const target = pick(random, candidates);
-        let replacement;
-        const identities = operations.filter(function (operation) {
+        const identities = shuffle(random, operations.filter(function (operation) {
             // A disguised exponent can explode far beyond JavaScript's safe
-            // integer range, so powers are generated only with small exponents.
-            return ['add', 'subtract', 'multiply', 'divide'].includes(operation);
-        });
-        const operation = identities.length ? pick(random, identities) : 'multiply';
-        if (operation === 'add' && target.value > 2) {
-            replacement = binary('add', number(target.value - 1), number(1, true));
-        } else if (operation === 'subtract' || operation === 'add') {
-            replacement = binary('subtract', number(target.value + 1), number(1, true));
-        } else if (operation === 'divide') {
-            replacement = binary('divide', number(target.value), number(1, true));
-        } else {
-            replacement = binary('multiply', number(target.value), number(1, true));
+            // integer range, so the power identity uses a fixed decoy exponent.
+            return ['add', 'subtract', 'multiply', 'divide', 'power'].includes(operation);
+        }));
+        for (const operation of identities) {
+            const sideOrder = random() < 0.5 ? [0, 1] : [1, 0];
+            for (const sideIndex of sideOrder) {
+                const candidates = solutionNodes(sides[sideIndex]).filter(function (node) {
+                    return operation !== 'add' || node.value > 2;
+                });
+                if (!candidates.length) continue;
+                const target = pick(random, candidates);
+                let replacement;
+                if (operation === 'add') {
+                    replacement = binary('add', number(target.value - 1), number(1, true));
+                } else if (operation === 'subtract') {
+                    replacement = binary('subtract', number(target.value + 1), number(1, true));
+                } else if (operation === 'divide') {
+                    replacement = binary('divide', number(target.value), number(1, true));
+                } else if (operation === 'power') {
+                    replacement = binary('power', number(target.value), number(1, true, 2));
+                } else {
+                    replacement = binary('multiply', number(target.value), number(1, true));
+                }
+                sides[sideIndex] = replaceNode(sides[sideIndex], target, replacement);
+                return;
+            }
         }
-        sides[sideIndex] = replaceNode(sides[sideIndex], target, replacement);
+        throw new Error('Unable to place a one-flip solution with the selected operations');
     }
 
     function disguiseOnes(sides, random, maxNumber) {
@@ -333,7 +364,9 @@
             visitNumbers(side, function (node) {
                 node.id = 'n' + nextId++;
                 if (node.value === 1) {
-                    node.value = randomInt(random, 5, Math.max(7, maxNumber));
+                    node.value = node.decoyValue === undefined
+                        ? randomInt(random, 5, Math.max(7, maxNumber))
+                        : node.decoyValue;
                 }
             });
         }
@@ -376,6 +409,11 @@
         const settings = normalizeOptions(options || {});
         if (!settings.operations.length) {
             throw new Error('Choose at least one operation');
+        }
+        if (!settings.operations.some(function (operation) {
+            return ['add', 'subtract', 'multiply', 'divide', 'power'].includes(operation);
+        })) {
+            throw new Error('Choose an operation that can create a one-flip identity');
         }
         const powerFriendly = settings.operations.indexOf('power') !== -1;
         const multiplyFriendly = settings.operations.indexOf('multiply') !== -1;

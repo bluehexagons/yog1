@@ -46,6 +46,7 @@ for (const profile of Object.values(core.DIFFICULTIES)) {
         core.visitNumbers(problem.sides[0], function (node) { allNumbers.push(node); });
         core.visitNumbers(problem.sides[1], function (node) { allNumbers.push(node); });
         for (const node of allNumbers) {
+            assert(node.value > 0, profile.name + ' keeps standard puzzle literals positive');
             const trial = {};
             trial[node.id] = 1;
             assert(Number.isInteger(core.evaluate(problem.sides[0], trial)));
@@ -61,13 +62,27 @@ for (const profile of Object.values(core.DIFFICULTIES)) {
 
 const average = core.ROUND_WAVE.reduce((sum, value) => sum + value, 0) / core.ROUND_WAVE.length;
 assert.strictEqual(average, 1);
+for (let sessionLength = 20; sessionLength <= 40; sessionLength++) {
+    const sessionAverage = Array.from({ length: sessionLength }, function (_, index) {
+        return core.ROUND_WAVE[index % core.ROUND_WAVE.length];
+    }).reduce(function (sum, value) {
+        return sum + value;
+    }, 0) / sessionLength;
+    assert(
+        Math.abs(sessionAverage - 1) <= 0.04,
+        sessionLength + '-round sessions stay close to the selected average difficulty'
+    );
+}
 assert.strictEqual(core.roundTarget(20, 1).kind, 'Warm-up');
 assert.strictEqual(core.roundTarget(20, 5).kind, 'Challenge');
 
 for (const operation of Object.keys(core.OPERATIONS)) {
+    const customOperations = operation === 'root'
+        ? ['root', 'add']
+        : (operation === 'modulo' ? ['modulo', 'subtract'] : [operation]);
     const custom = core.generateProblem({
         profile: core.DIFFICULTIES.easy,
-        operations: [operation],
+        operations: customOperations,
         length: 5,
         targetRange: [10, 30],
         round: 5,
@@ -86,6 +101,48 @@ const customWarmup = core.generateProblem({
     random: seededRandom(7)
 });
 assert.strictEqual(customWarmup.target, 10, 'warm-up round reaches custom minimum target');
+assert.throws(function () {
+    core.generateProblem({
+        profile: core.DIFFICULTIES.easy,
+        operations: ['root', 'modulo'],
+        random: seededRandom(1)
+    });
+}, /one-flip identity/, 'custom operation sets cannot silently add an unselected identity operation');
+
+for (const operations of [
+    ['add'],
+    ['subtract'],
+    ['multiply'],
+    ['divide'],
+    ['power'],
+    ['modulo', 'subtract'],
+    ['root', 'add']
+]) {
+    for (let seed = 1; seed <= 20; seed++) {
+        const custom = core.generateProblem({
+            profile: core.DIFFICULTIES.extreme,
+            operations: operations,
+            length: 8,
+            round: seed,
+            random: seededRandom(seed * 313)
+        });
+        const used = core.solutionDetails(custom.sides, {}).operations;
+        assert(
+            used.every(function (operation) { return operations.includes(operation); }),
+            'custom problem only uses selected operations: ' + operations.join(', ')
+        );
+        const nodes = [];
+        custom.sides.forEach(function (side) {
+            core.visitNumbers(side, function (node) { nodes.push(node); });
+        });
+        for (const node of nodes) {
+            const values = { [node.id]: 1 };
+            custom.sides.forEach(function (side) {
+                assert(Number.isSafeInteger(core.evaluate(side, values)));
+            });
+        }
+    }
+}
 
 const seededA = core.generateProblem({
     profile: core.DIFFICULTIES.hard,
