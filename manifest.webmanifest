@@ -1,0 +1,18 @@
+{
+  "name": "You Only Get 1s",
+  "short_name": "YOG1",
+  "description": "Balance integer equations by changing exactly one number into a 1.",
+  "start_url": "./yog1.htm",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#191919",
+  "theme_color": "#191919",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

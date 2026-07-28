@@ -57,6 +57,27 @@
         return values[Math.floor(random() * values.length)];
     }
 
+    function hashSeed(value) {
+        let hash = 2166136261;
+        const text = String(value);
+        for (let i = 0; i < text.length; i++) {
+            hash ^= text.charCodeAt(i);
+            hash = Math.imul(hash, 16777619);
+        }
+        return hash >>> 0;
+    }
+
+    function createSeededRandom(seed) {
+        let state = hashSeed(seed);
+        return function () {
+            state += 0x6D2B79F5;
+            let value = state;
+            value = Math.imul(value ^ value >>> 15, value | 1);
+            value ^= value + Math.imul(value ^ value >>> 7, value | 61);
+            return ((value ^ value >>> 14) >>> 0) / 4294967296;
+        };
+    }
+
     function number(value, solution) {
         return { type: 'number', value: value, solution: !!solution };
     }
@@ -401,10 +422,43 @@
             serialize(expression.right, values) + ')';
     }
 
+    function solutionDetails(sides, currentValues) {
+        let solution = null;
+        const operations = new Set();
+        function inspect(expression) {
+            if (expression.type === 'number') {
+                if (expression.solution) {
+                    solution = expression;
+                }
+                return;
+            }
+            if (expression.type === 'root') {
+                operations.add('root');
+                inspect(expression.value);
+                return;
+            }
+            operations.add(expression.operation);
+            inspect(expression.left);
+            inspect(expression.right);
+        }
+        sides.forEach(inspect);
+        const solvedValues = solution ? Object.assign({}, currentValues, { [solution.id]: 1 }) : {};
+        return {
+            solutionId: solution ? solution.id : null,
+            solutionValue: solution ? solution.value : null,
+            currentTotals: sides.map(function (side) { return evaluate(side, currentValues); }),
+            solvedTotals: sides.map(function (side) { return evaluate(side, solvedValues); }),
+            solvedExpression: sides.map(function (side) { return serialize(side, solvedValues); }).join(' = '),
+            operations: Array.from(operations)
+        };
+    }
+
     return {
         OPERATIONS: OPERATIONS,
         DIFFICULTIES: DIFFICULTIES,
         ROUND_WAVE: ROUND_WAVE,
+        hashSeed: hashSeed,
+        createSeededRandom: createSeededRandom,
         clone: clone,
         evaluate: evaluate,
         visitNumbers: visitNumbers,
@@ -412,6 +466,7 @@
         difficultyScore: difficultyScore,
         roundTarget: roundTarget,
         generateProblem: generateProblem,
-        serialize: serialize
+        serialize: serialize,
+        solutionDetails: solutionDetails
     };
 }));

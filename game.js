@@ -2,33 +2,32 @@
     'use strict';
 
     const core = window.Yog1Core;
-    const HISTORY_KEY = 'yog1.problemHistory.v2';
-    const STATS_KEY = 'yog1.difficultyStats.v2';
-    const CUSTOM_KEY = 'yog1.customSettings.v2';
+    const KEYS = {
+        history: 'yog1.problemHistory.v3',
+        stats: 'yog1.difficultyStats.v3',
+        custom: 'yog1.customSettings.v3',
+        achievements: 'yog1.achievements.v1',
+        settings: 'yog1.accessibility.v1',
+        daily: 'yog1.dailyResults.v1'
+    };
     const HISTORY_LIMIT = 100;
     const PAGE_SIZE = 10;
+    const TIMED_SECONDS = 60;
 
     const ui = {};
     for (const id of [
-        'mode_buttons', 'mode_info', 'round_label', 'round_kind', 'score_label',
-        'problem', 'flip_count', 'flip_text', 'submit', 'message_title', 'message_text',
-        'custom_panel', 'custom_form', 'custom_operations', 'custom_length',
-        'custom_length_value', 'custom_min', 'custom_max', 'custom_correct',
-        'custom_rate', 'custom_progress', 'history', 'history_page', 'history_prev',
-        'history_next', 'history_clear', 'stats_rows', 'stats_reset_all'
+        'mode_buttons', 'mode_info', 'round_label', 'round_kind', 'score_label', 'timer_label',
+        'problem', 'flip_count', 'flip_text', 'submit', 'hint', 'skip', 'share',
+        'message_title', 'message_text', 'feedback', 'custom_panel', 'custom_form',
+        'custom_operations', 'custom_length', 'custom_length_value', 'custom_min',
+        'custom_max', 'custom_correct', 'custom_rate', 'custom_seed', 'custom_progress',
+        'history', 'history_page', 'history_prev', 'history_next', 'history_clear',
+        'stats_rows', 'stats_reset_all', 'session_summary', 'achievement_list',
+        'achievement_notice', 'setting_sound', 'setting_large_text', 'setting_contrast',
+        'setting_reduced_clutter', 'install_app'
     ]) {
         ui[id] = document.getElementById(id);
     }
-
-    let mode = 'tutorial';
-    let profile = core.DIFFICULTIES.easy;
-    let round = 1;
-    let currentProblem = null;
-    let selectedId = null;
-    let currentValues = {};
-    let historyPage = 0;
-    let customRun = { attempts: 0, correct: 0, won: false };
-    let activeCustomSettings = null;
 
     function load(key, fallback) {
         try {
@@ -43,12 +42,9 @@
         try {
             localStorage.setItem(key, JSON.stringify(value));
         } catch (error) {
-            // Storage can be unavailable in private browsing; the current session still works.
+            // The game remains playable when browser storage is unavailable.
         }
     }
-
-    let history = load(HISTORY_KEY, []);
-    let stats = load(STATS_KEY, {});
 
     function text(type, value, className) {
         const element = document.createElement(type);
@@ -59,33 +55,110 @@
         return element;
     }
 
-    function tutorialProblem() {
-        return {
-            sides: [
-                { type: 'binary', operation: 'subtract',
-                    left: { type: 'number', value: 7, id: 't0' },
-                    right: { type: 'number', value: 2, id: 't1' } },
-                { type: 'binary', operation: 'add',
-                    left: { type: 'number', value: 3, id: 't2', solution: true },
-                    right: { type: 'number', value: 4, id: 't3' } }
-            ],
-            score: 4,
-            target: 4,
-            roundKind: 'Guided',
-            operationCount: 2
+    function number(value, id, solution) {
+        return { type: 'number', value: value, id: id, solution: !!solution };
+    }
+
+    function binary(operation, left, right) {
+        return { type: 'binary', operation: operation, left: left, right: right };
+    }
+
+    function squareRoot(value) {
+        return { type: 'root', value: value };
+    }
+
+    const CURATED = [
+        {
+            title: 'The original',
+            sides: [binary('subtract', number(7, 'c00'), number(2, 'c01')),
+                binary('add', number(3, 'c02', true), number(4, 'c03'))]
+        },
+        {
+            title: 'Product placement',
+            sides: [binary('multiply', number(6, 'c10'), number(2, 'c11')),
+                binary('subtract', number(13, 'c12'), number(8, 'c13', true))]
+        },
+        {
+            title: 'Root and remainder',
+            sides: [binary('modulo', number(25, 'c20'), number(7, 'c21')),
+                binary('add', squareRoot(number(9, 'c22')), number(6, 'c23', true))]
+        },
+        {
+            title: 'A small power',
+            sides: [binary('power', number(2, 'c30'), number(3, 'c31')),
+                binary('subtract', number(9, 'c32'), number(7, 'c33', true))]
+        },
+        {
+            title: 'Evenly divided',
+            sides: [binary('divide', number(42, 'c40'), number(6, 'c41')),
+                binary('subtract', number(8, 'c42'), number(5, 'c43', true))]
+        }
+    ];
+
+    const ACHIEVEMENTS = [
+        { id: 'first', name: 'The First 1', description: 'Solve your first puzzle.' },
+        { id: 'streak5', name: 'Ones in a Row', description: 'Reach a five-puzzle streak.' },
+        { id: 'twenty', name: 'Mental Arithmetic', description: 'Solve 20 puzzles.' },
+        { id: 'explorer', name: 'Operator', description: 'Solve puzzles using every operation.' },
+        { id: 'daily', name: 'Today’s One', description: 'Complete a Daily challenge.' },
+        { id: 'nohint', name: 'Unaided', description: 'Solve a Challenge round without a hint.' },
+        { id: 'curated', name: 'Gallery Walk', description: 'Finish all curated challenges.' }
+    ];
+
+    let history = load(KEYS.history, []);
+    let stats = load(KEYS.stats, {});
+    let achievementState = load(KEYS.achievements, { unlocked: [], operations: [], solved: 0 });
+    let settings = load(KEYS.settings, {
+        sound: false, largeText: false, contrast: false, reducedClutter: false
+    });
+    let dailyResults = load(KEYS.daily, {});
+    if (!Array.isArray(history)) history = [];
+    if (!achievementState || !Array.isArray(achievementState.unlocked)) {
+        achievementState = { unlocked: [], operations: [], solved: 0 };
+    }
+
+    let mode = 'tutorial';
+    let profile = core.DIFFICULTIES.easy;
+    let round = 1;
+    let currentProblem = null;
+    let currentSeed = '';
+    let selectedId = null;
+    let currentValues = {};
+    let hintLevel = 0;
+    let attemptsOnPuzzle = 0;
+    let awaitingAdvance = false;
+    let activeCustomSettings = null;
+    let customRun = { attempts: 0, correct: 0, won: false };
+    let historyPage = 0;
+    let forcedSeed = null;
+    let forcedRound = null;
+    let dailyDateOverride = null;
+    let timerId = null;
+    let timeRemaining = TIMED_SECONDS;
+    let installPrompt = null;
+    let audioContext = null;
+    let session = null;
+
+    function newSession() {
+        session = {
+            id: Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8),
+            startedAt: Date.now(), puzzleStartedAt: Date.now(), attempts: 0, correct: 0,
+            solved: 0, streak: 0, bestStreak: 0, hardest: 0, durations: [],
+            hints: 0, lives: 3, finished: false
         };
+        renderSession();
     }
 
     function customSettings() {
-        const operations = Array.from(ui.custom_operations.querySelectorAll('input:checked'))
-            .map(function (input) { return input.value; });
         return {
-            operations: operations,
+            operations: Array.from(ui.custom_operations.querySelectorAll('input:checked'))
+                .map(function (input) { return input.value; }),
             length: Number(ui.custom_length.value),
             min: Number(ui.custom_min.value),
             max: Number(ui.custom_max.value),
             correct: Number(ui.custom_correct.value),
-            rate: Number(ui.custom_rate.value)
+            rate: Number(ui.custom_rate.value),
+            seed: ui.custom_seed.value.trim()
         };
     }
 
@@ -96,17 +169,16 @@
             input.type = 'checkbox';
             input.value = key;
             input.checked = ['add', 'subtract', 'multiply'].includes(key);
-            label.appendChild(input);
-            label.appendChild(document.createTextNode(' ' + core.OPERATIONS[key].label));
+            label.append(input, document.createTextNode(' ' + core.OPERATIONS[key].label));
             ui.custom_operations.appendChild(label);
         }
-        const saved = load(CUSTOM_KEY, null);
+        const saved = load(KEYS.custom, null);
         if (saved && Array.isArray(saved.operations)) {
             for (const input of ui.custom_operations.querySelectorAll('input')) {
                 input.checked = saved.operations.includes(input.value);
             }
-            for (const key of ['length', 'min', 'max', 'correct', 'rate']) {
-                if (Number.isFinite(saved[key])) {
+            for (const key of ['length', 'min', 'max', 'correct', 'rate', 'seed']) {
+                if (saved[key] !== undefined) {
                     ui['custom_' + key].value = saved[key];
                 }
             }
@@ -114,27 +186,94 @@
         ui.custom_length_value.textContent = ui.custom_length.value;
     }
 
+    function tutorialProblem() {
+        return {
+            sides: CURATED[0].sides, score: 4, target: 4,
+            roundKind: 'Guided', operationCount: 2, title: 'Tutorial'
+        };
+    }
+
+    function curatedProblem(index) {
+        const item = CURATED[index % CURATED.length];
+        return {
+            sides: core.clone(item.sides),
+            score: core.difficultyScore(item.sides),
+            target: 10 + index * 8,
+            roundKind: index + 1 === CURATED.length ? 'Challenge' : 'Curated',
+            operationCount: core.countOperations(item.sides[0]) + core.countOperations(item.sides[1]),
+            title: item.title
+        };
+    }
+
+    function utcDate() {
+        return dailyDateOverride || new Date().toISOString().slice(0, 10);
+    }
+
+    function modeProfile() {
+        if (mode === 'timed') return core.DIFFICULTIES.hard;
+        if (mode === 'endless') {
+            const choices = Object.values(core.DIFFICULTIES);
+            return choices[Math.min(choices.length - 1, Math.floor((round - 1) / 8))];
+        }
+        if (mode === 'daily') {
+            const choices = [core.DIFFICULTIES.normal, core.DIFFICULTIES.hard, core.DIFFICULTIES.expert];
+            return choices[core.hashSeed(utcDate()) % choices.length];
+        }
+        return profile;
+    }
+
+    function problemSeed() {
+        if (mode === 'daily') return 'daily:' + utcDate() + ':v1';
+        if (forcedSeed) {
+            const value = forcedSeed;
+            forcedSeed = null;
+            return value;
+        }
+        if (mode === 'custom' && activeCustomSettings.seed) {
+            return activeCustomSettings.seed + ':' + round;
+        }
+        return session.id + ':' + mode + ':' + round;
+    }
+
+    function generateCurrentProblem() {
+        if (mode === 'tutorial') return tutorialProblem();
+        if (mode === 'challenges') return curatedProblem(round - 1);
+        const selectedProfile = modeProfile();
+        const options = {
+            profile: selectedProfile,
+            round: mode === 'daily' ? (core.hashSeed(utcDate()) % 40) + 1 : round,
+            random: core.createSeededRandom(currentSeed)
+        };
+        if (mode === 'custom') {
+            Object.assign(options, {
+                operations: activeCustomSettings.operations,
+                length: activeCustomSettings.length,
+                targetRange: [activeCustomSettings.min, activeCustomSettings.max],
+                maxNumber: Math.max(30, activeCustomSettings.max * 2)
+            });
+        }
+        return core.generateProblem(options);
+    }
+
     function renderExpression(expression, parent) {
         if (expression.type === 'number') {
-            const button = text('button', currentValues[expression.id] === undefined
-                ? expression.value : currentValues[expression.id], 'number');
+            const value = currentValues[expression.id] === undefined
+                ? expression.value : currentValues[expression.id];
+            const button = text('button', value, 'number');
             button.type = 'button';
             button.dataset.numberId = expression.id;
             button.setAttribute('aria-pressed', selectedId === expression.id ? 'true' : 'false');
             button.setAttribute('aria-label', selectedId === expression.id
                 ? 'Restore ' + expression.value : 'Change ' + expression.value + ' to 1');
-            if (selectedId === expression.id) {
-                button.classList.add('flipped');
-            }
-            if (mode === 'tutorial' && expression.solution) {
-                button.classList.add('tutorial-target');
+            if (selectedId === expression.id) button.classList.add('flipped');
+            if ((mode === 'tutorial' || hintLevel >= 2) && expression.solution) {
+                button.classList.add('hint-target');
             }
             parent.appendChild(button);
             return;
         }
         if (expression.type === 'root') {
-            parent.appendChild(text('span', '√', 'operator root'));
-            parent.appendChild(text('span', '(', 'paren'));
+            parent.append(text('span', '√', 'operator root'), text('span', '(', 'paren'));
             renderExpression(expression.value, parent);
             parent.appendChild(text('span', ')', 'paren'));
             return;
@@ -146,30 +285,37 @@
         parent.appendChild(text('span', ')', 'paren'));
     }
 
+    function solutionSide() {
+        const details = core.solutionDetails(currentProblem.sides, {});
+        for (let i = 0; i < currentProblem.sides.length; i++) {
+            let found = false;
+            core.visitNumbers(currentProblem.sides[i], function (node) {
+                if (node.id === details.solutionId) found = true;
+            });
+            if (found) return i;
+        }
+        return 0;
+    }
+
     function drawProblem() {
         ui.problem.replaceChildren();
-        renderExpression(currentProblem.sides[0], ui.problem);
-        ui.problem.appendChild(text('span', ' = ', 'equals'));
-        renderExpression(currentProblem.sides[1], ui.problem);
+        currentProblem.sides.forEach(function (side, index) {
+            const wrapper = document.createElement('span');
+            wrapper.className = 'equation-side';
+            if (hintLevel >= 1 && index === solutionSide()) wrapper.classList.add('hint-side');
+            renderExpression(side, wrapper);
+            ui.problem.appendChild(wrapper);
+            if (index + 1 < currentProblem.sides.length) {
+                ui.problem.appendChild(text('span', ' = ', 'equals'));
+            }
+        });
         ui.flip_count.textContent = selectedId ? '0' : '1';
         ui.flip_text.textContent = selectedId ? 'flips remaining' : 'flip remaining';
-        ui.round_label.textContent = mode === 'tutorial' ? 'Tutorial' : 'Round ' + round;
+        ui.round_label.textContent = mode === 'tutorial' ? 'Tutorial' :
+            (mode === 'daily' ? utcDate() : 'Round ' + round);
         ui.round_kind.textContent = currentProblem.roundKind;
         ui.round_kind.className = 'round-kind ' + currentProblem.roundKind.toLowerCase().replace('-', '');
-        ui.score_label.textContent = 'Target ' + currentProblem.target + ' · generated score ' + currentProblem.score;
-    }
-
-    function valuesWithFlip(id) {
-        const values = {};
-        if (id) {
-            values[id] = 1;
-        }
-        return values;
-    }
-
-    function isSolved() {
-        return core.evaluate(currentProblem.sides[0], currentValues) ===
-            core.evaluate(currentProblem.sides[1], currentValues);
+        ui.score_label.textContent = 'Target ' + currentProblem.target + ' · score ' + currentProblem.score;
     }
 
     function setMessage(title, message) {
@@ -177,113 +323,295 @@
         ui.message_text.textContent = message;
     }
 
+    function hideFeedback() {
+        ui.feedback.hidden = true;
+        ui.feedback.replaceChildren();
+    }
+
+    function showExplanation(revealSolution) {
+        const details = core.solutionDetails(currentProblem.sides, currentValues);
+        const current = text('p', 'Your totals: ' + details.currentTotals.join(' and ') + '.');
+        ui.feedback.replaceChildren(current);
+        if (revealSolution) {
+            const solution = text('p', 'Intended flip: change ' + details.solutionValue +
+                ' to 1. Then both sides equal ' + details.solvedTotals[0] + '.');
+            const equation = text('code', details.solvedExpression);
+            ui.feedback.append(solution, equation);
+        }
+        ui.feedback.hidden = false;
+    }
+
     function startRound() {
         selectedId = null;
         currentValues = {};
-        if (mode === 'tutorial') {
-            currentProblem = tutorialProblem();
-            setMessage('How to play', 'Change exactly one number into a 1 so both sides have the same integer value.');
-        } else if (mode === 'custom') {
-            const settings = activeCustomSettings;
-            currentProblem = core.generateProblem({
-                profile: profile,
-                round: round,
-                operations: settings.operations,
-                length: settings.length,
-                targetRange: [settings.min, settings.max],
-                maxNumber: Math.max(30, settings.max * 2)
-            });
-            setMessage('Custom game', 'Meet both goals: enough correct answers and the selected win rate.');
-        } else {
-            currentProblem = core.generateProblem({ profile: profile, round: round });
-            setMessage(currentProblem.roundKind + ' round',
-                currentProblem.roundKind === 'Challenge'
-                    ? 'A difficulty spike—take your time.'
-                    : (currentProblem.roundKind === 'Warm-up'
-                        ? 'A lighter puzzle before the difficulty rises again.'
-                        : 'Change one number, then check the equation.'));
-        }
+        hintLevel = 0;
+        attemptsOnPuzzle = 0;
+        awaitingAdvance = false;
+        currentSeed = problemSeed();
+        currentProblem = generateCurrentProblem();
+        session.puzzleStartedAt = Date.now();
+        ui.submit.textContent = 'Check equation';
+        ui.submit.disabled = session.finished;
+        ui.hint.disabled = mode === 'tutorial' || session.finished;
+        ui.skip.disabled = mode === 'tutorial' || session.finished;
+        hideFeedback();
         drawProblem();
-        updateCustomProgress();
-    }
-
-    function updateModeInfo() {
+        updateProgress();
         if (mode === 'tutorial') {
-            ui.mode_info.innerHTML = '<strong>Tutorial</strong><span>A guided two-operation puzzle.</span>';
-            return;
-        }
-        if (mode === 'custom') {
-            ui.mode_info.innerHTML = '<strong>Custom</strong><span>Your operations, length, target range, and victory goal.</span>';
-            return;
-        }
-        const operationNames = profile.operations.map(function (key) {
-            return core.OPERATIONS[key].symbol;
-        }).join(' ');
-        ui.mode_info.replaceChildren(
-            text('strong', profile.name),
-            text('span', profile.description),
-            text('span', 'Operations: ' + operationNames),
-            text('span', 'Base length: ' + profile.length[0] + '–' + profile.length[1])
-        );
-    }
-
-    function activateMode(nextMode, button) {
-        mode = nextMode;
-        round = 1;
-        if (mode === 'custom') {
-            activeCustomSettings = null;
-        }
-        for (const candidate of ui.mode_buttons.querySelectorAll('button')) {
-            const active = candidate === button;
-            candidate.classList.toggle('active', active);
-            candidate.setAttribute('aria-pressed', active ? 'true' : 'false');
-        }
-        ui.custom_panel.hidden = mode !== 'custom';
-        ui.submit.disabled = mode === 'custom';
-        if (core.DIFFICULTIES[mode]) {
-            profile = core.DIFFICULTIES[mode];
-        }
-        updateModeInfo();
-        if (mode !== 'custom') {
-            startRound();
+            setMessage('How to play', 'Change exactly one number into a 1 so both sides have the same integer value.');
+        } else if (mode === 'daily') {
+            setMessage('Daily challenge', 'Everyone gets this same seeded puzzle today. Solve it and share your result.');
+        } else if (mode === 'timed') {
+            setMessage('Timed sprint', 'Solve as many puzzles as you can before the 60-second clock reaches zero.');
+        } else if (mode === 'endless') {
+            setMessage('Endless run', 'Keep solving as difficulty rises. An incorrect first guess costs one of three lives.');
+        } else if (mode === 'challenges') {
+            setMessage(currentProblem.title, 'A handcrafted puzzle ' + round + ' of ' + CURATED.length + '.');
         } else {
-            ui.custom_progress.hidden = true;
-            setMessage('Build a custom game',
-                'Choose at least one operation, tune the puzzle and victory targets, then start the run.');
+            setMessage(currentProblem.roundKind + ' round',
+                currentProblem.roundKind === 'Challenge' ? 'A difficulty spike—take your time.' :
+                    'Change one number, then check the equation.');
         }
     }
 
-    function historyRecord(correct) {
-        return {
+    function valuesWithFlip(id) {
+        return id ? { [id]: 1 } : {};
+    }
+
+    function isSolved() {
+        return core.evaluate(currentProblem.sides[0], currentValues) ===
+            core.evaluate(currentProblem.sides[1], currentValues);
+    }
+
+    function getStat(id) {
+        if (!stats[id] || typeof stats[id] !== 'object') {
+            stats[id] = { attempts: 0, correct: 0, bestStreak: 0, streak: 0, bestScore: 0 };
+        }
+        return stats[id];
+    }
+
+    function statId() {
+        return core.DIFFICULTIES[mode] ? mode : mode;
+    }
+
+    function recordStat(correct) {
+        if (mode === 'tutorial') return;
+        const stat = getStat(statId());
+        stat.attempts++;
+        if (correct) {
+            stat.correct++;
+            stat.streak++;
+            stat.bestStreak = Math.max(stat.bestStreak || 0, stat.streak);
+        } else {
+            stat.streak = 0;
+        }
+        save(KEYS.stats, stats);
+        renderStats();
+    }
+
+    function recordHistory(correct) {
+        if (mode === 'tutorial') return;
+        history.unshift({
             correct: correct,
             expression: currentProblem.sides.map(function (side) {
                 return core.serialize(side, currentValues);
             }).join(' = '),
-            mode: mode === 'custom' ? 'Custom' : profile.name,
+            mode: modeLabel(),
             round: round,
+            seed: currentSeed,
             at: new Date().toISOString()
-        };
+        });
+        history = history.slice(0, HISTORY_LIMIT);
+        save(KEYS.history, history);
+        historyPage = 0;
+        renderHistory();
+    }
+
+    function modeLabel() {
+        if (core.DIFFICULTIES[mode]) return core.DIFFICULTIES[mode].name;
+        return {
+            tutorial: 'Tutorial', custom: 'Custom', daily: 'Daily',
+            timed: 'Timed', endless: 'Endless', challenges: 'Challenges'
+        }[mode] || mode;
+    }
+
+    function recordAttempt(correct) {
+        attemptsOnPuzzle++;
+        session.attempts++;
+        if (correct) {
+            session.correct++;
+            session.solved++;
+            session.streak++;
+            session.bestStreak = Math.max(session.bestStreak, session.streak);
+            session.hardest = Math.max(session.hardest, currentProblem.score);
+            session.durations.push(Date.now() - session.puzzleStartedAt);
+        } else {
+            session.streak = 0;
+        }
+        if (mode === 'custom') {
+            customRun.attempts++;
+            if (correct) customRun.correct++;
+        }
+        recordStat(correct);
+        recordHistory(correct);
+        renderSession();
+    }
+
+    function unlock(id) {
+        if (achievementState.unlocked.includes(id)) return;
+        achievementState.unlocked.push(id);
+        save(KEYS.achievements, achievementState);
+        const item = ACHIEVEMENTS.find(function (achievement) { return achievement.id === id; });
+        ui.achievement_notice.textContent = 'Achievement unlocked: ' + item.name;
+        ui.achievement_notice.hidden = false;
+        playSound('achievement');
+        renderAchievements();
+    }
+
+    function updateAchievements() {
+        achievementState.solved = (achievementState.solved || 0) + 1;
+        const details = core.solutionDetails(currentProblem.sides, {});
+        achievementState.operations = Array.from(new Set(
+            (achievementState.operations || []).concat(details.operations)
+        ));
+        save(KEYS.achievements, achievementState);
+        unlock('first');
+        if (session.streak >= 5) unlock('streak5');
+        if (achievementState.solved >= 20) unlock('twenty');
+        if (achievementState.operations.length === Object.keys(core.OPERATIONS).length) unlock('explorer');
+        if (mode === 'daily') unlock('daily');
+        if (currentProblem.roundKind === 'Challenge' && hintLevel === 0) unlock('nohint');
+        if (mode === 'challenges' && round === CURATED.length) unlock('curated');
+    }
+
+    function correctAnswer() {
+        recordAttempt(true);
+        updateAchievements();
+        playSound('correct');
+        showExplanation(true);
+        awaitingAdvance = true;
+        ui.submit.textContent = 'Next puzzle';
+        ui.hint.disabled = true;
+        ui.skip.disabled = true;
+
+        if (mode === 'daily') {
+            dailyResults[utcDate()] = { attempts: session.attempts, hints: session.hints, at: Date.now() };
+            save(KEYS.daily, dailyResults);
+            ui.submit.disabled = true;
+            setMessage('Daily complete', dailyShareText());
+            return;
+        }
+        if (mode === 'custom') {
+            const accuracy = customRun.correct / customRun.attempts * 100;
+            if (customRun.correct >= activeCustomSettings.correct && accuracy >= activeCustomSettings.rate) {
+                customRun.won = true;
+                ui.submit.disabled = true;
+                setMessage('Custom game won!',
+                    customRun.correct + '/' + customRun.attempts + ' correct (' + Math.round(accuracy) + '%).');
+                return;
+            }
+        }
+        if (mode === 'challenges' && round === CURATED.length) {
+            ui.submit.textContent = 'Play again';
+            setMessage('Challenge set complete', 'You solved all ' + CURATED.length + ' handcrafted puzzles.');
+        } else {
+            setMessage('Correct', 'Both sides balance. Review the solution, then continue.');
+        }
+    }
+
+    function incorrectAnswer() {
+        recordAttempt(false);
+        playSound('incorrect');
+        showExplanation(false);
+        selectedId = null;
+        currentValues = {};
+        drawProblem();
+        if (mode === 'endless' && attemptsOnPuzzle === 1) {
+            session.lives--;
+            renderSession();
+            if (session.lives <= 0) {
+                finishSession('Run over', 'You solved ' + session.solved + ' puzzles before running out of lives.');
+                showExplanation(true);
+                return;
+            }
+        }
+        setMessage('Not balanced—retry', 'The totals differed. The same puzzle is still here, and your move has been restored.');
+    }
+
+    function advanceRound() {
+        if (session.finished) return;
+        if (mode === 'challenges' && round === CURATED.length) {
+            round = 1;
+            newSession();
+        } else {
+            round++;
+        }
+        startRound();
+    }
+
+    function finishSession(title, message) {
+        session.finished = true;
+        clearTimer();
+        ui.submit.disabled = true;
+        ui.hint.disabled = true;
+        ui.skip.disabled = true;
+        const stat = getStat(statId());
+        stat.bestScore = Math.max(stat.bestScore || 0, session.solved);
+        save(KEYS.stats, stats);
+        renderStats();
+        renderSession();
+        setMessage(title, message);
+    }
+
+    function updateProgress() {
+        ui.custom_progress.hidden = !['custom', 'endless'].includes(mode);
+        if (mode === 'custom') {
+            if (!activeCustomSettings) {
+                ui.custom_progress.hidden = true;
+                return;
+            }
+            const accuracy = customRun.attempts
+                ? Math.round(customRun.correct / customRun.attempts * 100) : 0;
+            ui.custom_progress.textContent = customRun.correct + '/' + activeCustomSettings.correct +
+                ' correct · ' + accuracy + '%/' + activeCustomSettings.rate + '%';
+        } else if (mode === 'endless') {
+            ui.custom_progress.textContent = 'Lives: ' + '●'.repeat(session.lives) + '○'.repeat(3 - session.lives);
+        }
+    }
+
+    function renderSession() {
+        if (!session) return;
+        const accuracy = session.attempts ? Math.round(session.correct / session.attempts * 100) : 0;
+        const average = session.durations.length
+            ? (session.durations.reduce(function (sum, value) { return sum + value; }, 0) /
+                session.durations.length / 1000).toFixed(1) + 's' : '—';
+        ui.session_summary.replaceChildren(
+            text('div', String(session.solved), 'summary-value'),
+            text('div', 'solved', 'summary-label'),
+            text('div', accuracy + '%', 'summary-value'),
+            text('div', 'accuracy', 'summary-label'),
+            text('div', average, 'summary-value'),
+            text('div', 'average', 'summary-label'),
+            text('div', String(Math.round(session.hardest)), 'summary-value'),
+            text('div', 'hardest', 'summary-label')
+        );
+        updateProgress();
     }
 
     function renderHistory() {
         const pages = Math.max(1, Math.ceil(history.length / PAGE_SIZE));
-        historyPage = Math.min(historyPage, pages - 1);
-        const start = historyPage * PAGE_SIZE;
+        historyPage = Math.max(0, Math.min(historyPage, pages - 1));
         ui.history.replaceChildren();
-        for (const item of history.slice(start, start + PAGE_SIZE)) {
+        for (const item of history.slice(historyPage * PAGE_SIZE, (historyPage + 1) * PAGE_SIZE)) {
             const li = document.createElement('li');
             li.className = item.correct ? 'correct' : 'incorrect';
             const summary = text('div', (item.correct ? 'Correct' : 'Incorrect') +
                 ' · ' + item.mode + ' · round ' + item.round, 'history-summary');
-            const date = new Date(item.at);
-            summary.appendChild(text('time', ' ' + date.toLocaleString(), 'history-date'));
-            li.appendChild(summary);
-            li.appendChild(text('code', item.expression));
+            summary.appendChild(text('time', ' ' + new Date(item.at).toLocaleString(), 'history-date'));
+            li.append(summary, text('code', item.expression));
             ui.history.appendChild(li);
         }
-        if (!history.length) {
-            ui.history.appendChild(text('li', 'No saved problems yet.', 'empty'));
-        }
+        if (!history.length) ui.history.appendChild(text('li', 'No saved problems yet.', 'empty'));
         ui.history_page.textContent = 'Page ' + (historyPage + 1) + ' of ' + pages +
             ' · ' + history.length + '/' + HISTORY_LIMIT + ' saved';
         ui.history_prev.disabled = historyPage === 0;
@@ -291,148 +619,273 @@
         ui.history_clear.disabled = history.length === 0;
     }
 
-    function getStat(id) {
-        if (!stats[id]) {
-            stats[id] = { attempts: 0, correct: 0, bestStreak: 0, streak: 0 };
-        }
-        return stats[id];
-    }
-
     function renderStats() {
         ui.stats_rows.replaceChildren();
-        const modes = Object.values(core.DIFFICULTIES).concat([{ id: 'custom', name: 'Custom' }]);
+        const modes = Object.values(core.DIFFICULTIES).map(function (item) {
+            return { id: item.id, name: item.name };
+        }).concat([
+            { id: 'custom', name: 'Custom' }, { id: 'daily', name: 'Daily' },
+            { id: 'timed', name: 'Timed' }, { id: 'endless', name: 'Endless' },
+            { id: 'challenges', name: 'Challenges' }
+        ]);
         for (const item of modes) {
             const stat = getStat(item.id);
             const row = document.createElement('tr');
             row.appendChild(text('th', item.name));
             row.appendChild(text('td', stat.correct + '/' + stat.attempts));
             row.appendChild(text('td', stat.attempts ? Math.round(stat.correct / stat.attempts * 100) + '%' : '—'));
-            row.appendChild(text('td', String(stat.bestStreak)));
+            row.appendChild(text('td', String(stat.bestStreak || 0)));
+            row.appendChild(text('td', stat.bestScore ? String(stat.bestScore) : '—'));
             const action = document.createElement('td');
             const reset = text('button', 'Reset', 'small-button');
             reset.type = 'button';
             reset.dataset.resetStat = item.id;
-            reset.disabled = stat.attempts === 0;
+            reset.disabled = stat.attempts === 0 && !stat.bestScore;
             action.appendChild(reset);
             row.appendChild(action);
             ui.stats_rows.appendChild(row);
         }
     }
 
-    function recordStat(correct) {
-        const id = mode === 'custom' ? 'custom' : profile.id;
-        const stat = getStat(id);
-        stat.attempts++;
-        if (correct) {
-            stat.correct++;
-            stat.streak++;
-            stat.bestStreak = Math.max(stat.bestStreak, stat.streak);
-        } else {
-            stat.streak = 0;
+    function renderAchievements() {
+        ui.achievement_list.replaceChildren();
+        for (const item of ACHIEVEMENTS) {
+            const unlocked = achievementState.unlocked.includes(item.id);
+            const li = document.createElement('li');
+            li.className = unlocked ? 'unlocked' : 'locked';
+            li.append(text('strong', (unlocked ? '✓ ' : '○ ') + item.name),
+                text('span', item.description));
+            ui.achievement_list.appendChild(li);
         }
-        save(STATS_KEY, stats);
-        renderStats();
     }
 
-    function updateCustomProgress() {
-        if (mode !== 'custom') {
-            ui.custom_progress.hidden = true;
-            return;
+    function updateModeInfo() {
+        const descriptions = {
+            tutorial: ['Tutorial', 'A guided introduction to the one-flip rule.'],
+            daily: ['Daily', 'One shared seeded puzzle each UTC day.'],
+            timed: ['Timed', 'Score as many correct answers as possible in 60 seconds.'],
+            endless: ['Endless', 'Three lives while difficulty rises every eight rounds.'],
+            challenges: ['Challenges', 'Five handcrafted puzzles featuring different operations.'],
+            custom: ['Custom', 'Your operations, length, seed, targets, and victory goal.']
+        };
+        if (core.DIFFICULTIES[mode]) {
+            const item = core.DIFFICULTIES[mode];
+            ui.mode_info.replaceChildren(
+                text('strong', item.name), text('span', item.description),
+                text('span', 'Operations: ' + item.operations.map(function (key) {
+                    return core.OPERATIONS[key].symbol;
+                }).join(' ')),
+                text('span', 'Base length: ' + item.length[0] + '–' + item.length[1])
+            );
+        } else {
+            const item = descriptions[mode];
+            ui.mode_info.replaceChildren(text('strong', item[0]), text('span', item[1]));
         }
-        ui.custom_progress.hidden = false;
-        const settings = activeCustomSettings || customSettings();
-        const accuracy = customRun.attempts
-            ? Math.round(customRun.correct / customRun.attempts * 100) : 0;
-        ui.custom_progress.textContent = customRun.correct + '/' + settings.correct +
-            ' correct · ' + accuracy + '%/' + settings.rate + '% win rate';
+    }
+
+    function clearTimer() {
+        if (timerId) window.clearInterval(timerId);
+        timerId = null;
+        ui.timer_label.hidden = true;
+    }
+
+    function startTimer() {
+        clearTimer();
+        timeRemaining = TIMED_SECONDS;
+        ui.timer_label.hidden = false;
+        ui.timer_label.textContent = timeRemaining + 's';
+        timerId = window.setInterval(function () {
+            timeRemaining--;
+            ui.timer_label.textContent = timeRemaining + 's';
+            if (timeRemaining <= 0) {
+                finishSession('Time!', 'You solved ' + session.solved + ' puzzles in ' + TIMED_SECONDS + ' seconds.');
+                playSound('finish');
+            }
+        }, 1000);
+    }
+
+    function activateMode(nextMode, button, options) {
+        options = options || {};
+        clearTimer();
+        mode = nextMode;
+        if (core.DIFFICULTIES[mode]) profile = core.DIFFICULTIES[mode];
+        round = options.round || 1;
+        forcedSeed = options.seed || null;
+        dailyDateOverride = options.date || null;
+        activeCustomSettings = null;
+        customRun = { attempts: 0, correct: 0, won: false };
+        for (const candidate of ui.mode_buttons.querySelectorAll('button')) {
+            const active = candidate === button;
+            candidate.classList.toggle('active', active);
+            candidate.setAttribute('aria-pressed', active ? 'true' : 'false');
+        }
+        ui.custom_panel.hidden = mode !== 'custom';
+        newSession();
+        updateModeInfo();
+        if (mode === 'custom') {
+            ui.submit.disabled = true;
+            ui.problem.replaceChildren();
+            hideFeedback();
+            setMessage('Build a custom game', 'Choose the rules, then start the run. A seed makes it reproducible.');
+        } else {
+            startRound();
+            if (mode === 'timed') startTimer();
+        }
+    }
+
+    function dailyShareText() {
+        const result = dailyResults[utcDate()];
+        return result
+            ? 'YOG1 ' + utcDate() + ' · solved in ' + result.attempts +
+                (result.attempts === 1 ? ' attempt' : ' attempts') +
+                (result.hints ? ' · ' + result.hints + ' hints' : ' · no hints')
+            : 'YOG1 Daily ' + utcDate();
+    }
+
+    function sharePuzzle() {
+        const url = new URL(window.location.href);
+        url.search = '';
+        let shareText = 'You Only Get 1s';
+        if (mode === 'daily') {
+            url.searchParams.set('daily', utcDate());
+            shareText = dailyShareText();
+        } else {
+            url.searchParams.set('seed', currentSeed);
+            url.searchParams.set('difficulty', modeProfile().id);
+            url.searchParams.set('round', String(round));
+            shareText += ' · ' + modeLabel() + ' puzzle';
+        }
+        const value = shareText + '\n' + url.toString();
+        if (navigator.share) {
+            navigator.share({ title: 'You Only Get 1s', text: shareText, url: url.toString() }).catch(function () {});
+        } else if (navigator.clipboard) {
+            navigator.clipboard.writeText(value).then(function () {
+                setMessage('Copied', 'The puzzle link and result are ready to paste.');
+            });
+        } else {
+            window.prompt('Copy this puzzle link:', value);
+        }
+    }
+
+    function playSound(kind) {
+        if (!settings.sound) return;
+        const Audio = window.AudioContext || window.webkitAudioContext;
+        if (!Audio) return;
+        if (!audioContext) audioContext = new Audio();
+        const patterns = {
+            flip: [[220, 0, 0.04, 'square']],
+            correct: [[440, 0, 0.08, 'sine'], [660, 0.08, 0.12, 'sine']],
+            incorrect: [[150, 0, 0.16, 'sawtooth']],
+            achievement: [[523, 0, 0.08, 'triangle'], [784, 0.09, 0.16, 'triangle']],
+            finish: [[330, 0, 0.08, 'square'], [220, 0.08, 0.18, 'square']]
+        };
+        const now = audioContext.currentTime;
+        for (const note of patterns[kind] || []) {
+            const oscillator = audioContext.createOscillator();
+            const gain = audioContext.createGain();
+            oscillator.type = note[3];
+            oscillator.frequency.setValueAtTime(note[0], now + note[1]);
+            gain.gain.setValueAtTime(0.035, now + note[1]);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + note[2]);
+            oscillator.connect(gain).connect(audioContext.destination);
+            oscillator.start(now + note[1]);
+            oscillator.stop(now + note[2]);
+        }
+    }
+
+    function applySettings() {
+        document.body.classList.toggle('large-text', !!settings.largeText);
+        document.body.classList.toggle('high-contrast', !!settings.contrast);
+        document.body.classList.toggle('reduced-clutter', !!settings.reducedClutter);
+        ui.setting_sound.checked = !!settings.sound;
+        ui.setting_large_text.checked = !!settings.largeText;
+        ui.setting_contrast.checked = !!settings.contrast;
+        ui.setting_reduced_clutter.checked = !!settings.reducedClutter;
     }
 
     ui.problem.addEventListener('click', function (event) {
         const button = event.target.closest('[data-number-id]');
-        if (!button || (mode === 'custom' && customRun.won)) {
-            return;
-        }
+        if (!button || awaitingAdvance || session.finished || !currentProblem) return;
         const id = button.dataset.numberId;
         selectedId = selectedId === id ? null : id;
         currentValues = valuesWithFlip(selectedId);
+        playSound('flip');
         drawProblem();
         if (mode === 'tutorial') {
             setMessage(isSolved() ? 'Good move' : 'Try the outlined number',
                 isSolved() ? 'The equation balances. Check it to finish.' :
-                    'You can click your selected number again to undo the flip.');
+                    'Click the selected number again to restore it.');
         }
     });
 
     ui.submit.addEventListener('click', function () {
-        const correct = isSolved();
-        if (mode !== 'tutorial') {
-            history.unshift(historyRecord(correct));
-            history = history.slice(0, HISTORY_LIMIT);
-            save(HISTORY_KEY, history);
-            historyPage = 0;
-            renderHistory();
-            recordStat(correct);
-        }
-
-        if (mode === 'tutorial') {
-            if (correct) {
-                const easyButton = ui.mode_buttons.querySelector('[data-mode="easy"]');
-                activateMode('easy', easyButton);
-                setMessage('Tutorial complete', 'That is the whole rule. Your first Easy round is ready.');
-            } else {
-                startRound();
-                setMessage('Not quite', 'The tutorial reset. Try changing the outlined 3.');
-            }
+        if (awaitingAdvance) {
+            advanceRound();
             return;
         }
-
-        if (mode === 'custom') {
-            customRun.attempts++;
-            if (correct) {
-                customRun.correct++;
+        if (!currentProblem || session.finished) return;
+        if (isSolved()) {
+            if (mode === 'tutorial') {
+                const easyButton = ui.mode_buttons.querySelector('[data-mode="easy"]');
+                activateMode('easy', easyButton);
+                setMessage('Tutorial complete', 'Your first Easy round is ready.');
+            } else {
+                correctAnswer();
             }
-            const settings = activeCustomSettings;
-            const accuracy = customRun.correct / customRun.attempts * 100;
-            if (customRun.correct >= settings.correct && accuracy >= settings.rate) {
-                customRun.won = true;
-                ui.submit.disabled = true;
-                updateCustomProgress();
-                setMessage('Custom game won!',
-                    'You finished with ' + customRun.correct + '/' + customRun.attempts +
-                    ' correct (' + Math.round(accuracy) + '%). Start Custom again for a new run.');
-                return;
-            }
+        } else if (mode === 'tutorial') {
+            selectedId = null;
+            currentValues = {};
+            drawProblem();
+            setMessage('Not quite', 'Try changing the outlined 3, then check again.');
+            playSound('incorrect');
+        } else {
+            incorrectAnswer();
         }
-
-        round++;
-        startRound();
-        setMessage(correct ? 'Correct' : 'Incorrect',
-            correct ? 'Balanced. The next round is ready.' : 'A fresh puzzle is ready—keep going.');
     });
 
+    ui.hint.addEventListener('click', function () {
+        if (!currentProblem || awaitingAdvance || session.finished) return;
+        hintLevel = Math.min(2, hintLevel + 1);
+        session.hints++;
+        drawProblem();
+        setMessage(hintLevel === 1 ? 'Hint: choose a side' : 'Hint: the number',
+            hintLevel === 1 ? 'The outlined side contains the intended flip.' :
+                'The outlined number is the one used by the generated solution.');
+    });
+
+    ui.skip.addEventListener('click', function () {
+        if (!currentProblem || awaitingAdvance || session.finished) return;
+        recordAttempt(false);
+        showExplanation(true);
+        awaitingAdvance = true;
+        ui.submit.textContent = 'Next puzzle';
+        ui.hint.disabled = true;
+        ui.skip.disabled = true;
+        setMessage('Solution revealed', 'This puzzle counts as incorrect. Review it, then continue.');
+    });
+
+    ui.share.addEventListener('click', sharePuzzle);
     ui.mode_buttons.addEventListener('click', function (event) {
         const button = event.target.closest('[data-mode]');
-        if (button) {
-            activateMode(button.dataset.mode, button);
-        }
+        if (button) activateMode(button.dataset.mode, button);
     });
 
     ui.custom_form.addEventListener('submit', function (event) {
         event.preventDefault();
-        const settings = customSettings();
-        if (!settings.operations.length) {
+        const chosen = customSettings();
+        if (!chosen.operations.length) {
             setMessage('Choose an operation', 'Custom games need at least one mathematical operation.');
             return;
         }
-        if (settings.min > settings.max) {
-            setMessage('Check the targets', 'The minimum difficulty target cannot exceed the maximum.');
+        if (chosen.min > chosen.max) {
+            setMessage('Check the targets', 'The minimum target cannot exceed the maximum.');
             return;
         }
-        save(CUSTOM_KEY, settings);
-        activeCustomSettings = settings;
+        save(KEYS.custom, chosen);
+        activeCustomSettings = chosen;
         customRun = { attempts: 0, correct: 0, won: false };
         round = 1;
-        ui.submit.disabled = false;
+        newSession();
         startRound();
     });
 
@@ -445,7 +898,7 @@
         if (window.confirm('Clear all locally saved problem history?')) {
             history = [];
             historyPage = 0;
-            save(HISTORY_KEY, history);
+            save(KEYS.history, history);
             renderHistory();
         }
     });
@@ -453,21 +906,95 @@
         const button = event.target.closest('[data-reset-stat]');
         if (button && window.confirm('Reset stats for ' + button.dataset.resetStat + '?')) {
             delete stats[button.dataset.resetStat];
-            save(STATS_KEY, stats);
+            save(KEYS.stats, stats);
             renderStats();
         }
     });
     ui.stats_reset_all.addEventListener('click', function () {
-        if (window.confirm('Reset stats for every difficulty?')) {
+        if (window.confirm('Reset stats for every mode?')) {
             stats = {};
-            save(STATS_KEY, stats);
+            save(KEYS.stats, stats);
             renderStats();
         }
     });
 
+    for (const input of [ui.setting_sound, ui.setting_large_text, ui.setting_contrast, ui.setting_reduced_clutter]) {
+        input.addEventListener('change', function () {
+            settings = {
+                sound: ui.setting_sound.checked,
+                largeText: ui.setting_large_text.checked,
+                contrast: ui.setting_contrast.checked,
+                reducedClutter: ui.setting_reduced_clutter.checked
+            };
+            save(KEYS.settings, settings);
+            applySettings();
+            if (input === ui.setting_sound && input.checked) playSound('flip');
+        });
+    }
+
+    document.addEventListener('keydown', function (event) {
+        if (event.target.matches('input, select, textarea')) return;
+        const numbers = Array.from(ui.problem.querySelectorAll('.number'));
+        if ((event.key === 'ArrowLeft' || event.key === 'ArrowRight') && numbers.length) {
+            event.preventDefault();
+            let index = numbers.indexOf(document.activeElement);
+            index += event.key === 'ArrowRight' ? 1 : -1;
+            if (index < 0) index = numbers.length - 1;
+            if (index >= numbers.length) index = 0;
+            numbers[index].focus();
+        } else if (event.key.toLowerCase() === 'h' && !ui.hint.disabled) {
+            event.preventDefault();
+            ui.hint.click();
+        } else if (event.key === 'Enter' && document.activeElement === document.body) {
+            ui.submit.click();
+        }
+    });
+
+    window.addEventListener('beforeinstallprompt', function (event) {
+        event.preventDefault();
+        installPrompt = event;
+        ui.install_app.hidden = false;
+    });
+    ui.install_app.addEventListener('click', function () {
+        if (installPrompt) {
+            installPrompt.prompt();
+            installPrompt = null;
+            ui.install_app.hidden = true;
+        }
+    });
+
+    function bootFromUrl() {
+        const params = new URLSearchParams(window.location.search);
+        const daily = params.get('daily');
+        const seed = params.get('seed');
+        if (daily) {
+            const button = ui.mode_buttons.querySelector('[data-mode="daily"]');
+            activateMode('daily', button, { date: daily });
+            return;
+        }
+        if (seed) {
+            const difficulty = core.DIFFICULTIES[params.get('difficulty')]
+                ? params.get('difficulty') : 'normal';
+            const button = ui.mode_buttons.querySelector('[data-mode="' + difficulty + '"]');
+            activateMode(difficulty, button, {
+                seed: seed,
+                round: Math.max(1, Number(params.get('round')) || 1)
+            });
+            setMessage('Shared seeded puzzle', 'This puzzle is reproduced from a shared link.');
+            return;
+        }
+        const button = ui.mode_buttons.querySelector('[data-mode="tutorial"]');
+        activateMode('tutorial', button);
+    }
+
     populateCustomForm();
+    applySettings();
     renderHistory();
     renderStats();
-    updateModeInfo();
-    startRound();
+    renderAchievements();
+    ui.achievement_notice.hidden = true;
+    if ('serviceWorker' in navigator && window.location.protocol !== 'file:') {
+        navigator.serviceWorker.register('sw.js').catch(function () {});
+    }
+    bootFromUrl();
 }());

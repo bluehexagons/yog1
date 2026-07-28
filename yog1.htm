@@ -3,6 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#191919">
+    <meta name="description" content="Balance integer equations by changing exactly one number into a 1.">
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="icon" href="icon.svg" type="image/svg+xml">
     <title>You Only Get 1s</title>
     <style>
         *, *::before, *::after { box-sizing: border-box; }
@@ -46,6 +50,7 @@
         #message { padding: 11px 14px; border: 1px solid var(--ink); border-left-width: 5px; background: #d6d5ce; }
         #message strong { display: block; font: bold .78rem "Courier New", monospace; letter-spacing: .08em; text-transform: uppercase; }
         #message_text { font-size: .85rem; }
+        #achievement_notice { margin-top: 7px; color: var(--green); font: bold .75rem "Courier New", monospace; }
         #round_bar { display: flex; gap: 10px; align-items: center; margin: 16px 0 8px; font-size: .76rem; color: var(--muted); }
         #round_label { margin-right: auto; color: var(--ink); font: bold .82rem "Courier New", monospace; text-transform: uppercase; }
         .round-kind { padding: 2px 7px; border: 1px solid var(--line); background: var(--paper); }
@@ -62,10 +67,15 @@
         }
         #problem .number:hover { transform: translateY(-1px); }
         #problem .number.flipped { color: var(--blue); background: #dcebf3; }
-        #problem .number.tutorial-target { outline: 2px dashed var(--warm); outline-offset: 3px; }
+        #problem .number.hint-target { outline: 2px dashed var(--warm); outline-offset: 3px; }
+        .equation-side.hint-side { background: #f3e5c8; outline: 2px dashed var(--warm); outline-offset: 4px; }
         .operator, .equals { font-weight: bold; }
-        #actions { display: flex; align-items: center; gap: 12px; border-top: 1px solid var(--line); padding-top: 13px; }
+        #actions { display: flex; flex-wrap: wrap; align-items: center; gap: 9px; border-top: 1px solid var(--line); padding-top: 13px; }
         #custom_progress { margin-right: auto; font: bold .78rem "Courier New", monospace; }
+        #feedback { margin-top: 14px; padding: 10px; border: 1px solid var(--line); background: #eeede6; font-size: .78rem; }
+        #feedback p { margin: 0 0 5px; }
+        #feedback code { display: block; overflow-x: auto; color: var(--blue); white-space: nowrap; }
+        #timer_label { padding: 2px 8px; color: var(--red); border: 1px solid var(--red); background: var(--paper); font-weight: bold; }
         .primary { padding: 9px 14px; font: bold .85rem "Courier New", monospace; text-transform: uppercase; }
         details.panel { margin-top: 22px; border-top: 2px solid var(--ink); }
         details.panel > summary { padding: 10px 3px; cursor: pointer; font: bold .83rem "Courier New", monospace; letter-spacing: .08em; text-transform: uppercase; }
@@ -94,6 +104,18 @@
         table { width: 100%; border-collapse: collapse; font-size: .78rem; }
         th, td { padding: 7px; border-bottom: 1px solid var(--line); text-align: left; }
         .stats-actions { margin-top: 10px; text-align: right; }
+        #session_summary { display: grid; grid-template-columns: repeat(4, auto 1fr); gap: 4px 8px; align-items: baseline; }
+        .summary-value { color: var(--blue); font: bold 1.05rem "Courier New", monospace; }
+        .summary-label { color: var(--muted); font-size: .68rem; text-transform: uppercase; }
+        #achievement_list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 7px; margin: 0; padding: 0; }
+        #achievement_list li { display: grid; list-style: none; padding: 8px; border: 1px solid var(--line); font-size: .7rem; }
+        #achievement_list li strong { font: bold .75rem "Courier New", monospace; }
+        #achievement_list .locked { color: var(--muted); opacity: .72; }
+        .settings-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; font-size: .78rem; }
+        body.large-text { font-size: 19px; }
+        body.high-contrast { --game: #fff; --menu: #fff; --paper: #fff; --line: #333; --muted: #333; --blue: #003b6f; }
+        body.high-contrast #message, body.high-contrast #mode_info, body.high-contrast #custom_panel { background: #fff; }
+        body.reduced-clutter details.panel:not(.settings-panel), body.reduced-clutter footer { display: none; }
         footer { margin-top: 22px; padding-top: 12px; border-top: 1px solid var(--line); color: var(--muted); font-size: .75rem; text-align: center; }
         [hidden] { display: none !important; }
         @media (max-width: 760px) {
@@ -105,6 +127,8 @@
             #score_label { display: none; }
             #problem { font-size: 1.05rem; }
             #problem .number { font-size: 1.2rem; }
+            #session_summary { grid-template-columns: repeat(2, auto 1fr); }
+            #achievement_list, .settings-grid { grid-template-columns: 1fr; }
         }
         @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; } }
     </style>
@@ -123,6 +147,10 @@
             <button type="button" data-mode="hard" aria-pressed="false">Hard</button>
             <button type="button" data-mode="expert" aria-pressed="false">Expert</button>
             <button type="button" data-mode="extreme" aria-pressed="false">Extreme</button>
+            <button type="button" data-mode="daily" aria-pressed="false">Daily</button>
+            <button type="button" data-mode="timed" aria-pressed="false">Timed</button>
+            <button type="button" data-mode="endless" aria-pressed="false">Endless</button>
+            <button type="button" data-mode="challenges" aria-pressed="false">Challenges</button>
             <button type="button" data-mode="custom" aria-pressed="false">Custom…</button>
         </div>
         <div id="mode_info" aria-live="polite"></div>
@@ -131,6 +159,7 @@
         <div id="message" role="status" aria-live="polite">
             <strong id="message_title">How to play</strong>
             <span id="message_text"></span>
+            <div id="achievement_notice" role="status"></div>
         </div>
 
         <section id="custom_panel" hidden>
@@ -144,6 +173,7 @@
                     <label>Maximum difficulty target<input id="custom_max" type="number" min="3" max="100" value="35"></label>
                     <label>Correct answers to win<input id="custom_correct" type="number" min="1" max="100" value="10"></label>
                     <label>Minimum win rate (%)<input id="custom_rate" type="number" min="1" max="100" value="80"></label>
+                    <label>Seed (optional)<input id="custom_seed" type="text" maxlength="80" placeholder="Same seed, same run"></label>
                 </div>
                 <button class="primary" type="submit">Start custom game</button>
             </form>
@@ -153,15 +183,25 @@
             <span id="round_label">Tutorial</span>
             <span id="round_kind" class="round-kind">Guided</span>
             <span id="score_label"></span>
+            <span id="timer_label" hidden>60s</span>
         </div>
         <section id="workspace" aria-label="Current puzzle">
             <div id="flips"><strong>Your move</strong><span id="flip_count">1</span><span id="flip_text">flip remaining</span></div>
             <div id="problem"></div>
             <div id="actions">
                 <span id="custom_progress" hidden></span>
+                <button id="hint" class="secondary" type="button" title="Hint (H)">Hint</button>
+                <button id="skip" class="secondary" type="button">Reveal</button>
+                <button id="share" class="secondary" type="button">Share</button>
                 <button id="submit" class="primary" type="button">Check equation</button>
             </div>
+            <div id="feedback" aria-live="polite" hidden></div>
         </section>
+
+        <details class="panel" open>
+            <summary>Current session</summary>
+            <div class="panel-body"><div id="session_summary"></div></div>
+        </details>
 
         <details class="panel">
             <summary>What changes by difficulty?</summary>
@@ -194,10 +234,29 @@
             <summary>Stats by difficulty</summary>
             <div class="panel-body">
                 <table>
-                    <thead><tr><th>Mode</th><th>Correct</th><th>Win rate</th><th>Best streak</th><th></th></tr></thead>
+                    <thead><tr><th>Mode</th><th>Correct</th><th>Win rate</th><th>Streak</th><th>Record</th><th></th></tr></thead>
                     <tbody id="stats_rows"></tbody>
                 </table>
                 <div class="stats-actions"><button id="stats_reset_all" class="secondary" type="button">Reset all stats</button></div>
+            </div>
+        </details>
+
+        <details class="panel">
+            <summary>Achievements</summary>
+            <div class="panel-body"><ul id="achievement_list"></ul></div>
+        </details>
+
+        <details class="panel settings-panel">
+            <summary>Accessibility &amp; sound</summary>
+            <div class="panel-body">
+                <div class="settings-grid">
+                    <label><input id="setting_sound" type="checkbox"> Waveform sound effects (off by default)</label>
+                    <label><input id="setting_large_text" type="checkbox"> Larger text</label>
+                    <label><input id="setting_contrast" type="checkbox"> Higher contrast</label>
+                    <label><input id="setting_reduced_clutter" type="checkbox"> Reduced clutter</label>
+                </div>
+                <p class="wave-note">Keyboard: Left/Right selects a number, Space flips it, Enter checks, and H gives a hint.</p>
+                <button id="install_app" class="secondary" type="button" hidden>Install offline app</button>
             </div>
         </details>
 

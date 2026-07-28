@@ -87,6 +87,21 @@ const customWarmup = core.generateProblem({
 });
 assert.strictEqual(customWarmup.target, 10, 'warm-up round reaches custom minimum target');
 
+const seededA = core.generateProblem({
+    profile: core.DIFFICULTIES.hard,
+    round: 7,
+    random: core.createSeededRandom('share-me')
+});
+const seededB = core.generateProblem({
+    profile: core.DIFFICULTIES.hard,
+    round: 7,
+    random: core.createSeededRandom('share-me')
+});
+assert.deepStrictEqual(seededA, seededB, 'the same seed reproduces a puzzle');
+const details = core.solutionDetails(seededA.sides, {});
+assert(details.solutionId, 'solution details identify the intended flip');
+assert.strictEqual(details.solvedTotals[0], details.solvedTotals[1]);
+
 const allOperations = new Set();
 for (let seed = 1; seed <= 100; seed++) {
     const problem = core.generateProblem({
