@@ -42,6 +42,15 @@ for (const profile of Object.values(core.DIFFICULTIES)) {
         );
         assert(Number.isInteger(core.evaluate(problem.sides[0], values)));
         assert(Number.isInteger(core.evaluate(problem.sides[1], values)));
+        const allNumbers = [];
+        core.visitNumbers(problem.sides[0], function (node) { allNumbers.push(node); });
+        core.visitNumbers(problem.sides[1], function (node) { allNumbers.push(node); });
+        for (const node of allNumbers) {
+            const trial = {};
+            trial[node.id] = 1;
+            assert(Number.isInteger(core.evaluate(problem.sides[0], trial)));
+            assert(Number.isInteger(core.evaluate(problem.sides[1], trial)));
+        }
         const signature = core.OPERATIONS[profile.operations[profile.operations.length - 1]].symbol;
         assert(
             problem.sides.map(core.serialize).join(' = ').includes(signature),
@@ -55,10 +64,33 @@ assert.strictEqual(average, 1);
 assert.strictEqual(core.roundTarget(20, 1).kind, 'Warm-up');
 assert.strictEqual(core.roundTarget(20, 5).kind, 'Challenge');
 
+for (const operation of Object.keys(core.OPERATIONS)) {
+    const custom = core.generateProblem({
+        profile: core.DIFFICULTIES.easy,
+        operations: [operation],
+        length: 5,
+        targetRange: [10, 30],
+        round: 5,
+        random: seededRandom(operation.length * 101)
+    });
+    const customText = custom.sides.map(core.serialize).join(' = ');
+    assert(customText.includes(core.OPERATIONS[operation].symbol), 'custom mode includes ' + operation);
+    assert.strictEqual(custom.target, 30, 'challenge round reaches custom maximum target');
+}
+const customWarmup = core.generateProblem({
+    profile: core.DIFFICULTIES.easy,
+    operations: ['add'],
+    length: 5,
+    targetRange: [10, 30],
+    round: 1,
+    random: seededRandom(7)
+});
+assert.strictEqual(customWarmup.target, 10, 'warm-up round reaches custom minimum target');
+
 const allOperations = new Set();
 for (let seed = 1; seed <= 100; seed++) {
     const problem = core.generateProblem({
-        profile: core.DIFFICULTIES.master,
+        profile: core.DIFFICULTIES.extreme,
         round: seed,
         random: seededRandom(seed)
     });

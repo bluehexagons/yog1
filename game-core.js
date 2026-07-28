@@ -38,8 +38,8 @@
             operations: ['add', 'subtract', 'multiply', 'divide', 'modulo', 'power'], maxNumber: 80,
             description: 'Adds remainders and powers, with larger values.'
         },
-        master: {
-            id: 'master', name: 'Master', target: 52, length: [6, 11],
+        extreme: {
+            id: 'extreme', name: 'Extreme', target: 52, length: [6, 11],
             operations: Object.keys(OPERATIONS), maxNumber: 120,
             description: 'Every operation, including roots, in deep expressions.'
         }
@@ -208,10 +208,15 @@
         if (expression.type === 'number' && expression.value >= 2) {
             result.push(expression);
         } else if (expression.type === 'root') {
-            expandableNodes(expression.value, result);
+            // Keep radicands as single positive integers so any player flip
+            // still has a defined integer result.
         } else if (expression.type === 'binary') {
-            expandableNodes(expression.left, result);
-            expandableNodes(expression.right, result);
+            if (expression.operation !== 'power') {
+                expandableNodes(expression.left, result);
+            }
+            if (!['divide', 'modulo', 'power'].includes(expression.operation)) {
+                expandableNodes(expression.right, result);
+            }
         }
         return result;
     }
@@ -284,7 +289,9 @@
         const target = pick(random, candidates);
         let replacement;
         const identities = operations.filter(function (operation) {
-            return ['add', 'subtract', 'multiply', 'divide', 'power'].includes(operation);
+            // A disguised exponent can explode far beyond JavaScript's safe
+            // integer range, so powers are generated only with small exponents.
+            return ['add', 'subtract', 'multiply', 'divide'].includes(operation);
         });
         const operation = identities.length ? pick(random, identities) : 'multiply';
         if (operation === 'add' && target.value > 2) {
@@ -293,8 +300,6 @@
             replacement = binary('subtract', number(target.value + 1), number(1, true));
         } else if (operation === 'divide') {
             replacement = binary('divide', number(target.value), number(1, true));
-        } else if (operation === 'power') {
-            replacement = binary('power', number(target.value), number(1, true));
         } else {
             replacement = binary('multiply', number(target.value), number(1, true));
         }

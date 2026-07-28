@@ -28,6 +28,7 @@
     let currentValues = {};
     let historyPage = 0;
     let customRun = { attempts: 0, correct: 0, won: false };
+    let activeCustomSettings = null;
 
     function load(key, fallback) {
         try {
@@ -100,7 +101,7 @@
             ui.custom_operations.appendChild(label);
         }
         const saved = load(CUSTOM_KEY, null);
-        if (saved) {
+        if (saved && Array.isArray(saved.operations)) {
             for (const input of ui.custom_operations.querySelectorAll('input')) {
                 input.checked = saved.operations.includes(input.value);
             }
@@ -183,7 +184,7 @@
             currentProblem = tutorialProblem();
             setMessage('How to play', 'Change exactly one number into a 1 so both sides have the same integer value.');
         } else if (mode === 'custom') {
-            const settings = customSettings();
+            const settings = activeCustomSettings;
             currentProblem = core.generateProblem({
                 profile: profile,
                 round: round,
@@ -229,6 +230,9 @@
     function activateMode(nextMode, button) {
         mode = nextMode;
         round = 1;
+        if (mode === 'custom') {
+            activeCustomSettings = null;
+        }
         for (const candidate of ui.mode_buttons.querySelectorAll('button')) {
             const active = candidate === button;
             candidate.classList.toggle('active', active);
@@ -336,7 +340,7 @@
             return;
         }
         ui.custom_progress.hidden = false;
-        const settings = customSettings();
+        const settings = activeCustomSettings || customSettings();
         const accuracy = customRun.attempts
             ? Math.round(customRun.correct / customRun.attempts * 100) : 0;
         ui.custom_progress.textContent = customRun.correct + '/' + settings.correct +
@@ -345,7 +349,7 @@
 
     ui.problem.addEventListener('click', function (event) {
         const button = event.target.closest('[data-number-id]');
-        if (!button || customRun.won) {
+        if (!button || (mode === 'custom' && customRun.won)) {
             return;
         }
         const id = button.dataset.numberId;
@@ -387,7 +391,7 @@
             if (correct) {
                 customRun.correct++;
             }
-            const settings = customSettings();
+            const settings = activeCustomSettings;
             const accuracy = customRun.correct / customRun.attempts * 100;
             if (customRun.correct >= settings.correct && accuracy >= settings.rate) {
                 customRun.won = true;
@@ -425,6 +429,7 @@
             return;
         }
         save(CUSTOM_KEY, settings);
+        activeCustomSettings = settings;
         customRun = { attempts: 0, correct: 0, won: false };
         round = 1;
         ui.submit.disabled = false;
