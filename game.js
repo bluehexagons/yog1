@@ -3,9 +3,9 @@
 
     const core = window.Yog1Core;
     const KEYS = {
-        history: 'yog1.problemHistory.v3',
-        stats: 'yog1.difficultyStats.v3',
-        custom: 'yog1.customSettings.v3',
+        history: 'yog1.problemHistory.v2',
+        stats: 'yog1.difficultyStats.v2',
+        custom: 'yog1.customSettings.v2',
         achievements: 'yog1.achievements.v1',
         settings: 'yog1.accessibility.v1',
         daily: 'yog1.dailyResults.v1'
@@ -354,6 +354,7 @@
         ui.submit.disabled = session.finished;
         ui.hint.disabled = mode === 'tutorial' || session.finished;
         ui.skip.disabled = mode === 'tutorial' || session.finished;
+        ui.share.disabled = mode === 'tutorial';
         hideFeedback();
         drawProblem();
         updateProgress();
@@ -495,7 +496,9 @@
         ui.skip.disabled = true;
 
         if (mode === 'daily') {
-            dailyResults[utcDate()] = { attempts: session.attempts, hints: session.hints, at: Date.now() };
+            dailyResults[utcDate()] = {
+                attempts: session.attempts, hints: session.hints, success: true, at: Date.now()
+            };
             save(KEYS.daily, dailyResults);
             ui.submit.disabled = true;
             setMessage('Daily complete', dailyShareText());
@@ -711,6 +714,7 @@
         if (core.DIFFICULTIES[mode]) profile = core.DIFFICULTIES[mode];
         round = options.round || 1;
         forcedSeed = options.seed || null;
+        forcedRound = options.round || null;
         dailyDateOverride = options.date || null;
         activeCustomSettings = null;
         customRun = { attempts: 0, correct: 0, won: false };
@@ -736,7 +740,8 @@
     function dailyShareText() {
         const result = dailyResults[utcDate()];
         return result
-            ? 'YOG1 ' + utcDate() + ' · solved in ' + result.attempts +
+            ? 'YOG1 ' + utcDate() + ' · ' +
+                (result.success === false ? 'solution revealed after ' : 'solved in ') + result.attempts +
                 (result.attempts === 1 ? ' attempt' : ' attempts') +
                 (result.hints ? ' · ' + result.hints + ' hints' : ' · no hints')
             : 'YOG1 Daily ' + utcDate();
@@ -749,9 +754,20 @@
         if (mode === 'daily') {
             url.searchParams.set('daily', utcDate());
             shareText = dailyShareText();
+        } else if (mode === 'challenges') {
+            url.searchParams.set('challenge', String(round));
+            shareText += ' · handcrafted challenge ' + round;
         } else {
             url.searchParams.set('seed', currentSeed);
-            url.searchParams.set('difficulty', modeProfile().id);
+            if (mode === 'custom') {
+                url.searchParams.set('difficulty', 'custom');
+                url.searchParams.set('ops', activeCustomSettings.operations.join(','));
+                url.searchParams.set('length', String(activeCustomSettings.length));
+                url.searchParams.set('min', String(activeCustomSettings.min));
+                url.searchParams.set('max', String(activeCustomSettings.max));
+            } else {
+                url.searchParams.set('difficulty', modeProfile().id);
+            }
             url.searchParams.set('round', String(round));
             shareText += ' · ' + modeLabel() + ' puzzle';
         }
@@ -811,6 +827,8 @@
         currentValues = valuesWithFlip(selectedId);
         playSound('flip');
         drawProblem();
+        const replacement = ui.problem.querySelector('[data-number-id="' + id + '"]');
+        if (replacement) replacement.focus();
         if (mode === 'tutorial') {
             setMessage(isSolved() ? 'Good move' : 'Try the outlined number',
                 isSolved() ? 'The equation balances. Check it to finish.' :
@@ -861,6 +879,23 @@
         ui.submit.textContent = 'Next puzzle';
         ui.hint.disabled = true;
         ui.skip.disabled = true;
+        if (mode === 'daily') {
+            dailyResults[utcDate()] = {
+                attempts: session.attempts, hints: session.hints, success: false, at: Date.now()
+            };
+            save(KEYS.daily, dailyResults);
+            ui.submit.disabled = true;
+            setMessage('Daily solution revealed', 'The shared result records this as a reveal.');
+            return;
+        }
+        if (mode === 'endless') {
+            session.lives--;
+            renderSession();
+            if (session.lives <= 0) {
+                finishSession('Run over', 'The revealed puzzle used your final life.');
+                return;
+            }
+        }
         setMessage('Solution revealed', 'This puzzle counts as incorrect. Review it, then continue.');
     });
 
@@ -884,7 +919,8 @@
         save(KEYS.custom, chosen);
         activeCustomSettings = chosen;
         customRun = { attempts: 0, correct: 0, won: false };
-        round = 1;
+        round = forcedRound || 1;
+        forcedRound = null;
         newSession();
         startRound();
     });
@@ -945,7 +981,9 @@
         } else if (event.key.toLowerCase() === 'h' && !ui.hint.disabled) {
             event.preventDefault();
             ui.hint.click();
-        } else if (event.key === 'Enter' && document.activeElement === document.body) {
+        } else if (event.key === 'Enter' &&
+            (document.activeElement === document.body || ui.problem.contains(document.activeElement))) {
+            event.preventDefault();
             ui.submit.click();
         }
     });
@@ -966,15 +1004,45 @@
     function bootFromUrl() {
         const params = new URLSearchParams(window.location.search);
         const daily = params.get('daily');
+        const challenge = params.get('challenge');
         const seed = params.get('seed');
         if (daily) {
             const button = ui.mode_buttons.querySelector('[data-mode="daily"]');
             activateMode('daily', button, { date: daily });
             return;
         }
+        if (challenge) {
+            const button = ui.mode_buttons.querySelector('[data-mode="challenges"]');
+            activateMode('challenges', button, {
+                round: Math.max(1, Math.min(CURATED.length, Number(challenge) || 1))
+            });
+            setMessage('Shared handcrafted puzzle', currentProblem.title);
+            return;
+        }
         if (seed) {
-            const difficulty = core.DIFFICULTIES[params.get('difficulty')]
-                ? params.get('difficulty') : 'normal';
+            const requested = params.get('difficulty');
+            if (requested === 'custom') {
+                const button = ui.mode_buttons.querySelector('[data-mode="custom"]');
+                activateMode('custom', button, {
+                    seed: seed,
+                    round: Math.max(1, Number(params.get('round')) || 1)
+                });
+                const requestedOperations = (params.get('ops') || '').split(',').filter(function (key) {
+                    return Object.prototype.hasOwnProperty.call(core.OPERATIONS, key);
+                });
+                for (const input of ui.custom_operations.querySelectorAll('input')) {
+                    input.checked = requestedOperations.includes(input.value);
+                }
+                ui.custom_length.value = Math.max(2, Math.min(12, Number(params.get('length')) || 5));
+                ui.custom_length_value.textContent = ui.custom_length.value;
+                ui.custom_min.value = Math.max(3, Math.min(100, Number(params.get('min')) || 12));
+                ui.custom_max.value = Math.max(Number(ui.custom_min.value),
+                    Math.min(100, Number(params.get('max')) || 35));
+                ui.custom_form.requestSubmit();
+                setMessage('Shared custom puzzle', 'This custom puzzle is reproduced from a shared link.');
+                return;
+            }
+            const difficulty = core.DIFFICULTIES[requested] ? requested : 'normal';
             const button = ui.mode_buttons.querySelector('[data-mode="' + difficulty + '"]');
             activateMode(difficulty, button, {
                 seed: seed,

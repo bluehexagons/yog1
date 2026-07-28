@@ -6,7 +6,9 @@ const FILES = [
     './game-core.js',
     './game.js',
     './manifest.webmanifest',
-    './icon.svg'
+    './icon.svg',
+    './icon-192.png',
+    './icon-512.png'
 ];
 
 self.addEventListener('install', function (event) {

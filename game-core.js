@@ -442,7 +442,7 @@
             inspect(expression.right);
         }
         sides.forEach(inspect);
-        const solvedValues = solution ? Object.assign({}, currentValues, { [solution.id]: 1 }) : {};
+        const solvedValues = solution ? { [solution.id]: 1 } : {};
         return {
             solutionId: solution ? solution.id : null,
             solutionValue: solution ? solution.value : null,
