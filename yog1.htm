@@ -5,882 +5,210 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>You Only Get 1s</title>
     <style>
-        *, *::before, *::after {
-            box-sizing: border-box;
-        }
+        *, *::before, *::after { box-sizing: border-box; }
         :root {
-            --bg: #191919;
-            --menu-bg: #c9c9c3;
-            --game-bg: #e5e4dc;
-            --paper: #f7f6ee;
-            --number-bg: #fffef8;
-            --number-color: #123d61;
-            --hint-color: #8b4b28;
-            --hint-border: #633307;
-            --flipped-color: #174f7c;
-            --correct: #17672f;
-            --incorrect: #a52d39;
-            --button-active-bg: #aaa9a2;
-            --muted: #62625d;
-            --border-color: #171717;
+            --ink: #171717; --bg: #191919; --menu: #c9c9c3; --game: #e5e4dc;
+            --paper: #fffef8; --blue: #123d61; --green: #17672f; --red: #a52d39;
+            --muted: #62625d; --warm: #8b4b28; --line: #aaa9a2;
         }
         body {
-            font-family: Verdana, Geneva, sans-serif;
-            font-size: 16px;
-            color: var(--border-color);
-            background: var(--bg);
-            margin: 0;
-            min-height: 100vh;
-            display: flex;
-            align-items: flex-start;
-            justify-content: center;
+            margin: 0; min-height: 100vh; background: var(--bg); color: var(--ink);
+            font: 16px/1.45 Verdana, Geneva, sans-serif;
         }
-        button {
-            color: inherit;
-        }
+        button, input { font: inherit; color: inherit; }
+        button { cursor: pointer; }
+        button:disabled { cursor: not-allowed; opacity: .5; }
+        a { color: var(--blue); }
         #wrapper {
-            width: 820px;
-            max-width: calc(100vw - 32px);
-            min-height: 590px;
-            display: flex;
-            margin: 24px 0;
-            border: 2px solid var(--border-color);
-            box-shadow: 6px 6px 0 #000;
+            width: 1080px; max-width: calc(100vw - 32px); min-height: 650px;
+            display: flex; margin: 24px auto; border: 2px solid var(--ink);
+            box-shadow: 6px 6px #000; background: var(--game);
         }
         #menu {
-            width: 174px;
-            flex-shrink: 0;
-            padding: 22px 14px;
-            background: var(--menu-bg);
-            border-right: 2px solid var(--border-color);
+            width: 205px; flex: none; padding: 20px 14px; background: var(--menu);
+            border-right: 2px solid var(--ink);
         }
-        #menu h1 {
-            font-family: "Courier New", Courier, monospace;
-            font-size: 1.45rem;
-            line-height: 1.05;
-            letter-spacing: -0.06em;
-            margin: 8px 0 10px;
+        h1 { margin: 6px 0; font: bold 1.45rem/1 "Courier New", monospace; letter-spacing: -.06em; }
+        .jam-label, .section-label {
+            font: bold .7rem "Courier New", monospace; letter-spacing: .12em; text-transform: uppercase;
         }
-        .jam-label,
-        .section-label {
-            font-family: "Courier New", Courier, monospace;
-            font-size: 0.7rem;
-            font-weight: bold;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
+        .tagline { margin: 0 0 22px; color: #41413e; font-size: .78rem; }
+        #mode_buttons { display: grid; gap: 7px; margin: 7px 0 16px; }
+        #mode_buttons button, .primary, .secondary, .small-button {
+            border: 1px solid var(--ink); background: var(--paper); box-shadow: 2px 2px var(--ink);
         }
-        .tagline {
-            color: #41413e;
-            font-size: 0.77rem;
-            line-height: 1.5;
-            margin: 0 0 26px;
+        #mode_buttons button { padding: 8px 9px; text-align: left; }
+        #mode_buttons button:hover, .primary:hover, .secondary:hover { background: #edede7; }
+        #mode_buttons button.active { background: #aaa9a2; font-weight: bold; box-shadow: inset 3px 0 var(--ink), 2px 2px var(--ink); }
+        #mode_info { display: grid; gap: 6px; padding: 10px; border: 1px solid var(--ink); background: #d6d5ce; font-size: .72rem; }
+        #mode_info strong { font: bold .8rem "Courier New", monospace; text-transform: uppercase; }
+        #game { flex: 1; min-width: 0; padding: 24px 28px; overflow: hidden; }
+        #message { padding: 11px 14px; border: 1px solid var(--ink); border-left-width: 5px; background: #d6d5ce; }
+        #message strong { display: block; font: bold .78rem "Courier New", monospace; letter-spacing: .08em; text-transform: uppercase; }
+        #message_text { font-size: .85rem; }
+        #round_bar { display: flex; gap: 10px; align-items: center; margin: 16px 0 8px; font-size: .76rem; color: var(--muted); }
+        #round_label { margin-right: auto; color: var(--ink); font: bold .82rem "Courier New", monospace; text-transform: uppercase; }
+        .round-kind { padding: 2px 7px; border: 1px solid var(--line); background: var(--paper); }
+        .round-kind.challenge { color: var(--red); border-color: var(--red); }
+        .round-kind.warmup { color: var(--green); border-color: var(--green); }
+        #workspace { padding: 17px 19px; border: 2px solid var(--ink); background: #f7f6ee; box-shadow: 4px 4px #b4b3ac; }
+        #flips { display: flex; gap: 6px; color: var(--muted); font-size: .78rem; }
+        #flips strong { margin-right: auto; color: var(--ink); font: bold .75rem "Courier New", monospace; letter-spacing: .08em; text-transform: uppercase; }
+        #flip_count { color: var(--ink); font-weight: bold; }
+        #problem { min-height: 90px; display: flex; align-items: center; overflow-x: auto; padding: 10px 2px 16px; white-space: nowrap; font: 1.45rem "Courier New", monospace; }
+        #problem .number {
+            padding: 1px 6px; border: 1px solid var(--ink); background: var(--paper); color: var(--blue);
+            box-shadow: 2px 2px var(--ink); font: 1.65rem "Courier New", monospace;
         }
-        #start_buttons {
-            margin: 6px 0 0;
-            padding: 0;
+        #problem .number:hover { transform: translateY(-1px); }
+        #problem .number.flipped { color: var(--blue); background: #dcebf3; }
+        #problem .number.tutorial-target { outline: 2px dashed var(--warm); outline-offset: 3px; }
+        .operator, .equals { font-weight: bold; }
+        #actions { display: flex; align-items: center; gap: 12px; border-top: 1px solid var(--line); padding-top: 13px; }
+        #custom_progress { margin-right: auto; font: bold .78rem "Courier New", monospace; }
+        .primary { padding: 9px 14px; font: bold .85rem "Courier New", monospace; text-transform: uppercase; }
+        details.panel { margin-top: 22px; border-top: 2px solid var(--ink); }
+        details.panel > summary { padding: 10px 3px; cursor: pointer; font: bold .83rem "Courier New", monospace; letter-spacing: .08em; text-transform: uppercase; }
+        .panel-body { padding: 8px 3px 18px; }
+        .difficulty-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 7px; }
+        .difficulty-grid article { padding: 9px; border: 1px solid var(--line); background: #eeeDE6; font-size: .72rem; }
+        .difficulty-grid h3 { margin: 0 0 5px; font: bold .78rem "Courier New", monospace; }
+        .wave-note { margin: 10px 0 0; font-size: .78rem; color: var(--muted); }
+        #custom_panel { margin-top: 18px; padding: 13px; border: 1px solid var(--ink); background: #d6d5ce; }
+        #custom_form { display: grid; gap: 12px; }
+        #custom_form fieldset { margin: 0; border: 1px solid var(--line); }
+        #custom_form legend { font: bold .75rem "Courier New", monospace; text-transform: uppercase; }
+        #custom_operations { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; font-size: .78rem; }
+        .custom-fields { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .custom-fields label { display: grid; gap: 3px; font-size: .75rem; }
+        input[type="number"] { width: 100%; padding: 5px; border: 1px solid var(--ink); background: var(--paper); }
+        #history { margin: 0; padding: 0; }
+        #history li { list-style: none; padding: 9px 6px; border-bottom: 1px solid var(--line); }
+        #history li.correct { color: var(--green); } #history li.incorrect { color: var(--red); }
+        #history code { display: block; overflow-x: auto; padding-top: 4px; color: inherit; white-space: nowrap; }
+        .history-summary { font-size: .72rem; font-weight: bold; }
+        .history-date { color: var(--muted); font-weight: normal; }
+        .history-controls { display: flex; gap: 8px; align-items: center; margin-top: 10px; }
+        #history_page { margin-right: auto; font-size: .72rem; color: var(--muted); }
+        .secondary, .small-button { padding: 5px 9px; font-size: .72rem; }
+        table { width: 100%; border-collapse: collapse; font-size: .78rem; }
+        th, td { padding: 7px; border-bottom: 1px solid var(--line); text-align: left; }
+        .stats-actions { margin-top: 10px; text-align: right; }
+        footer { margin-top: 22px; padding-top: 12px; border-top: 1px solid var(--line); color: var(--muted); font-size: .75rem; text-align: center; }
+        [hidden] { display: none !important; }
+        @media (max-width: 760px) {
+            #wrapper { flex-direction: column; margin: 10px; max-width: calc(100vw - 20px); }
+            #menu { width: 100%; border-right: 0; border-bottom: 2px solid var(--ink); }
+            #mode_buttons { grid-template-columns: repeat(2, 1fr); }
+            #game { padding: 16px 13px; }
+            .difficulty-grid { grid-template-columns: 1fr; }
+            #score_label { display: none; }
+            #problem { font-size: 1.05rem; }
+            #problem .number { font-size: 1.2rem; }
         }
-        #start_buttons button {
-            display: block;
-            width: 100%;
-            padding: 8px 9px;
-            border: 1px solid var(--border-color);
-            border-radius: 1px;
-            cursor: pointer;
-            text-align: left;
-            margin: 0 0 7px;
-            background: var(--number-bg);
-            box-shadow: 2px 2px 0 var(--border-color);
-            font: 0.82rem Verdana, Geneva, sans-serif;
-            transition: transform 70ms ease, box-shadow 70ms ease, background-color 100ms ease;
-        }
-        #start_buttons button:hover {
-            background: #edede7;
-        }
-        #start_buttons button:active {
-            transform: translate(2px, 2px);
-            box-shadow: 0 0 0 var(--border-color);
-        }
-        #start_buttons button.active {
-            background: var(--button-active-bg);
-            font-weight: bold;
-            box-shadow: inset 3px 0 0 var(--border-color), 2px 2px 0 var(--border-color);
-        }
-        #game {
-            flex: 1;
-            min-width: 0;
-            padding: 24px 28px 30px;
-            background: var(--game-bg);
-            overflow: auto;
-        }
-        #tutorial {
-            min-height: 76px;
-            margin-bottom: 20px;
-            padding: 12px 14px;
-            border: 1px solid var(--border-color);
-            border-left-width: 5px;
-            background: #d6d5ce;
-        }
-        #tutorial strong {
-            display: block;
-            font-family: "Courier New", Courier, monospace;
-            font-size: 0.78rem;
-            letter-spacing: 0.08em;
-            margin-bottom: 5px;
-            text-transform: uppercase;
-        }
-        #tutorial_text {
-            display: block;
-            font-size: 0.86rem;
-            line-height: 1.55;
-        }
-        #workspace {
-            padding: 18px 20px 20px;
-            border: 2px solid var(--border-color);
-            background: var(--paper);
-            box-shadow: 4px 4px 0 #b4b3ac;
-        }
-        #flips {
-            display: flex;
-            align-items: baseline;
-            gap: 7px;
-            color: var(--muted);
-            font-size: 0.78rem;
-            margin-bottom: 15px;
-        }
-        #flips .flips-label {
-            color: var(--border-color);
-            font-family: "Courier New", Courier, monospace;
-            font-weight: bold;
-            letter-spacing: 0.08em;
-            margin-right: auto;
-            text-transform: uppercase;
-        }
-        #problem {
-            min-height: 76px;
-            display: flex;
-            align-items: center;
-            overflow-x: auto;
-            padding: 5px 2px 14px;
-            font-family: "Courier New", Courier, monospace;
-            font-size: 1.65rem;
-            white-space: nowrap;
-        }
-        #problem span.operator {
-            font-weight: bold;
-        }
-        #problem span.equals {
-            font-weight: bolder;
-        }
-        #problem span.number {
-            color: var(--number-color);
-            font-size: 1.8rem;
-            line-height: 1.3;
-            border: 1px solid var(--border-color);
-            border-radius: 1px;
-            padding: 0 6px;
-            cursor: pointer;
-            display: inline-block;
-            text-align: center;
-            background: var(--number-bg);
-            box-shadow: 2px 2px 0 var(--border-color);
-            transition: transform 70ms ease, box-shadow 70ms ease, background-color 100ms ease;
-        }
-        #problem span.number:hover {
-            background: #eef1f2;
-            transform: translateY(-1px);
-        }
-        #problem span.number:active {
-            box-shadow: 0 0 0 var(--border-color);
-            transform: translate(2px, 2px);
-        }
-        #problem span.number:focus {
-            outline: 2px solid var(--number-color);
-            outline-offset: 1px;
-        }
-        #actions {
-            display: flex;
-            justify-content: flex-end;
-            border-top: 1px solid #aaa9a2;
-            padding-top: 15px;
-        }
-        #submit {
-            background: var(--number-bg);
-            font-weight: bold;
-            font: bold 0.9rem "Courier New", Courier, monospace;
-            letter-spacing: 0.04em;
-            cursor: pointer;
-            border: 2px solid var(--border-color);
-            border-radius: 1px;
-            box-shadow: 3px 3px 0 var(--border-color);
-            padding: 10px 16px;
-            text-transform: uppercase;
-            transition: transform 70ms ease, box-shadow 70ms ease, background-color 100ms ease;
-        }
-        #submit:hover {
-            background: #deded7;
-        }
-        #submit:active {
-            box-shadow: 0 0 0 var(--border-color);
-            transform: translate(3px, 3px);
-        }
-        #problem span.hint {
-            color: var(--hint-color);
-            border-color: var(--hint-border);
-        }
-        #problem span.flipped {
-            color: var(--flipped-color);
-            background: #dcebf3;
-            animation: flip-in 140ms ease-out;
-        }
-        #problem span.blocked {
-            animation: blocked 160ms linear;
-        }
-        #flips span.number {
-            font-weight: bold;
-            font: bold 1.15rem "Courier New", Courier, monospace;
-            color: var(--border-color);
-            border: 1px solid #aaa9a2;
-            border-radius: 1px;
-            background: var(--number-bg);
-            padding: 1px 6px;
-        }
-        #flips.notice {
-            animation: nudge 180ms linear;
-        }
-        #problem span.tutorial-target {
-            outline: 2px dashed var(--hint-border);
-            outline-offset: 4px;
-        }
-        #history_text {
-            display: flex;
-            align-items: baseline;
-            justify-content: space-between;
-            font-family: "Courier New", Courier, monospace;
-            font-size: 0.75rem;
-            font-weight: bold;
-            letter-spacing: 0.1em;
-            margin-top: 28px;
-            padding-bottom: 7px;
-            border-bottom: 2px solid var(--border-color);
-            text-transform: uppercase;
-        }
-        #history_text span {
-            color: var(--muted);
-            font: normal 0.68rem Verdana, Geneva, sans-serif;
-            letter-spacing: 0;
-            text-transform: none;
-        }
-        #history {
-            margin: 0;
-            padding: 0;
-        }
-        #history li {
-            border-bottom: 1px solid #aaa9a2;
-            padding: 9px 7px;
-            display: block;
-            text-align: left;
-            list-style: none;
-            font-family: "Courier New", Courier, monospace;
-            font-size: 0.88rem;
-            animation: history-in 140ms ease-out;
-        }
-        #history li strong {
-            display: inline-block;
-            min-width: 92px;
-        }
-        #history li.correct {
-            color: var(--correct);
-        }
-        #history li.incorrect {
-            color: var(--incorrect);
-        }
-
-        @keyframes flip-in {
-            50% { transform: translateY(-3px); }
-        }
-        @keyframes blocked {
-            25% { transform: translateX(-2px); }
-            75% { transform: translateX(2px); }
-        }
-        @keyframes nudge {
-            50% { color: var(--incorrect); transform: translateX(3px); }
-        }
-        @keyframes history-in {
-            from { opacity: 0; transform: translateY(-4px); }
-        }
-
-        @media (max-width: 680px) {
-            body {
-                display: block;
-            }
-            #wrapper {
-                flex-direction: column;
-                min-height: auto;
-                max-width: calc(100vw - 20px);
-                margin: 10px;
-                box-shadow: 4px 4px 0 #000;
-            }
-            #menu {
-                width: 100%;
-                padding: 14px;
-                border-right: 0;
-                border-bottom: 2px solid var(--border-color);
-            }
-            #menu h1 {
-                margin: 4px 0;
-            }
-            .tagline {
-                margin-bottom: 12px;
-            }
-            #start_buttons {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 6px;
-            }
-            #start_buttons button {
-                flex: 1 1 calc(50% - 3px);
-                margin: 0;
-                padding: 8px 4px;
-                text-align: center;
-            }
-            #game {
-                padding: 18px 14px 22px;
-            }
-            #workspace {
-                padding: 14px;
-            }
-            #problem {
-                min-height: 66px;
-                font-size: 1.2rem;
-            }
-            #problem span.number {
-                font-size: 1.35rem;
-            }
-            #history li strong {
-                display: block;
-                margin-bottom: 3px;
-            }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            *, *::before, *::after {
-                animation-duration: 0.01ms !important;
-                transition-duration: 0.01ms !important;
-            }
-        }
+        @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; } }
     </style>
 </head>
 <body>
-    <div id="wrapper">
-        <aside id="menu">
-            <div class="jam-label">LD28 / 2013</div>
-            <h1>You Only Get 1s</h1>
-            <p class="tagline">One move. Make it count.</p>
-            <div class="section-label">Mode</div>
-            <div id="start_buttons" role="group" aria-label="Game mode">
-                <button type="button" data-difficulty="0" data-tutorial="true" class="active" aria-pressed="true">Tutorial</button>
-                <button type="button" data-difficulty="0" aria-pressed="false">Easy</button>
-                <button type="button" data-difficulty="15" aria-pressed="false">Normal</button>
-                <button type="button" data-difficulty="30" aria-pressed="false">Hard</button>
-            </div>
-        </aside>
-        <main id="game">
-            <div id="tutorial" role="status" aria-live="polite" aria-atomic="true">
-                <strong id="tutorial_title">How to play</strong>
-                <span id="tutorial_text">Turn one number into a 1 so both sides of the equation have the same value.</span>
-            </div>
-            <div id="workspace">
-                <div id="flips">
-                    <span class="flips-label">Your move</span>
-                    <span class="number">0</span>
-                    <span>flips remaining</span>
+<div id="wrapper">
+    <aside id="menu">
+        <div class="jam-label">LD28 / 2013</div>
+        <h1>You Only Get 1s</h1>
+        <p class="tagline">One move. Make it count.</p>
+        <div class="section-label">Mode</div>
+        <div id="mode_buttons" role="group" aria-label="Game mode">
+            <button type="button" data-mode="tutorial" class="active" aria-pressed="true">Tutorial</button>
+            <button type="button" data-mode="easy" aria-pressed="false">Easy</button>
+            <button type="button" data-mode="normal" aria-pressed="false">Normal</button>
+            <button type="button" data-mode="hard" aria-pressed="false">Hard</button>
+            <button type="button" data-mode="expert" aria-pressed="false">Expert</button>
+            <button type="button" data-mode="master" aria-pressed="false">Master</button>
+            <button type="button" data-mode="custom" aria-pressed="false">Custom…</button>
+        </div>
+        <div id="mode_info" aria-live="polite"></div>
+    </aside>
+    <main id="game">
+        <div id="message" role="status" aria-live="polite">
+            <strong id="message_title">How to play</strong>
+            <span id="message_text"></span>
+        </div>
+
+        <section id="custom_panel" hidden>
+            <form id="custom_form">
+                <fieldset><legend>Operations</legend><div id="custom_operations"></div></fieldset>
+                <div class="custom-fields">
+                    <label>Problem length: <strong><span id="custom_length_value">5</span> operations</strong>
+                        <input id="custom_length" type="range" min="2" max="12" value="5">
+                    </label>
+                    <label>Minimum difficulty target<input id="custom_min" type="number" min="3" max="100" value="12"></label>
+                    <label>Maximum difficulty target<input id="custom_max" type="number" min="3" max="100" value="35"></label>
+                    <label>Correct answers to win<input id="custom_correct" type="number" min="1" max="100" value="10"></label>
+                    <label>Minimum win rate (%)<input id="custom_rate" type="number" min="1" max="100" value="80"></label>
                 </div>
-                <div id="problem"></div>
-                <div id="actions">
-                    <button id="submit" type="button">Check equation</button>
+                <button class="primary" type="submit">Start custom game</button>
+            </form>
+        </section>
+
+        <div id="round_bar">
+            <span id="round_label">Tutorial</span>
+            <span id="round_kind" class="round-kind">Guided</span>
+            <span id="score_label"></span>
+        </div>
+        <section id="workspace" aria-label="Current puzzle">
+            <div id="flips"><strong>Your move</strong><span id="flip_count">1</span><span id="flip_text">flip remaining</span></div>
+            <div id="problem"></div>
+            <div id="actions">
+                <span id="custom_progress" hidden></span>
+                <button id="submit" class="primary" type="button">Check equation</button>
+            </div>
+        </section>
+
+        <details class="panel">
+            <summary>What changes by difficulty?</summary>
+            <div class="panel-body">
+                <div class="difficulty-grid">
+                    <article><h3>Easy</h3>Short + and − puzzles; small integers.</article>
+                    <article><h3>Normal</h3>Longer puzzles; adds ×.</article>
+                    <article><h3>Hard</h3>Deeper puzzles; adds integer ÷.</article>
+                    <article><h3>Expert</h3>Adds modulus % and powers ^.</article>
+                    <article><h3>Master</h3>Largest values and every operation, including √.</article>
+                </div>
+                <p class="wave-note">Every mode follows a repeating eight-round wave: warm-ups, standard rounds, and challenge rounds average back to the mode’s normal difficulty. The wave averages exactly over typical 24, 32, and 40-puzzle sessions.</p>
+            </div>
+        </details>
+
+        <details class="panel">
+            <summary>Problem history</summary>
+            <div class="panel-body">
+                <ul id="history"></ul>
+                <div class="history-controls">
+                    <span id="history_page"></span>
+                    <button id="history_prev" class="secondary" type="button">Previous</button>
+                    <button id="history_next" class="secondary" type="button">Next</button>
+                    <button id="history_clear" class="secondary" type="button">Clear history</button>
                 </div>
             </div>
-            <h2 id="history_text">Problem History <span>Newest first</span></h2>
-            <ul id="history"></ul>
-        </main>
-    </div>
-<script>
-(function () {
-    'use strict';
+        </details>
 
-    const ui = (function (data) {
-        for (const key in data) {
-            const found = document.querySelectorAll(data[key]);
-            data[key] = found.length <= 1 ? found[0] : found;
-        }
-        return data;
-    }({
-        menu: '#menu',
-        game: '#game',
-        tutorialTitle: '#tutorial_title',
-        tutorialText: '#tutorial_text',
-        problem: '#problem',
-        flips: '#flips',
-        flipCount: '#flips .number',
-        flipText: '#flips > span:last-child',
-        startButtons: '#start_buttons button',
-        submit: '#submit',
-        history: '#history'
-    }));
+        <details class="panel">
+            <summary>Stats by difficulty</summary>
+            <div class="panel-body">
+                <table>
+                    <thead><tr><th>Mode</th><th>Correct</th><th>Win rate</th><th>Best streak</th><th></th></tr></thead>
+                    <tbody id="stats_rows"></tbody>
+                </table>
+                <div class="stats-actions"><button id="stats_reset_all" class="secondary" type="button">Reset all stats</button></div>
+            </div>
+        </details>
 
-    let modeDifficulty = 0;
-    let tutorialMode = true;
-    let flipsRemaining;
-    let currentProblem;
-
-    class NumberNode {
-        constructor(value) {
-            this.defaultValue = value;
-            this.currentValue = value;
-            this.toggled = false;
-            this.span = null;
-            this.originalWidth = null;
-        }
-
-        showValue() {
-            this.span.classList.add('hint');
-            this.span.classList.remove('flipped');
-            this.span.firstChild.textContent = this.defaultValue;
-        }
-
-        hideValue() {
-            this.span.classList.remove('hint');
-            if (this.toggled) {
-                this.span.classList.add('flipped');
-            }
-            this.span.firstChild.textContent = this.currentValue;
-        }
-
-        handleClick() {
-            if (this.toggled) {
-                this.currentValue = this.defaultValue;
-                this.span.classList.remove('flipped', 'hint');
-                if (this.originalWidth !== null) {
-                    this.span.style.minWidth = '';
-                    this.originalWidth = null;
-                }
-                this.span.removeEventListener('mouseover', this.showValueBound, false);
-                this.span.removeEventListener('mouseout', this.hideValueBound, false);
-                this.span.removeEventListener('focus', this.showValueBound, false);
-                this.span.removeEventListener('blur', this.hideValueBound, false);
-                flipsRemaining++;
-                this.toggled = false;
-                this.span.setAttribute('aria-label', 'Change ' + this.defaultValue + ' to 1');
-                this.span.setAttribute('aria-pressed', 'false');
-                updateFlips();
-            } else {
-                if (flipsRemaining) {
-                    flipsRemaining--;
-                    this.currentValue = 1;
-                    this.span.classList.add('flipped');
-                    this.span.classList.remove('hint');
-                    if (this.originalWidth === null) {
-                        this.originalWidth = this.span.offsetWidth;
-                    }
-                    this.span.style.minWidth = this.originalWidth + 'px';
-                    this.span.addEventListener('mouseover', this.showValueBound, false);
-                    this.span.addEventListener('mouseout', this.hideValueBound, false);
-                    this.span.addEventListener('focus', this.showValueBound, false);
-                    this.span.addEventListener('blur', this.hideValueBound, false);
-                    this.toggled = true;
-                    this.span.setAttribute('aria-label', 'Restore ' + this.defaultValue);
-                    this.span.setAttribute('aria-pressed', 'true');
-                    updateFlips();
-                } else {
-                    this.span.classList.remove('blocked');
-                    ui.flips.classList.remove('notice');
-                    void this.span.offsetWidth;
-                    this.span.classList.add('blocked');
-                    ui.flips.classList.add('notice');
-                }
-            }
-            this.span.firstChild.textContent = this.currentValue;
-            updateTutorialGuidance();
-        }
-
-        handleKeydown(e) {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                this.handleClick();
-            }
-        }
-
-        build() {
-            this.span = document.createElement('span');
-            this.span.appendChild(document.createTextNode(this.currentValue));
-            this.span.classList.add('number');
-            this.span.tabIndex = 0;
-            this.span.setAttribute('role', 'button');
-            this.span.setAttribute('aria-label', 'Change ' + this.defaultValue + ' to 1');
-            this.span.setAttribute('aria-pressed', 'false');
-
-            this.showValueBound = this.showValue.bind(this);
-            this.hideValueBound = this.hideValue.bind(this);
-            this.clickBound = this.handleClick.bind(this);
-            this.keydownBound = this.handleKeydown.bind(this);
-
-            this.span.addEventListener('click', this.clickBound, false);
-            this.span.addEventListener('keydown', this.keydownBound, false);
-            return this.span;
-        }
-
-        toString() {
-            return '' + this.currentValue;
-        }
-    }
-
-    function calculateDifficulty(problem) {
-        let i = problem.length;
-        let diff = 0;
-        while (i--) {
-            diff += problem[i].length / 2;
-        }
-        diff *= problem.length + 2;
-        return diff;
-    }
-
-    const operationStrings = {
-        0: ' + ',
-        1: ' - '
-    };
-
-    function makeOne(n) {
-        // 2 = 1 + 1 would require two flips after both 1s are disguised.
-        const operation = n === 2 ? 1 : Math.random() * 2 | 0;
-        let n1, n2;
-        switch (operation) {
-            case 0:
-                if (Math.random() < 0.5) {
-                    n1 = 1;
-                    n2 = n - 1;
-                } else {
-                    n1 = n - 1;
-                    n2 = 1;
-                }
-                return ['(', n1, operationStrings[operation], n2, ')'];
-            case 1:
-                n1 = n + 1;
-                n2 = 1;
-                return ['(', n1, operationStrings[operation], n2, ')'];
-        }
-    }
-
-    function splitNumber(n) {
-        let operation = Math.random() * 2 | 0;
-        let n1, n2;
-        if (n <= 3) {
-            operation = 1;
-        }
-        switch (operation) {
-            case 0:
-                n1 = Math.random() * (n - 3) + 2 | 0;
-                n2 = n - n1;
-                return ['(', n1, operationStrings[operation], n2, ')'];
-            case 1:
-                n1 = Math.random() * n * 2.3 + n + 2 | 0;
-                n2 = n1 - n;
-                return ['(', n1, operationStrings[operation], n2, ')'];
-        }
-    }
-
-    function getRandomValIndex(arr) {
-        const vals = [];
-        let i = arr.length;
-        while (i--) {
-            if (typeof arr[i] === 'number') {
-                vals.push(i);
-            }
-        }
-        return vals[vals.length * Math.random() | 0];
-    }
-
-    function generateProblem(baseDifficulty) {
-        const numSides = 2;
-        const difficulty = baseDifficulty;
-        let currentDifficulty = 0;
-        const startEqual = (Math.random() * Math.pow(difficulty, 0.25) | 0) * 5 + 5 + (Math.random() * 6 - 3 | 0);
-        const sides = [];
-        let i;
-
-        i = numSides;
-        while (i--) {
-            sides[i] = [startEqual];
-        }
-        while (currentDifficulty < difficulty) {
-            const modSide = Math.random() * numSides | 0;
-            const modVal = getRandomValIndex(sides[modSide]);
-            const split = splitNumber(sides[modSide][modVal]);
-            split.unshift(modVal, 1);
-            sides[modSide].splice(...split);
-            currentDifficulty = calculateDifficulty(sides);
-        }
-
-        const modSide = Math.random() * numSides | 0;
-        const modVal = getRandomValIndex(sides[modSide]);
-        const split = makeOne(sides[modSide][modVal]);
-        split.unshift(modVal, 1);
-        sides[modSide].splice(...split);
-
-        return sides;
-    }
-
-    function unsolveProblem(problem, difficulty) {
-        let i = problem.length;
-        const sides = [];
-        while (i--) {
-            const nodes = [];
-            sides[i] = nodes;
-            let j = problem[i].length;
-            while (j--) {
-                if (typeof problem[i][j] === 'number' && problem[i][j] === 1) {
-                    nodes[j] = (Math.random() * Math.pow(difficulty, 0.25) | 0) * 5 + 5 + (Math.random() * 6 - 3 | 0);
-                } else {
-                    nodes[j] = problem[i][j];
-                }
-            }
-        }
-        return sides;
-    }
-
-    function problemToNodes(problem) {
-        const sides = [];
-        let i = problem.length;
-        while (i--) {
-            const nodes = [];
-            sides[i] = nodes;
-            let j = problem[i].length;
-            while (j--) {
-                if (typeof problem[i][j] === 'number') {
-                    nodes[j] = new NumberNode(problem[i][j]);
-                } else {
-                    nodes[j] = problem[i][j];
-                }
-            }
-        }
-        return sides;
-    }
-
-    function textElement(type, content, className) {
-        const e = document.createElement(type);
-        e.appendChild(document.createTextNode(content));
-        if (className) {
-            e.classList.add(className);
-        }
-        return e;
-    }
-
-    function buildProblemElements(problem) {
-        const container = document.createElement('span');
-        for (let i = 0; i < problem.length; i++) {
-            for (let j = 0; j < problem[i].length; j++) {
-                if (problem[i][j] instanceof NumberNode) {
-                    container.appendChild(problem[i][j].build());
-                } else {
-                    container.appendChild(textElement('span', problem[i][j], 'operator'));
-                }
-            }
-            if (i + 1 < problem.length) {
-                container.appendChild(textElement('span', ' = ', 'equals'));
-            }
-        }
-        return container;
-    }
-
-    function updateFlips() {
-        ui.flipCount.textContent = flipsRemaining;
-        ui.flipText.textContent = flipsRemaining === 1 ? 'flip remaining' : 'flips remaining';
-        if (!currentProblem) {
-            return;
-        }
-        for (const side of currentProblem.nodes) {
-            for (const node of side) {
-                if (node instanceof NumberNode) {
-                    node.span.setAttribute('aria-disabled', flipsRemaining === 0 && !node.toggled ? 'true' : 'false');
-                }
-            }
-        }
-    }
-
-    function setHelp(title, message) {
-        ui.tutorialTitle.textContent = title;
-        ui.tutorialText.textContent = message;
-    }
-
-    function updateTutorialGuidance() {
-        if (!tutorialMode || !currentProblem) {
-            return;
-        }
-        if (currentProblem.checkSolved()) {
-            setHelp('Good move', 'Both sides now equal 5. Check the equation to finish the tutorial.');
-        } else if (flipsRemaining === 0) {
-            setHelp('Try another number', 'That does not balance the equation. Click it again to take back your move, then try the outlined 3.');
-        } else {
-            setHelp('Your first puzzle', 'The left side equals 5. Click the outlined 3 to make the right side equal 5 too.');
-        }
-    }
-
-    function evaluateTokens(tokens) {
-        let position = 0;
-
-        function parseValue() {
-            const token = tokens[position++];
-            if (token instanceof NumberNode) {
-                return token.currentValue;
-            }
-            if (token !== '(') {
-                throw new Error('Invalid expression');
-            }
-
-            const left = parseValue();
-            const operator = tokens[position++].trim();
-            const right = parseValue();
-            if (tokens[position++] !== ')') {
-                throw new Error('Invalid expression');
-            }
-            if (operator === '+') {
-                return left + right;
-            }
-            if (operator === '-') {
-                return left - right;
-            }
-            throw new Error('Invalid operator');
-        }
-
-        const result = parseValue();
-        if (position !== tokens.length) {
-            throw new Error('Invalid expression');
-        }
-        return result;
-    }
-
-    class ProblemData {
-        constructor(difficulty, problem) {
-            this.solved = problem ? null : generateProblem(difficulty);
-            this.problem = problem || unsolveProblem(this.solved, difficulty);
-            this.nodes = problemToNodes(this.problem);
-            this.elements = buildProblemElements(this.nodes);
-        }
-
-        checkSolved() {
-            const totals = [];
-            for (let i = 0; i < this.nodes.length; i++) {
-                totals[i] = evaluateTokens(this.nodes[i]);
-            }
-            for (let i = 1; i < totals.length; i++) {
-                if (totals[i] !== totals[0]) {
-                    return false;
-                }
-            }
-            return true;
-        }
-    }
-
-    const tutorialProblem = [
-        ['(', 7, ' - ', 2, ')'],
-        ['(', 3, ' + ', 4, ')']
-    ];
-
-    function startRound() {
-        flipsRemaining = 1;
-        currentProblem = tutorialMode
-            ? new ProblemData(0, tutorialProblem)
-            : new ProblemData(modeDifficulty);
-        if (ui.problem.firstChild) {
-            ui.problem.replaceChild(currentProblem.elements, ui.problem.firstChild);
-        } else {
-            ui.problem.appendChild(currentProblem.elements);
-        }
-        updateFlips();
-        if (tutorialMode) {
-            currentProblem.nodes[1][1].span.classList.add('tutorial-target');
-            updateTutorialGuidance();
-        } else {
-            setHelp('How to play', 'Change one number into a 1 so both sides have the same value, then check the equation.');
-        }
-    }
-
-    function setActiveMode(target) {
-        for (const button of ui.startButtons) {
-            const isActive = button === target;
-            button.classList.toggle('active', isActive);
-            button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
-        }
-    }
-
-    function clickDifficulty(e) {
-        const target = e.target;
-        modeDifficulty = +target.dataset.difficulty;
-        tutorialMode = target.dataset.tutorial === 'true';
-        setActiveMode(target);
-        startRound();
-    }
-
-    function clickSubmit() {
-        const li = document.createElement('li');
-        const isSolved = currentProblem.checkSolved();
-        const wasTutorial = tutorialMode;
-        const snapshot = currentProblem.elements.cloneNode(true);
-        const snapshotNumbers = snapshot.querySelectorAll('.number');
-        let numberIndex = 0;
-        for (const side of currentProblem.nodes) {
-            for (const node of side) {
-                if (node instanceof NumberNode) {
-                    snapshotNumbers[numberIndex++].textContent = node.currentValue;
-                }
-            }
-        }
-        for (const number of snapshotNumbers) {
-            number.removeAttribute('tabindex');
-            number.removeAttribute('role');
-            number.removeAttribute('aria-label');
-            number.removeAttribute('aria-pressed');
-            number.removeAttribute('aria-disabled');
-            number.classList.remove('tutorial-target', 'blocked', 'hint');
-        }
-        li.appendChild(textElement('strong', isSolved ? 'Correct: ' : 'Incorrect: '));
-        li.appendChild(snapshot);
-        li.classList.add(isSolved ? 'correct' : 'incorrect');
-        if (!ui.history.firstChild) {
-            ui.history.appendChild(li);
-        } else {
-            ui.history.insertBefore(li, ui.history.firstChild);
-        }
-        while (ui.history.children.length > 20) {
-            ui.history.removeChild(ui.history.lastChild);
-        }
-
-        if (wasTutorial && isSolved) {
-            tutorialMode = false;
-            modeDifficulty = 0;
-            setActiveMode(document.querySelector('#start_buttons button:not([data-tutorial])'));
-        }
-        startRound();
-        if (wasTutorial && isSolved) {
-            setHelp('Tutorial complete', 'That is the whole game: one flip, one balanced equation. Here is an Easy puzzle.');
-        } else if (wasTutorial) {
-            setHelp('Not quite', 'That equation was still unbalanced, so the tutorial has reset. Try the outlined 3.');
-        } else if (isSolved) {
-            setHelp('Correct', 'Balanced. A new puzzle is ready below.');
-        } else {
-            setHelp('Incorrect', 'Those sides had different values. A fresh puzzle is ready below.');
-        }
-    }
-
-    (function () {
-        let i = ui.startButtons.length;
-        while (i--) {
-            ui.startButtons[i].addEventListener('click', clickDifficulty, false);
-        }
-        ui.submit.addEventListener('click', clickSubmit, false);
-    }());
-
-    startRound();
-}());
-</script>
+        <footer>
+            Made by <a href="https://bluehexagons.com/">bluehexagons</a> for Ludum Dare 28.
+            Open source on <a href="https://github.com/bluehexagons/yog1">GitHub</a>.
+            History and stats stay in this browser.
+        </footer>
+    </main>
+</div>
+<script src="game-core.js"></script>
+<script src="game.js"></script>
 </body>
 </html>
