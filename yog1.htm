@@ -176,7 +176,7 @@
 </head>
 <body>
 <div id="wrapper">
-    <aside id="menu" aria-label="Game navigation">
+    <aside id="menu" aria-label="Game navigation" data-i18n-aria-label="aria.navigation">
         <div class="menu-heading">
             <div><div class="jam-label">LD28 / 2013</div>
             <h1>You Only Get 1s</h1>
@@ -184,14 +184,14 @@
             <button id="sidebar_toggle" class="secondary" type="button" aria-controls="menu" aria-expanded="true" title="Collapse game menu" data-i18n="menu.collapse" data-i18n-title="menu.collapseTitle">Collapse</button>
         </div>
         <div class="section-label" data-i18n="nav.view">View</div>
-        <div id="view_buttons" role="navigation" aria-label="Game sections">
+        <div id="view_buttons" role="navigation" aria-label="Game sections" data-i18n-aria-label="aria.sections">
             <button type="button" data-view="play" class="active" aria-current="page" data-i18n="nav.play">Play</button>
             <button type="button" data-view="options" data-i18n="nav.options">Options</button>
             <button type="button" data-view="stats" data-i18n="nav.stats">Stats</button>
-            <button type="button" data-view="about">About</button>
+            <button type="button" data-view="about" data-i18n="nav.about">About</button>
         </div>
         <div class="section-label" data-i18n="nav.mode">Mode</div>
-        <div id="mode_buttons" role="group" aria-label="Game mode">
+        <div id="mode_buttons" role="group" aria-label="Game mode" data-i18n-aria-label="aria.mode">
             <button type="button" data-mode="tutorial" class="active" aria-pressed="true" data-localize>Tutorial</button>
             <button type="button" data-mode="easy" aria-pressed="false" data-localize>Easy</button>
             <button type="button" data-mode="normal" aria-pressed="false" data-localize>Normal</button>
@@ -208,7 +208,7 @@
     </aside>
     <main id="game">
         <div id="game_toolbar"><div class="toolbar-controls"><button id="sidebar_toggle_play" class="secondary" type="button" aria-controls="menu" aria-expanded="true" data-i18n="action.menu">Menu</button><label class="sr-only" for="quick_language" data-i18n="language.label">Language</label><select id="quick_language" aria-label="Language" data-i18n-aria-label="language.label"><option value="en">English</option><option value="es">Español</option><option value="zh">简体中文</option><option value="ar">العربية</option><option value="bn">বাংলা</option><option value="ja">日本語</option><option value="hi">हिन्दी</option><option value="pt">Português (Brasil)</option><option value="ru">Русский</option><option value="vi">Tiếng Việt</option><option value="tr">Türkçe</option><option value="ur">اردو</option></select></div></div>
-        <section id="play_screen" class="screen" data-screen="play" aria-label="Play">
+        <section id="play_screen" class="screen" data-screen="play" aria-label="Play" data-i18n-aria-label="aria.play">
         <div id="message" role="status" aria-live="polite">
             <strong id="message_title" data-localize>How to play</strong>
             <span id="message_text"></span>
@@ -218,21 +218,21 @@
         <section id="custom_panel" hidden>
             <form id="custom_form">
                 <fieldset>
-                    <legend>Operations</legend>
+                    <legend data-i18n="custom.operations">Operations</legend>
                     <div id="custom_operations"></div>
-                    <p class="field-note">Include +, −, ×, ÷, or powers to support the one-flip identity.</p>
+                    <p class="field-note" data-i18n="custom.note">Choose +, −, ×, ÷, or powers.</p>
                 </fieldset>
                 <div class="custom-fields">
-                    <label>Problem length: <strong><span id="custom_length_value">5</span> operations</strong>
+                    <label><span data-i18n="custom.length">Length</span>: <strong><span id="custom_length_value">5</span> <span data-i18n="custom.operationCount">operations</span></strong>
                         <input id="custom_length" type="range" min="2" max="12" value="5">
                     </label>
-                    <label>Minimum difficulty target<input id="custom_min" type="number" min="3" max="100" value="12"></label>
-                    <label>Maximum difficulty target<input id="custom_max" type="number" min="3" max="100" value="35"></label>
-                    <label>Correct answers to win<input id="custom_correct" type="number" min="1" max="100" value="10"></label>
-                    <label>Minimum win rate (%)<input id="custom_rate" type="number" min="1" max="100" value="80"></label>
-                    <label>Seed (optional)<input id="custom_seed" type="text" maxlength="80" placeholder="Same seed, same run"></label>
+                    <label><span data-i18n="custom.minimum">Minimum target</span><input id="custom_min" type="number" min="3" max="100" value="12"></label>
+                    <label><span data-i18n="custom.maximum">Maximum target</span><input id="custom_max" type="number" min="3" max="100" value="35"></label>
+                    <label><span data-i18n="custom.correct">Correct answers to finish</span><input id="custom_correct" type="number" min="1" max="100" value="10"></label>
+                    <label><span data-i18n="custom.rate">Minimum win rate (%)</span><input id="custom_rate" type="number" min="1" max="100" value="80"></label>
+                    <label><span data-i18n="custom.seed">Seed (optional)</span><input id="custom_seed" type="text" maxlength="80" placeholder="Same seed, same game" data-i18n-placeholder="custom.seedHint"></label>
                 </div>
-                <button class="primary" type="submit">Start custom game</button>
+                <button class="primary" type="submit" data-i18n="custom.start">Start custom game</button>
             </form>
         </section>
 
@@ -241,16 +241,16 @@
             <span id="round_kind" class="round-kind">Guided</span>
             <span id="score_label"></span>
             <span id="timer_label" hidden>60s</span>
-            <div id="session_summary" aria-label="Current session statistics"></div>
+            <div id="session_summary" aria-label="Current session statistics" data-i18n-aria-label="aria.session"></div>
         </div>
-        <section id="workspace" aria-label="Current puzzle">
+        <section id="workspace" aria-label="Current puzzle" data-i18n-aria-label="aria.puzzle">
             <div id="flips"><strong data-localize>Your move</strong><span id="flip_count">1</span><span id="flip_text">flip remaining</span></div>
             <div id="problem"></div>
             <div id="actions">
                 <span id="custom_progress" hidden></span>
-                <button id="hint" class="secondary" type="button" title="Hint (H)" data-localize>Hint</button>
-                <button id="skip" class="secondary" type="button" data-localize>Reveal</button>
-                <button id="share" class="secondary" type="button" data-localize>Share</button>
+                <button id="hint" class="secondary" type="button" title="Hint (H)" data-i18n="action.hint">Hint</button>
+                <button id="skip" class="secondary" type="button" data-i18n="action.reveal">Show solution</button>
+                <button id="share" class="secondary" type="button" data-i18n="action.share">Share</button>
                 <button id="submit" class="primary" type="button" data-i18n="action.check">Check equation</button>
             </div>
             <div id="feedback" aria-live="polite" hidden></div>
@@ -258,7 +258,7 @@
 
         </section>
 
-        <section id="options_screen" class="screen" data-screen="options" aria-label="Options" hidden>
+        <section id="options_screen" class="screen" data-screen="options" aria-label="Options" data-i18n-aria-label="aria.options" hidden>
             <h2 data-localize>Options</h2>
             <div class="options-grid">
             <section class="screen-panel">
@@ -270,7 +270,7 @@
                     <article><h3 data-localize>Expert</h3><span data-localize>Adds modulus % and powers ^, with occasional three-value rounds.</span></article>
                     <article><h3 data-localize>Extreme</h3><span data-localize>Largest values and every operation, including √, in the longest puzzles.</span></article>
                 </div>
-                <p class="wave-note">Every mode follows a repeating eight-round wave: warm-ups, standard rounds, and challenge rounds average back to the mode’s normal difficulty. The wave averages exactly over typical 24, 32, and 40-puzzle sessions.</p>
+                <p class="wave-note" data-i18n="options.wave">Each mode repeats an eight-round wave of warm-ups, standard rounds, and gentler challenges.</p>
             </section>
 
             <section class="screen-panel">
@@ -283,29 +283,29 @@
                     <label><input id="setting_contrast" type="checkbox"><span data-localize>Higher contrast</span></label>
                     <label><input id="setting_reduced_clutter" type="checkbox"><span data-localize>Reduced clutter</span></label>
                 </div>
-                <p class="wave-note">Keyboard: Left/Right selects a number, Space flips it, Enter checks, and H gives a hint.</p>
-                <button id="install_app" class="secondary" type="button" hidden>Install offline app</button>
+                <p class="wave-note" data-i18n="options.keyboard">Keys: ←/→ select · Space changes · Enter checks · H hints.</p>
+                <button id="install_app" class="secondary" type="button" data-i18n="action.install" hidden>Install offline app</button>
             </section>
             </div>
         </section>
 
-        <section id="stats_screen" class="screen" data-screen="stats" aria-label="Statistics" hidden>
+        <section id="stats_screen" class="screen" data-screen="stats" aria-label="Statistics" data-i18n-aria-label="aria.stats" hidden>
             <h2 data-localize>Stats &amp; history</h2>
             <section class="screen-panel">
                 <h3 data-localize>Stats by difficulty</h3>
                 <div class="panel-body"><table>
-                    <thead><tr><th scope="col">Mode</th><th scope="col">Correct</th><th scope="col">Win rate</th><th scope="col">Streak</th><th scope="col">Record</th><th scope="col"><span class="sr-only">Actions</span></th></tr></thead>
+                    <thead><tr><th scope="col" data-i18n="stats.mode">Mode</th><th scope="col" data-i18n="stats.correct">Correct</th><th scope="col" data-i18n="stats.winRate">Win rate</th><th scope="col" data-i18n="stats.streak">Streak</th><th scope="col" data-i18n="stats.record">Record</th><th scope="col"><span class="sr-only" data-i18n="stats.actions">Actions</span></th></tr></thead>
                     <tbody id="stats_rows"></tbody>
-                </table><div class="stats-actions"><button id="stats_reset_all" class="secondary" type="button">Reset all stats</button></div></div>
+                </table><div class="stats-actions"><button id="stats_reset_all" class="secondary" type="button" data-i18n="stats.resetAll">Reset all stats</button></div></div>
             </section>
             <section class="screen-panel">
                 <h3 data-localize>Problem history</h3>
                 <ul id="history"></ul>
                 <div class="history-controls">
                     <span id="history_page"></span>
-                    <button id="history_prev" class="secondary" type="button">Previous</button>
-                    <button id="history_next" class="secondary" type="button">Next</button>
-                    <button id="history_clear" class="secondary" type="button">Clear history</button>
+                    <button id="history_prev" class="secondary" type="button" data-i18n="stats.previous">Previous</button>
+                    <button id="history_next" class="secondary" type="button" data-i18n="stats.next">Next</button>
+                    <button id="history_clear" class="secondary" type="button" data-i18n="stats.clearHistory">Clear history</button>
                 </div>
             </section>
             <section class="screen-panel options-extras">
@@ -313,7 +313,7 @@
             </section>
         </section>
 
-        <section id="about_screen" class="screen" data-screen="about" aria-label="About" hidden>
+        <section id="about_screen" class="screen" data-screen="about" aria-label="About" data-i18n-aria-label="aria.about" hidden>
             <h2>About</h2>
             <section class="screen-panel about-copy">
                 <h3>You Only Get 1s</h3>

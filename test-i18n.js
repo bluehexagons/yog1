@@ -61,4 +61,14 @@ for (const locale of i18n.availableLocales) {
     assert.deepStrictEqual(missing, [], locale + ' provides every core catalog key');
 }
 
+const html = fs.readFileSync('yog1.htm', 'utf8');
+const catalogKeys = Array.from(html.matchAll(/\bdata-i18n(?:-aria-label|-title|-placeholder)?="([^"]+)"/g))
+    .map(function (match) { return match[1]; });
+for (const locale of i18n.availableLocales) {
+    const missing = catalogKeys.filter(function (key) {
+        return !Object.prototype.hasOwnProperty.call(i18n.locales[locale], key);
+    });
+    assert.deepStrictEqual(missing, [], locale + ' provides every catalog key used in the document');
+}
+
 console.log('Localization tests passed.');

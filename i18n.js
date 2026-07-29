@@ -325,6 +325,167 @@
         }
     };
 
+    // Structural UI copy is keyed so every selectable locale must provide it.
+    const uiMessages = {
+        en: {
+            'nav.about': 'About', 'aria.navigation': 'Game navigation', 'aria.sections': 'Game sections', 'aria.mode': 'Game mode',
+            'aria.play': 'Play', 'aria.options': 'Options', 'aria.stats': 'Statistics', 'aria.about': 'About',
+            'aria.session': 'Current session statistics', 'aria.puzzle': 'Current puzzle',
+            'custom.operations': 'Operations', 'custom.note': 'Choose +, −, ×, ÷, or powers.', 'custom.length': 'Length', 'custom.operationCount': 'operations',
+            'custom.minimum': 'Minimum target', 'custom.maximum': 'Maximum target', 'custom.correct': 'Correct answers to finish',
+            'custom.rate': 'Minimum win rate (%)', 'custom.seed': 'Seed (optional)', 'custom.seedHint': 'Same seed, same game', 'custom.start': 'Start custom game',
+            'options.wave': 'Each mode repeats an eight-round wave of warm-ups, standard rounds, and gentler challenges.',
+            'options.keyboard': 'Keys: ←/→ select · Space changes · Enter checks · H hints.',
+            'action.hint': 'Hint', 'action.reveal': 'Show solution', 'action.share': 'Share', 'action.install': 'Install offline app',
+            'stats.mode': 'Mode', 'stats.correct': 'Correct', 'stats.winRate': 'Win rate', 'stats.streak': 'Streak', 'stats.record': 'Record',
+            'stats.actions': 'Actions', 'stats.resetAll': 'Reset all stats', 'stats.previous': 'Previous', 'stats.next': 'Next', 'stats.clearHistory': 'Clear history'
+        },
+        es: {
+            'nav.about': 'Acerca de', 'aria.navigation': 'Navegación del juego', 'aria.sections': 'Secciones del juego', 'aria.mode': 'Modo de juego',
+            'aria.play': 'Jugar', 'aria.options': 'Opciones', 'aria.stats': 'Estadísticas', 'aria.about': 'Acerca de',
+            'aria.session': 'Estadísticas de la sesión actual', 'aria.puzzle': 'Problema actual',
+            'custom.operations': 'Operaciones', 'custom.note': 'Elige +, −, ×, ÷ o potencias.', 'custom.length': 'Longitud', 'custom.operationCount': 'operaciones',
+            'custom.minimum': 'Objetivo mínimo', 'custom.maximum': 'Objetivo máximo', 'custom.correct': 'Respuestas correctas para terminar',
+            'custom.rate': 'Porcentaje mínimo de aciertos (%)', 'custom.seed': 'Semilla (opcional)', 'custom.seedHint': 'Misma semilla, mismo juego', 'custom.start': 'Iniciar juego personalizado',
+            'options.wave': 'Cada modo repite una secuencia de ocho rondas: calentamientos, rondas normales y desafíos suaves.',
+            'options.keyboard': 'Teclas: ←/→ seleccionan · Espacio cambia · Intro comprueba · H da una pista.',
+            'action.hint': 'Pista', 'action.reveal': 'Mostrar solución', 'action.share': 'Compartir', 'action.install': 'Instalar aplicación sin conexión',
+            'stats.mode': 'Modo', 'stats.correct': 'Correctas', 'stats.winRate': 'Porcentaje de aciertos', 'stats.streak': 'Racha', 'stats.record': 'Récord',
+            'stats.actions': 'Acciones', 'stats.resetAll': 'Restablecer todas las estadísticas', 'stats.previous': 'Anterior', 'stats.next': 'Siguiente', 'stats.clearHistory': 'Borrar historial'
+        },
+        zh: {
+            'nav.about': '关于', 'aria.navigation': '游戏导航', 'aria.sections': '游戏页面', 'aria.mode': '游戏模式',
+            'aria.play': '游戏', 'aria.options': '选项', 'aria.stats': '统计', 'aria.about': '关于',
+            'aria.session': '当前游戏统计', 'aria.puzzle': '当前题目',
+            'custom.operations': '运算', 'custom.note': '选择 +、−、×、÷ 或幂。', 'custom.length': '长度', 'custom.operationCount': '个运算',
+            'custom.minimum': '最小目标', 'custom.maximum': '最大目标', 'custom.correct': '完成所需正确题数',
+            'custom.rate': '最低正确率 (%)', 'custom.seed': '种子（可选）', 'custom.seedHint': '相同种子，相同游戏', 'custom.start': '开始自定义游戏',
+            'options.wave': '每种模式都会循环八轮：热身、标准轮和较温和的挑战轮。',
+            'options.keyboard': '按键：←/→ 选择 · 空格改变 · Enter 检查 · H 提示。',
+            'action.hint': '提示', 'action.reveal': '显示解法', 'action.share': '分享', 'action.install': '安装离线应用',
+            'stats.mode': '模式', 'stats.correct': '正确', 'stats.winRate': '正确率', 'stats.streak': '连对', 'stats.record': '记录',
+            'stats.actions': '操作', 'stats.resetAll': '重置所有统计', 'stats.previous': '上一页', 'stats.next': '下一页', 'stats.clearHistory': '清除历史'
+        },
+        ar: {
+            'nav.about': 'حول', 'aria.navigation': 'التنقل في اللعبة', 'aria.sections': 'أقسام اللعبة', 'aria.mode': 'نمط اللعبة',
+            'aria.play': 'العب', 'aria.options': 'الخيارات', 'aria.stats': 'الإحصاءات', 'aria.about': 'حول',
+            'aria.session': 'إحصاءات الجلسة الحالية', 'aria.puzzle': 'المسألة الحالية',
+            'custom.operations': 'العمليات', 'custom.note': 'اختر + أو − أو × أو ÷ أو الأسس.', 'custom.length': 'الطول', 'custom.operationCount': 'عمليات',
+            'custom.minimum': 'الهدف الأدنى', 'custom.maximum': 'الهدف الأقصى', 'custom.correct': 'إجابات صحيحة للإنهاء',
+            'custom.rate': 'أدنى نسبة نجاح (%)', 'custom.seed': 'بذرة (اختياري)', 'custom.seedHint': 'البذرة نفسها، اللعبة نفسها', 'custom.start': 'ابدأ لعبة مخصصة',
+            'options.wave': 'يتكرر في كل نمط تسلسل من ثماني جولات: تمهيد وجولات عادية وتحديات ألطف.',
+            'options.keyboard': 'المفاتيح: ←/→ للاختيار · مسافة للتغيير · Enter للتحقق · H للتلميح.',
+            'action.hint': 'تلميح', 'action.reveal': 'أظهر الحل', 'action.share': 'مشاركة', 'action.install': 'ثبّت التطبيق دون اتصال',
+            'stats.mode': 'النمط', 'stats.correct': 'صحيح', 'stats.winRate': 'نسبة النجاح', 'stats.streak': 'سلسلة', 'stats.record': 'أفضل نتيجة',
+            'stats.actions': 'إجراءات', 'stats.resetAll': 'أعد ضبط كل الإحصاءات', 'stats.previous': 'السابق', 'stats.next': 'التالي', 'stats.clearHistory': 'امسح السجل'
+        },
+        bn: {
+            'nav.about': 'পরিচিতি', 'aria.navigation': 'গেম নেভিগেশন', 'aria.sections': 'গেমের বিভাগ', 'aria.mode': 'গেমের মোড',
+            'aria.play': 'খেলুন', 'aria.options': 'বিকল্প', 'aria.stats': 'পরিসংখ্যান', 'aria.about': 'পরিচিতি',
+            'aria.session': 'বর্তমান সেশনের পরিসংখ্যান', 'aria.puzzle': 'বর্তমান ধাঁধা',
+            'custom.operations': 'ক্রিয়া', 'custom.note': '+, −, ×, ÷ বা ঘাত বেছে নিন।', 'custom.length': 'দৈর্ঘ্য', 'custom.operationCount': 'ক্রিয়া',
+            'custom.minimum': 'সর্বনিম্ন লক্ষ্য', 'custom.maximum': 'সর্বোচ্চ লক্ষ্য', 'custom.correct': 'শেষ করতে সঠিক উত্তর',
+            'custom.rate': 'সর্বনিম্ন জয়ের হার (%)', 'custom.seed': 'বীজ (ঐচ্ছিক)', 'custom.seedHint': 'একই বীজ, একই খেলা', 'custom.start': 'কাস্টম গেম শুরু করুন',
+            'options.wave': 'প্রতিটি মোডে আট রাউন্ডের ধারা থাকে: ওয়ার্ম-আপ, সাধারণ রাউন্ড ও হালকা চ্যালেঞ্জ।',
+            'options.keyboard': 'কী: ←/→ নির্বাচন · Space পরিবর্তন · Enter পরীক্ষা · H ইঙ্গিত।',
+            'action.hint': 'ইঙ্গিত', 'action.reveal': 'সমাধান দেখুন', 'action.share': 'শেয়ার করুন', 'action.install': 'অফলাইন অ্যাপ ইনস্টল করুন',
+            'stats.mode': 'মোড', 'stats.correct': 'সঠিক', 'stats.winRate': 'জয়ের হার', 'stats.streak': 'ধারা', 'stats.record': 'সেরা',
+            'stats.actions': 'কাজ', 'stats.resetAll': 'সব পরিসংখ্যান রিসেট করুন', 'stats.previous': 'আগের', 'stats.next': 'পরের', 'stats.clearHistory': 'ইতিহাস মুছুন'
+        },
+        ja: {
+            'nav.about': 'このゲームについて', 'aria.navigation': 'ゲームのナビゲーション', 'aria.sections': 'ゲーム画面', 'aria.mode': 'ゲームモード',
+            'aria.play': 'プレイ', 'aria.options': 'オプション', 'aria.stats': '統計', 'aria.about': 'このゲームについて',
+            'aria.session': '現在のセッションの統計', 'aria.puzzle': '現在の問題',
+            'custom.operations': '演算', 'custom.note': '+、−、×、÷、またはべきを選びます。', 'custom.length': '長さ', 'custom.operationCount': '演算',
+            'custom.minimum': '最小目標', 'custom.maximum': '最大目標', 'custom.correct': '終了に必要な正解数',
+            'custom.rate': '最低正答率 (%)', 'custom.seed': 'シード（任意）', 'custom.seedHint': '同じシード、同じゲーム', 'custom.start': 'カスタムゲームを始める',
+            'options.wave': '各モードでは、ウォームアップ、通常ラウンド、やさしめのチャレンジの8ラウンドを繰り返します。',
+            'options.keyboard': 'キー：←/→ 選択 · Space 変更 · Enter 確認 · H ヒント。',
+            'action.hint': 'ヒント', 'action.reveal': '答えを見る', 'action.share': '共有', 'action.install': 'オフラインアプリをインストール',
+            'stats.mode': 'モード', 'stats.correct': '正解', 'stats.winRate': '正答率', 'stats.streak': '連続正解', 'stats.record': '記録',
+            'stats.actions': '操作', 'stats.resetAll': 'すべての統計をリセット', 'stats.previous': '前へ', 'stats.next': '次へ', 'stats.clearHistory': '履歴を消去'
+        },
+        hi: {
+            'nav.about': 'परिचय', 'aria.navigation': 'गेम नेविगेशन', 'aria.sections': 'गेम अनुभाग', 'aria.mode': 'गेम मोड',
+            'aria.play': 'खेलें', 'aria.options': 'विकल्प', 'aria.stats': 'आँकड़े', 'aria.about': 'परिचय',
+            'aria.session': 'वर्तमान सत्र के आँकड़े', 'aria.puzzle': 'वर्तमान पहेली',
+            'custom.operations': 'क्रियाएँ', 'custom.note': '+, −, ×, ÷ या घात चुनें।', 'custom.length': 'लंबाई', 'custom.operationCount': 'क्रियाएँ',
+            'custom.minimum': 'न्यूनतम लक्ष्य', 'custom.maximum': 'अधिकतम लक्ष्य', 'custom.correct': 'समाप्त करने के लिए सही उत्तर',
+            'custom.rate': 'न्यूनतम जीत दर (%)', 'custom.seed': 'बीज (वैकल्पिक)', 'custom.seedHint': 'वही बीज, वही गेम', 'custom.start': 'कस्टम गेम शुरू करें',
+            'options.wave': 'हर मोड में आठ राउंड की लहर दोहरती है: वार्म-अप, सामान्य राउंड और हल्की चुनौतियाँ।',
+            'options.keyboard': 'कुंजियाँ: ←/→ चुनें · Space बदलें · Enter जाँचें · H संकेत।',
+            'action.hint': 'संकेत', 'action.reveal': 'हल देखें', 'action.share': 'साझा करें', 'action.install': 'ऑफ़लाइन ऐप इंस्टॉल करें',
+            'stats.mode': 'मोड', 'stats.correct': 'सही', 'stats.winRate': 'जीत दर', 'stats.streak': 'लगातार सही', 'stats.record': 'रिकॉर्ड',
+            'stats.actions': 'क्रियाएँ', 'stats.resetAll': 'सभी आँकड़े रीसेट करें', 'stats.previous': 'पिछला', 'stats.next': 'अगला', 'stats.clearHistory': 'इतिहास मिटाएँ'
+        },
+        pt: {
+            'nav.about': 'Sobre', 'aria.navigation': 'Navegação do jogo', 'aria.sections': 'Seções do jogo', 'aria.mode': 'Modo de jogo',
+            'aria.play': 'Jogar', 'aria.options': 'Opções', 'aria.stats': 'Estatísticas', 'aria.about': 'Sobre',
+            'aria.session': 'Estatísticas da sessão atual', 'aria.puzzle': 'Problema atual',
+            'custom.operations': 'Operações', 'custom.note': 'Escolha +, −, ×, ÷ ou potências.', 'custom.length': 'Tamanho', 'custom.operationCount': 'operações',
+            'custom.minimum': 'Meta mínima', 'custom.maximum': 'Meta máxima', 'custom.correct': 'Respostas corretas para terminar',
+            'custom.rate': 'Taxa mínima de acerto (%)', 'custom.seed': 'Semente (opcional)', 'custom.seedHint': 'Mesma semente, mesmo jogo', 'custom.start': 'Iniciar jogo personalizado',
+            'options.wave': 'Cada modo repete uma sequência de oito rodadas: aquecimentos, rodadas normais e desafios mais leves.',
+            'options.keyboard': 'Teclas: ←/→ selecionam · Espaço altera · Enter verifica · H dá uma dica.',
+            'action.hint': 'Dica', 'action.reveal': 'Mostrar solução', 'action.share': 'Compartilhar', 'action.install': 'Instalar aplicativo offline',
+            'stats.mode': 'Modo', 'stats.correct': 'Corretas', 'stats.winRate': 'Taxa de acerto', 'stats.streak': 'Sequência', 'stats.record': 'Recorde',
+            'stats.actions': 'Ações', 'stats.resetAll': 'Redefinir todas as estatísticas', 'stats.previous': 'Anterior', 'stats.next': 'Próxima', 'stats.clearHistory': 'Limpar histórico'
+        },
+        ru: {
+            'nav.about': 'О игре', 'aria.navigation': 'Навигация игры', 'aria.sections': 'Разделы игры', 'aria.mode': 'Режим игры',
+            'aria.play': 'Играть', 'aria.options': 'Настройки', 'aria.stats': 'Статистика', 'aria.about': 'О игре',
+            'aria.session': 'Статистика текущей сессии', 'aria.puzzle': 'Текущая задача',
+            'custom.operations': 'Операции', 'custom.note': 'Выберите +, −, ×, ÷ или степени.', 'custom.length': 'Длина', 'custom.operationCount': 'операций',
+            'custom.minimum': 'Минимальная цель', 'custom.maximum': 'Максимальная цель', 'custom.correct': 'Верных ответов для завершения',
+            'custom.rate': 'Минимальный процент верных (%)', 'custom.seed': 'Сид (необязательно)', 'custom.seedHint': 'Тот же сид, та же игра', 'custom.start': 'Начать свою игру',
+            'options.wave': 'В каждом режиме повторяется волна из восьми раундов: разминка, обычные раунды и более мягкие испытания.',
+            'options.keyboard': 'Клавиши: ←/→ выбор · Пробел изменить · Enter проверить · H подсказка.',
+            'action.hint': 'Подсказка', 'action.reveal': 'Показать решение', 'action.share': 'Поделиться', 'action.install': 'Установить офлайн-приложение',
+            'stats.mode': 'Режим', 'stats.correct': 'Верно', 'stats.winRate': 'Процент верных', 'stats.streak': 'Серия', 'stats.record': 'Рекорд',
+            'stats.actions': 'Действия', 'stats.resetAll': 'Сбросить всю статистику', 'stats.previous': 'Назад', 'stats.next': 'Далее', 'stats.clearHistory': 'Очистить историю'
+        },
+        vi: {
+            'nav.about': 'Giới thiệu', 'aria.navigation': 'Điều hướng trò chơi', 'aria.sections': 'Các phần trò chơi', 'aria.mode': 'Chế độ chơi',
+            'aria.play': 'Chơi', 'aria.options': 'Tùy chọn', 'aria.stats': 'Thống kê', 'aria.about': 'Giới thiệu',
+            'aria.session': 'Thống kê phiên hiện tại', 'aria.puzzle': 'Câu đố hiện tại',
+            'custom.operations': 'Phép toán', 'custom.note': 'Chọn +, −, ×, ÷ hoặc lũy thừa.', 'custom.length': 'Độ dài', 'custom.operationCount': 'phép toán',
+            'custom.minimum': 'Mục tiêu tối thiểu', 'custom.maximum': 'Mục tiêu tối đa', 'custom.correct': 'Số đáp án đúng để kết thúc',
+            'custom.rate': 'Tỷ lệ thắng tối thiểu (%)', 'custom.seed': 'Hạt giống (tùy chọn)', 'custom.seedHint': 'Cùng hạt giống, cùng trò chơi', 'custom.start': 'Bắt đầu trò chơi tùy chỉnh',
+            'options.wave': 'Mỗi chế độ lặp lại một chuỗi tám vòng: khởi động, vòng thường và thử thách nhẹ nhàng hơn.',
+            'options.keyboard': 'Phím: ←/→ chọn · Space thay đổi · Enter kiểm tra · H gợi ý.',
+            'action.hint': 'Gợi ý', 'action.reveal': 'Xem lời giải', 'action.share': 'Chia sẻ', 'action.install': 'Cài ứng dụng ngoại tuyến',
+            'stats.mode': 'Chế độ', 'stats.correct': 'Đúng', 'stats.winRate': 'Tỷ lệ đúng', 'stats.streak': 'Chuỗi', 'stats.record': 'Kỷ lục',
+            'stats.actions': 'Thao tác', 'stats.resetAll': 'Đặt lại mọi thống kê', 'stats.previous': 'Trước', 'stats.next': 'Tiếp', 'stats.clearHistory': 'Xóa lịch sử'
+        },
+        tr: {
+            'nav.about': 'Hakkında', 'aria.navigation': 'Oyun gezintisi', 'aria.sections': 'Oyun bölümleri', 'aria.mode': 'Oyun modu',
+            'aria.play': 'Oyna', 'aria.options': 'Seçenekler', 'aria.stats': 'İstatistikler', 'aria.about': 'Hakkında',
+            'aria.session': 'Geçerli oturum istatistikleri', 'aria.puzzle': 'Geçerli bulmaca',
+            'custom.operations': 'İşlemler', 'custom.note': '+, −, ×, ÷ veya üsleri seçin.', 'custom.length': 'Uzunluk', 'custom.operationCount': 'işlem',
+            'custom.minimum': 'En düşük hedef', 'custom.maximum': 'En yüksek hedef', 'custom.correct': 'Bitirmek için doğru yanıtlar',
+            'custom.rate': 'En düşük kazanma oranı (%)', 'custom.seed': 'Tohum (isteğe bağlı)', 'custom.seedHint': 'Aynı tohum, aynı oyun', 'custom.start': 'Özel oyunu başlat',
+            'options.wave': 'Her mod sekiz turluk bir dalgayı tekrarlar: ısınma, standart turlar ve daha yumuşak meydan okumalar.',
+            'options.keyboard': 'Tuşlar: ←/→ seçer · Boşluk değiştirir · Enter kontrol eder · H ipucu verir.',
+            'action.hint': 'İpucu', 'action.reveal': 'Çözümü göster', 'action.share': 'Paylaş', 'action.install': 'Çevrimdışı uygulamayı yükle',
+            'stats.mode': 'Mod', 'stats.correct': 'Doğru', 'stats.winRate': 'Kazanma oranı', 'stats.streak': 'Seri', 'stats.record': 'Rekor',
+            'stats.actions': 'İşlemler', 'stats.resetAll': 'Tüm istatistikleri sıfırla', 'stats.previous': 'Önceki', 'stats.next': 'Sonraki', 'stats.clearHistory': 'Geçmişi temizle'
+        },
+        ur: {
+            'nav.about': 'تعارف', 'aria.navigation': 'گیم نیویگیشن', 'aria.sections': 'گیم کے حصے', 'aria.mode': 'گیم موڈ',
+            'aria.play': 'کھیلیں', 'aria.options': 'اختیارات', 'aria.stats': 'اعداد و شمار', 'aria.about': 'تعارف',
+            'aria.session': 'موجودہ نشست کے اعداد و شمار', 'aria.puzzle': 'موجودہ پہیلی',
+            'custom.operations': 'عمل', 'custom.note': '+، −، ×، ÷ یا طاقتیں منتخب کریں۔', 'custom.length': 'لمبائی', 'custom.operationCount': 'عمل',
+            'custom.minimum': 'کم از کم ہدف', 'custom.maximum': 'زیادہ سے زیادہ ہدف', 'custom.correct': 'ختم کرنے کے لیے درست جواب',
+            'custom.rate': 'کم از کم جیت کی شرح (%)', 'custom.seed': 'بیج (اختیاری)', 'custom.seedHint': 'وہی بیج، وہی گیم', 'custom.start': 'اپنی گیم شروع کریں',
+            'options.wave': 'ہر موڈ میں آٹھ راؤنڈز کی لہر دہرائی جاتی ہے: وارم اپ، عام راؤنڈز اور نرم چیلنجز۔',
+            'options.keyboard': 'کلیدیں: ←/→ انتخاب · Space تبدیلی · Enter جانچ · H اشارہ۔',
+            'action.hint': 'اشارہ', 'action.reveal': 'حل دکھائیں', 'action.share': 'شیئر کریں', 'action.install': 'آف لائن ایپ انسٹال کریں',
+            'stats.mode': 'موڈ', 'stats.correct': 'درست', 'stats.winRate': 'جیت کی شرح', 'stats.streak': 'تسلسل', 'stats.record': 'ریکارڈ',
+            'stats.actions': 'عمل', 'stats.resetAll': 'تمام اعداد و شمار ری سیٹ کریں', 'stats.previous': 'پچھلا', 'stats.next': 'اگلا', 'stats.clearHistory': 'تاریخ صاف کریں'
+        }
+    };
+    for (const code of AVAILABLE_LOCALES) Object.assign(messages[code], uiMessages[code]);
+
     function translate(value) {
         if (typeof value !== 'string') return value;
         return (sourceTexts[locale] && sourceTexts[locale][value]) || value;
@@ -344,6 +505,9 @@
             element.setAttribute('aria-label', t(element.dataset.i18nAriaLabel));
         }
         for (const element of scope.querySelectorAll('[data-i18n-title]')) element.title = t(element.dataset.i18nTitle);
+        for (const element of scope.querySelectorAll('[data-i18n-placeholder]')) {
+            element.placeholder = t(element.dataset.i18nPlaceholder);
+        }
         for (const element of scope.querySelectorAll('[data-localize]')) {
             if (!element.dataset.sourceText) element.dataset.sourceText = element.textContent;
             element.textContent = translate(element.dataset.sourceText);
