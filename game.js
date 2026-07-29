@@ -27,7 +27,7 @@
         'history', 'history_page', 'history_prev', 'history_next', 'history_clear',
         'stats_rows', 'stats_reset_all', 'session_summary', 'achievement_list',
         'achievement_notice', 'setting_sound', 'setting_large_text', 'setting_contrast',
-        'setting_reduced_clutter', 'setting_language', 'setting_sidebar_side', 'install_app'
+        'setting_reduced_clutter', 'setting_language', 'quick_language', 'setting_sidebar_side', 'install_app'
     ]) {
         ui[id] = document.getElementById(id);
     }
@@ -887,6 +887,7 @@
         ui.setting_contrast.checked = !!settings.contrast;
         ui.setting_reduced_clutter.checked = !!settings.reducedClutter;
         ui.setting_language.value = i18n.getLocale();
+        ui.quick_language.value = i18n.getLocale();
         ui.setting_sidebar_side.value = requestedSide;
     }
 
@@ -1078,6 +1079,9 @@
     }
     ui.setting_language.addEventListener('change', function () {
         i18n.setLocale(ui.setting_language.value);
+    });
+    ui.quick_language.addEventListener('change', function () {
+        i18n.setLocale(ui.quick_language.value);
     });
     ui.setting_sidebar_side.addEventListener('change', function () {
         settings.sidebarSide = ui.setting_sidebar_side.value;
