@@ -697,7 +697,7 @@
         if (core.DIFFICULTIES[mode]) {
             const item = core.DIFFICULTIES[mode];
             ui.mode_info.replaceChildren(
-                text('strong', item.name), text('span', item.description),
+                text('strong', t('mode.' + item.id)), text('span', t('difficulty.' + item.id)),
                 text('span', t('mode.operations', { operations: item.operations.map(function (key) {
                     return core.OPERATIONS[key].symbol;
                 }).join(' ') })),
