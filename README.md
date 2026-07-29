@@ -31,6 +31,13 @@ It remains a dependency-free static site. Open `yog1.htm` in a browser to play.
 When served over HTTPS or localhost, its web app manifest and service worker make
 it installable and available offline.
 
+## Localization
+
+`i18n.js` contains the English and Spanish translation catalogs and safely
+falls back to English. The Options screen remembers the chosen language and
+shared links preserve it with `?lang=en` or `?lang=es`. Use `data-i18n` for
+static markup and `Yog1I18n.t(key, values)` for generated text.
+
 Run the generator tests with:
 
 ```sh

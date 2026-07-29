@@ -19,25 +19,31 @@
             margin: 0; min-height: 100vh; background: var(--bg); color: var(--ink);
             font: 16px/1.45 Verdana, Geneva, sans-serif;
         }
-        button, input { font: inherit; color: inherit; }
+        button, input, select { font: inherit; color: inherit; }
         button { cursor: pointer; }
         button:disabled { cursor: not-allowed; opacity: .5; }
         a { color: var(--blue); }
         #wrapper {
-            width: 1080px; max-width: calc(100vw - 32px); min-height: 650px;
+            width: 1180px; max-width: calc(100vw - 32px); min-height: 650px;
             display: flex; margin: 24px auto; border: 2px solid var(--ink);
             box-shadow: 6px 6px #000; background: var(--game);
         }
         #menu {
-            width: 205px; flex: none; padding: 20px 14px; background: var(--menu);
+            width: 340px; flex: none; padding: 18px 16px; background: var(--menu);
             border-right: 2px solid var(--ink);
         }
+        .menu-heading { display: flex; align-items: start; gap: 10px; }
+        .menu-heading > div { min-width: 0; flex: 1; }
+        #sidebar_toggle { flex: none; padding: 5px 8px; }
         h1 { margin: 6px 0; font: bold 1.45rem/1 "Courier New", monospace; letter-spacing: -.06em; }
         .jam-label, .section-label {
             font: bold .7rem "Courier New", monospace; letter-spacing: .12em; text-transform: uppercase;
         }
         .tagline { margin: 0 0 22px; color: #41413e; font-size: .78rem; }
-        #mode_buttons { display: grid; gap: 7px; margin: 7px 0 16px; }
+        #view_buttons { display: grid; grid-template-columns: repeat(2, 1fr); gap: 7px; margin: 7px 0 18px; }
+        #view_buttons button { padding: 7px; border: 1px solid var(--ink); background: var(--paper); box-shadow: 2px 2px var(--ink); }
+        #view_buttons button.active { background: #aaa9a2; font-weight: bold; box-shadow: inset 3px 0 var(--ink), 2px 2px var(--ink); }
+        #mode_buttons { display: grid; grid-template-columns: repeat(2, 1fr); gap: 7px; margin: 7px 0 16px; }
         #mode_buttons button, .primary, .secondary, .small-button {
             border: 1px solid var(--ink); background: var(--paper); box-shadow: 2px 2px var(--ink);
         }
@@ -47,6 +53,9 @@
         #mode_info { display: grid; gap: 6px; padding: 10px; border: 1px solid var(--ink); background: #d6d5ce; font-size: .72rem; }
         #mode_info strong { font: bold .8rem "Courier New", monospace; text-transform: uppercase; }
         #game { flex: 1; min-width: 0; padding: 24px 28px; overflow: hidden; }
+        #game_toolbar { display: flex; justify-content: flex-end; min-height: 28px; margin-bottom: 8px; }
+        #game_toolbar #sidebar_toggle_play { padding: 4px 8px; }
+        .screen > h2 { margin: 0 0 16px; font: bold 1.1rem "Courier New", monospace; text-transform: uppercase; }
         #message { padding: 11px 14px; border: 1px solid var(--ink); border-left-width: 5px; background: #d6d5ce; }
         #message strong { display: block; font: bold .78rem "Courier New", monospace; letter-spacing: .08em; text-transform: uppercase; }
         #message_text { font-size: .85rem; }
@@ -77,8 +86,9 @@
         #feedback code { display: block; overflow-x: auto; color: var(--blue); white-space: nowrap; }
         #timer_label { padding: 2px 8px; color: var(--red); border: 1px solid var(--red); background: var(--paper); font-weight: bold; }
         .primary { padding: 9px 14px; font: bold .85rem "Courier New", monospace; text-transform: uppercase; }
-        details.panel { margin-top: 22px; border-top: 2px solid var(--ink); }
-        details.panel > summary { padding: 10px 3px; cursor: pointer; font: bold .83rem "Courier New", monospace; letter-spacing: .08em; text-transform: uppercase; }
+        #session_summary { display: flex; align-items: baseline; gap: 5px; margin-left: auto; color: var(--muted); }
+        #session_summary .summary-value { color: var(--ink); font-size: .78rem; }
+        #session_summary .summary-label { font-size: .62rem; margin-right: 5px; }
         .panel-body { padding: 8px 3px 18px; overflow-x: auto; }
         .difficulty-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 7px; }
         .difficulty-grid article { padding: 9px; border: 1px solid var(--line); background: #eeeDE6; font-size: .72rem; }
@@ -92,7 +102,7 @@
         .field-note { margin: 8px 0 0; color: var(--muted); font-size: .7rem; }
         .custom-fields { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
         .custom-fields label { display: grid; gap: 3px; font-size: .75rem; }
-        input[type="number"] { width: 100%; padding: 5px; border: 1px solid var(--ink); background: var(--paper); }
+        input[type="number"], select { width: 100%; padding: 5px; border: 1px solid var(--ink); background: var(--paper); }
         #history { margin: 0; padding: 0; }
         #history li { list-style: none; padding: 9px 6px; border-bottom: 1px solid var(--line); }
         #history li.correct { color: var(--green); } #history li.incorrect { color: var(--red); }
@@ -105,7 +115,6 @@
         table { width: 100%; min-width: 610px; border-collapse: collapse; font-size: .78rem; }
         th, td { padding: 7px; border-bottom: 1px solid var(--line); text-align: left; }
         .stats-actions { margin-top: 10px; text-align: right; }
-        #session_summary { display: grid; grid-template-columns: repeat(4, auto 1fr); gap: 4px 8px; align-items: baseline; }
         .summary-value { color: var(--blue); font: bold 1.05rem "Courier New", monospace; }
         .summary-label { color: var(--muted); font-size: .68rem; text-transform: uppercase; }
         #achievement_list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 7px; margin: 0; padding: 0; }
@@ -116,7 +125,17 @@
         body.large-text { font-size: 19px; }
         body.high-contrast { --game: #fff; --menu: #fff; --paper: #fff; --line: #333; --muted: #333; --blue: #003b6f; }
         body.high-contrast #message, body.high-contrast #mode_info, body.high-contrast #custom_panel { background: #fff; }
-        body.reduced-clutter details.panel:not(.settings-panel) { display: none; }
+        body.reduced-clutter .options-extras, body.reduced-clutter #achievement_list { display: none; }
+        #wrapper.sidebar-collapsed #menu { width: 62px; padding: 14px 8px; }
+        #wrapper.sidebar-collapsed #menu .menu-heading > div,
+        #wrapper.sidebar-collapsed #menu > :not(.menu-heading) { display: none; }
+        #wrapper.sidebar-collapsed #menu .menu-heading { justify-content: center; }
+        #wrapper.sidebar-collapsed #sidebar_toggle { font-size: 0; }
+        #wrapper.sidebar-collapsed #sidebar_toggle::after { content: '☰'; font-size: 1rem; }
+        .options-grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(260px, .75fr); gap: 20px; }
+        .screen-panel { padding: 15px; border: 1px solid var(--ink); background: #f7f6ee; }
+        .screen-panel h3 { margin: 0 0 10px; font: bold .82rem "Courier New", monospace; text-transform: uppercase; }
+        .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
         footer { margin-top: 22px; padding-top: 12px; border-top: 1px solid var(--line); color: var(--muted); font-size: .75rem; text-align: center; }
         [hidden] { display: none !important; }
         @media (max-width: 760px) {
@@ -128,37 +147,52 @@
             #score_label { display: none; }
             #problem { font-size: 1.05rem; }
             #problem .number { font-size: 1.2rem; }
-            #session_summary { grid-template-columns: repeat(2, auto 1fr); }
+            #session_summary { width: 100%; order: 5; margin-left: 0; }
             #achievement_list, .settings-grid { grid-template-columns: 1fr; }
+            .options-grid { grid-template-columns: 1fr; }
+            #wrapper.sidebar-collapsed #menu { width: 100%; padding: 8px; }
+            #wrapper.sidebar-collapsed #menu .menu-heading > div { display: block; }
+            #wrapper.sidebar-collapsed #menu > :not(.menu-heading) { display: none; }
         }
         @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; } }
     </style>
 </head>
 <body>
 <div id="wrapper">
-    <aside id="menu">
-        <div class="jam-label">LD28 / 2013</div>
-        <h1>You Only Get 1s</h1>
-        <p class="tagline">One move. Make it count.</p>
-        <div class="section-label">Mode</div>
+    <aside id="menu" aria-label="Game navigation">
+        <div class="menu-heading">
+            <div><div class="jam-label">LD28 / 2013</div>
+            <h1>You Only Get 1s</h1>
+            <p class="tagline" data-localize>One move. Make it count.</p></div>
+            <button id="sidebar_toggle" class="secondary" type="button" aria-controls="menu" aria-expanded="true" title="Collapse game menu" data-i18n="menu.collapse" data-i18n-title="menu.collapseTitle">Collapse</button>
+        </div>
+        <div class="section-label" data-i18n="nav.view">View</div>
+        <div id="view_buttons" role="navigation" aria-label="Game sections">
+            <button type="button" data-view="play" class="active" aria-current="page" data-i18n="nav.play">Play</button>
+            <button type="button" data-view="options" data-i18n="nav.options">Options</button>
+            <button type="button" data-view="stats" data-i18n="nav.stats">Stats</button>
+        </div>
+        <div class="section-label" data-i18n="nav.mode">Mode</div>
         <div id="mode_buttons" role="group" aria-label="Game mode">
-            <button type="button" data-mode="tutorial" class="active" aria-pressed="true">Tutorial</button>
-            <button type="button" data-mode="easy" aria-pressed="false">Easy</button>
-            <button type="button" data-mode="normal" aria-pressed="false">Normal</button>
-            <button type="button" data-mode="hard" aria-pressed="false">Hard</button>
-            <button type="button" data-mode="expert" aria-pressed="false">Expert</button>
-            <button type="button" data-mode="extreme" aria-pressed="false">Extreme</button>
-            <button type="button" data-mode="daily" aria-pressed="false">Daily</button>
-            <button type="button" data-mode="timed" aria-pressed="false">Timed</button>
-            <button type="button" data-mode="endless" aria-pressed="false">Endless</button>
-            <button type="button" data-mode="challenges" aria-pressed="false">Challenges</button>
-            <button type="button" data-mode="custom" aria-pressed="false">Custom…</button>
+            <button type="button" data-mode="tutorial" class="active" aria-pressed="true" data-localize>Tutorial</button>
+            <button type="button" data-mode="easy" aria-pressed="false" data-localize>Easy</button>
+            <button type="button" data-mode="normal" aria-pressed="false" data-localize>Normal</button>
+            <button type="button" data-mode="hard" aria-pressed="false" data-localize>Hard</button>
+            <button type="button" data-mode="expert" aria-pressed="false" data-localize>Expert</button>
+            <button type="button" data-mode="extreme" aria-pressed="false" data-localize>Extreme</button>
+            <button type="button" data-mode="daily" aria-pressed="false" data-localize>Daily</button>
+            <button type="button" data-mode="timed" aria-pressed="false" data-localize>Timed</button>
+            <button type="button" data-mode="endless" aria-pressed="false" data-localize>Endless</button>
+            <button type="button" data-mode="challenges" aria-pressed="false" data-localize>Challenges</button>
+            <button type="button" data-mode="custom" aria-pressed="false" data-localize>Custom…</button>
         </div>
         <div id="mode_info" aria-live="polite"></div>
     </aside>
     <main id="game">
+        <div id="game_toolbar"><button id="sidebar_toggle_play" class="secondary" type="button" aria-controls="menu" aria-expanded="true" data-i18n="action.menu">Menu</button></div>
+        <section id="play_screen" class="screen" data-screen="play" aria-label="Play">
         <div id="message" role="status" aria-live="polite">
-            <strong id="message_title">How to play</strong>
+            <strong id="message_title" data-localize>How to play</strong>
             <span id="message_text"></span>
             <div id="achievement_notice" role="status"></div>
         </div>
@@ -189,42 +223,64 @@
             <span id="round_kind" class="round-kind">Guided</span>
             <span id="score_label"></span>
             <span id="timer_label" hidden>60s</span>
+            <div id="session_summary" aria-label="Current session statistics"></div>
         </div>
         <section id="workspace" aria-label="Current puzzle">
-            <div id="flips"><strong>Your move</strong><span id="flip_count">1</span><span id="flip_text">flip remaining</span></div>
+            <div id="flips"><strong data-localize>Your move</strong><span id="flip_count">1</span><span id="flip_text">flip remaining</span></div>
             <div id="problem"></div>
             <div id="actions">
                 <span id="custom_progress" hidden></span>
-                <button id="hint" class="secondary" type="button" title="Hint (H)">Hint</button>
-                <button id="skip" class="secondary" type="button">Reveal</button>
-                <button id="share" class="secondary" type="button">Share</button>
-                <button id="submit" class="primary" type="button">Check equation</button>
+                <button id="hint" class="secondary" type="button" title="Hint (H)" data-localize>Hint</button>
+                <button id="skip" class="secondary" type="button" data-localize>Reveal</button>
+                <button id="share" class="secondary" type="button" data-localize>Share</button>
+                <button id="submit" class="primary" type="button" data-i18n="action.check">Check equation</button>
             </div>
             <div id="feedback" aria-live="polite" hidden></div>
         </section>
 
-        <details class="panel" open>
-            <summary>Current session</summary>
-            <div class="panel-body"><div id="session_summary"></div></div>
-        </details>
+        </section>
 
-        <details class="panel">
-            <summary>What changes by difficulty?</summary>
-            <div class="panel-body">
+        <section id="options_screen" class="screen" data-screen="options" aria-label="Options" hidden>
+            <h2 data-localize>Options</h2>
+            <div class="options-grid">
+            <section class="screen-panel">
+                <h3 data-localize>Difficulty guide</h3>
                 <div class="difficulty-grid">
-                    <article><h3>Easy</h3>Short + and − puzzles; small integers.</article>
-                    <article><h3>Normal</h3>Longer puzzles; adds ×.</article>
-                    <article><h3>Hard</h3>Deeper puzzles; adds integer ÷.</article>
-                    <article><h3>Expert</h3>Adds modulus % and powers ^.</article>
-                    <article><h3>Extreme</h3>Largest values and every operation, including √.</article>
+                    <article><h3 data-localize>Easy</h3><span data-localize>Three values only; small + and − puzzles.</span></article>
+                    <article><h3 data-localize>Normal</h3><span data-localize>Compact puzzles; adds × and frequent three-value rounds.</span></article>
+                    <article><h3 data-localize>Hard</h3><span data-localize>Compact puzzles; adds integer ÷ and some three-value rounds.</span></article>
+                    <article><h3 data-localize>Expert</h3><span data-localize>Adds modulus % and powers ^, with occasional three-value rounds.</span></article>
+                    <article><h3 data-localize>Extreme</h3><span data-localize>Largest values and every operation, including √, in the longest puzzles.</span></article>
                 </div>
                 <p class="wave-note">Every mode follows a repeating eight-round wave: warm-ups, standard rounds, and challenge rounds average back to the mode’s normal difficulty. The wave averages exactly over typical 24, 32, and 40-puzzle sessions.</p>
-            </div>
-        </details>
+            </section>
 
-        <details class="panel">
-            <summary>Problem history</summary>
-            <div class="panel-body">
+            <section class="screen-panel">
+                <h3 data-localize>Accessibility &amp; sound</h3>
+                <div class="settings-grid">
+                    <label><span data-i18n="language.label">Language</span><select id="setting_language" aria-label="Language" data-i18n-aria-label="language.label"><option value="en">English</option><option value="es">Español</option></select></label>
+                    <label><input id="setting_sound" type="checkbox"><span data-localize>Waveform sound effects (off by default)</span></label>
+                    <label><input id="setting_large_text" type="checkbox"><span data-localize>Larger text</span></label>
+                    <label><input id="setting_contrast" type="checkbox"><span data-localize>Higher contrast</span></label>
+                    <label><input id="setting_reduced_clutter" type="checkbox"><span data-localize>Reduced clutter</span></label>
+                </div>
+                <p class="wave-note">Keyboard: Left/Right selects a number, Space flips it, Enter checks, and H gives a hint.</p>
+                <button id="install_app" class="secondary" type="button" hidden>Install offline app</button>
+            </section>
+            </div>
+        </section>
+
+        <section id="stats_screen" class="screen" data-screen="stats" aria-label="Statistics" hidden>
+            <h2 data-localize>Stats &amp; history</h2>
+            <section class="screen-panel">
+                <h3 data-localize>Stats by difficulty</h3>
+                <div class="panel-body"><table>
+                    <thead><tr><th scope="col">Mode</th><th scope="col">Correct</th><th scope="col">Win rate</th><th scope="col">Streak</th><th scope="col">Record</th><th scope="col"><span class="sr-only">Actions</span></th></tr></thead>
+                    <tbody id="stats_rows"></tbody>
+                </table><div class="stats-actions"><button id="stats_reset_all" class="secondary" type="button">Reset all stats</button></div></div>
+            </section>
+            <section class="screen-panel">
+                <h3 data-localize>Problem history</h3>
                 <ul id="history"></ul>
                 <div class="history-controls">
                     <span id="history_page"></span>
@@ -232,40 +288,13 @@
                     <button id="history_next" class="secondary" type="button">Next</button>
                     <button id="history_clear" class="secondary" type="button">Clear history</button>
                 </div>
-            </div>
-        </details>
+            </section>
+            <section class="screen-panel options-extras">
+                <h3 data-localize>Achievements</h3><ul id="achievement_list"></ul>
+            </section>
+        </section>
 
-        <details class="panel">
-            <summary>Stats by difficulty</summary>
-            <div class="panel-body">
-                <table>
-                    <thead><tr><th>Mode</th><th>Correct</th><th>Win rate</th><th>Streak</th><th>Record</th><th></th></tr></thead>
-                    <tbody id="stats_rows"></tbody>
-                </table>
-                <div class="stats-actions"><button id="stats_reset_all" class="secondary" type="button">Reset all stats</button></div>
-            </div>
-        </details>
-
-        <details class="panel">
-            <summary>Achievements</summary>
-            <div class="panel-body"><ul id="achievement_list"></ul></div>
-        </details>
-
-        <details class="panel settings-panel">
-            <summary>Accessibility &amp; sound</summary>
-            <div class="panel-body">
-                <div class="settings-grid">
-                    <label><input id="setting_sound" type="checkbox"> Waveform sound effects (off by default)</label>
-                    <label><input id="setting_large_text" type="checkbox"> Larger text</label>
-                    <label><input id="setting_contrast" type="checkbox"> Higher contrast</label>
-                    <label><input id="setting_reduced_clutter" type="checkbox"> Reduced clutter</label>
-                </div>
-                <p class="wave-note">Keyboard: Left/Right selects a number, Space flips it, Enter checks, and H gives a hint.</p>
-                <button id="install_app" class="secondary" type="button" hidden>Install offline app</button>
-            </div>
-        </details>
-
-        <footer>
+        <footer id="app_footer" hidden>
             Made by <a href="https://bluehexagons.com/">bluehexagons</a> for Ludum Dare 28.
             Open source on <a href="https://github.com/bluehexagons/yog1">GitHub</a>.
             History and stats stay in this browser.
@@ -273,6 +302,7 @@
     </main>
 </div>
 <script src="game-core.js"></script>
+<script src="i18n.js"></script>
 <script src="game.js"></script>
 </body>
 </html>

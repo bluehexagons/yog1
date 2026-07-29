@@ -60,6 +60,35 @@ for (const profile of Object.values(core.DIFFICULTIES)) {
     }
 }
 
+function numberCount(problem) {
+    let count = 0;
+    problem.sides.forEach(function (side) {
+        core.visitNumbers(side, function () { count++; });
+    });
+    return count;
+}
+
+for (let seed = 1; seed <= 40; seed++) {
+    const easy = core.generateProblem({
+        profile: core.DIFFICULTIES.easy,
+        round: seed,
+        random: seededRandom(seed)
+    });
+    assert.strictEqual(numberCount(easy), 3, 'easy problems have exactly three selectable values');
+}
+for (const profile of [core.DIFFICULTIES.normal, core.DIFFICULTIES.hard, core.DIFFICULTIES.expert]) {
+    let shortRounds = 0;
+    for (let seed = 1; seed <= 100; seed++) {
+        const problem = core.generateProblem({
+            profile: profile,
+            round: seed,
+            random: seededRandom(seed * 17 + profile.target)
+        });
+        if (numberCount(problem) === 3) shortRounds++;
+    }
+    assert(shortRounds > 10, profile.name + ' retains a meaningful number of three-value rounds');
+}
+
 const average = core.ROUND_WAVE.reduce((sum, value) => sum + value, 0) / core.ROUND_WAVE.length;
 assert.strictEqual(average, 1);
 for (let sessionLength = 20; sessionLength <= 40; sessionLength++) {

@@ -2,6 +2,8 @@
     'use strict';
 
     const core = window.Yog1Core;
+    const i18n = window.Yog1I18n;
+    const t = i18n.t;
     const KEYS = {
         history: 'yog1.problemHistory.v2',
         stats: 'yog1.difficultyStats.v2',
@@ -16,7 +18,8 @@
 
     const ui = {};
     for (const id of [
-        'mode_buttons', 'mode_info', 'round_label', 'round_kind', 'score_label', 'timer_label',
+        'mode_buttons', 'mode_info', 'view_buttons', 'sidebar_toggle', 'sidebar_toggle_play',
+        'round_label', 'round_kind', 'score_label', 'timer_label',
         'problem', 'flip_count', 'flip_text', 'submit', 'hint', 'skip', 'share',
         'message_title', 'message_text', 'feedback', 'custom_panel', 'custom_form',
         'custom_operations', 'custom_length', 'custom_length_value', 'custom_min',
@@ -24,7 +27,7 @@
         'history', 'history_page', 'history_prev', 'history_next', 'history_clear',
         'stats_rows', 'stats_reset_all', 'session_summary', 'achievement_list',
         'achievement_notice', 'setting_sound', 'setting_large_text', 'setting_contrast',
-        'setting_reduced_clutter', 'install_app'
+        'setting_reduced_clutter', 'setting_language', 'install_app'
     ]) {
         ui[id] = document.getElementById(id);
     }
@@ -48,7 +51,7 @@
 
     function text(type, value, className) {
         const element = document.createElement(type);
-        element.textContent = value;
+        element.textContent = i18n.translate(value);
         if (className) {
             element.className = className;
         }
@@ -320,17 +323,17 @@
             }
         });
         ui.flip_count.textContent = selectedId ? '0' : '1';
-        ui.flip_text.textContent = selectedId ? 'flips remaining' : 'flip remaining';
-        ui.round_label.textContent = mode === 'tutorial' ? 'Tutorial' :
-            (mode === 'daily' ? utcDate() : 'Round ' + round);
-        ui.round_kind.textContent = currentProblem.roundKind;
+        ui.flip_text.textContent = t(selectedId ? 'flip.many' : 'flip.one');
+        ui.round_label.textContent = mode === 'tutorial' ? t('round.tutorial') :
+            (mode === 'daily' ? utcDate() : i18n.translate('Round ') + round);
+        ui.round_kind.textContent = i18n.translate(currentProblem.roundKind);
         ui.round_kind.className = 'round-kind ' + currentProblem.roundKind.toLowerCase().replace('-', '');
-        ui.score_label.textContent = 'Target ' + currentProblem.target + ' · score ' + currentProblem.score;
+        ui.score_label.textContent = t('round.score', { target: currentProblem.target, score: currentProblem.score });
     }
 
     function setMessage(title, message) {
-        ui.message_title.textContent = title;
-        ui.message_text.textContent = message;
+        ui.message_title.textContent = i18n.translate(title);
+        ui.message_text.textContent = i18n.translate(message);
     }
 
     function hideFeedback() {
@@ -363,7 +366,7 @@
         currentSeed = problemSeed();
         currentProblem = generateCurrentProblem();
         session.puzzleStartedAt = Date.now();
-        ui.submit.textContent = 'Check equation';
+        ui.submit.textContent = t('action.check');
         ui.submit.disabled = session.finished;
         ui.hint.disabled = mode === 'tutorial' || session.finished;
         ui.skip.disabled = mode === 'tutorial' || session.finished;
@@ -445,11 +448,11 @@
     }
 
     function modeLabel() {
-        if (core.DIFFICULTIES[mode]) return core.DIFFICULTIES[mode].name;
-        return {
+        if (core.DIFFICULTIES[mode]) return i18n.translate(core.DIFFICULTIES[mode].name);
+        return i18n.translate({
             tutorial: 'Tutorial', custom: 'Custom', daily: 'Daily',
             timed: 'Timed', endless: 'Endless', challenges: 'Challenges'
-        }[mode] || mode;
+        }[mode] || mode);
     }
 
     function recordAttempt(correct) {
@@ -507,7 +510,7 @@
         playSound('correct');
         showExplanation(true);
         awaitingAdvance = true;
-        ui.submit.textContent = 'Next puzzle';
+        ui.submit.textContent = t('action.next');
         ui.hint.disabled = true;
         ui.skip.disabled = true;
 
@@ -531,7 +534,7 @@
             }
         }
         if (mode === 'challenges' && round === CURATED.length) {
-            ui.submit.textContent = 'Play again';
+            ui.submit.textContent = t('action.again');
             setMessage('Challenge set complete', 'You solved all ' + CURATED.length + ' handcrafted puzzles.');
         } else {
             setMessage('Correct', 'Both sides balance. Review the solution, then continue.');
@@ -607,13 +610,13 @@
                 session.durations.length / 1000).toFixed(1) + 's' : '—';
         ui.session_summary.replaceChildren(
             text('div', String(session.solved), 'summary-value'),
-            text('div', 'solved', 'summary-label'),
+            text('div', t('session.solved'), 'summary-label'),
             text('div', accuracy + '%', 'summary-value'),
-            text('div', 'accuracy', 'summary-label'),
+            text('div', t('session.accuracy'), 'summary-label'),
             text('div', average, 'summary-value'),
-            text('div', 'average', 'summary-label'),
+            text('div', t('session.average'), 'summary-label'),
             text('div', String(Math.round(session.hardest)), 'summary-value'),
-            text('div', 'hardest', 'summary-label')
+            text('div', t('session.hardest'), 'summary-label')
         );
         updateProgress();
     }
@@ -625,15 +628,16 @@
         for (const item of history.slice(historyPage * PAGE_SIZE, (historyPage + 1) * PAGE_SIZE)) {
             const li = document.createElement('li');
             li.className = item.correct ? 'correct' : 'incorrect';
-            const summary = text('div', (item.correct ? 'Correct' : 'Incorrect') +
-                ' · ' + item.mode + ' · round ' + item.round, 'history-summary');
-            summary.appendChild(text('time', ' ' + new Date(item.at).toLocaleString(), 'history-date'));
+            const summary = text('div', (item.correct ? t('history.correct') : t('history.incorrect')) +
+                ' · ' + item.mode + ' · ' + t('history.round', { round: item.round }), 'history-summary');
+            summary.appendChild(text('time', ' ' + new Date(item.at).toLocaleString(i18n.getLocale()), 'history-date'));
             li.append(summary, text('code', item.expression));
             ui.history.appendChild(li);
         }
-        if (!history.length) ui.history.appendChild(text('li', 'No saved problems yet.', 'empty'));
-        ui.history_page.textContent = 'Page ' + (historyPage + 1) + ' of ' + pages +
-            ' · ' + history.length + '/' + HISTORY_LIMIT + ' saved';
+        if (!history.length) ui.history.appendChild(text('li', t('history.empty'), 'empty'));
+        ui.history_page.textContent = t('history.page', {
+            page: historyPage + 1, pages: pages, count: history.length, limit: HISTORY_LIMIT
+        });
         ui.history_prev.disabled = historyPage === 0;
         ui.history_next.disabled = historyPage + 1 >= pages;
         ui.history_clear.disabled = history.length === 0;
@@ -651,15 +655,18 @@
         for (const item of modes) {
             const stat = getStat(item.id);
             const row = document.createElement('tr');
-            row.appendChild(text('th', item.name));
+            const name = text('th', item.name);
+            name.scope = 'row';
+            row.appendChild(name);
             row.appendChild(text('td', stat.correct + '/' + stat.attempts));
             row.appendChild(text('td', stat.attempts ? Math.round(stat.correct / stat.attempts * 100) + '%' : '—'));
             row.appendChild(text('td', String(stat.bestStreak || 0)));
             row.appendChild(text('td', stat.bestScore ? String(stat.bestScore) : '—'));
             const action = document.createElement('td');
-            const reset = text('button', 'Reset', 'small-button');
+            const reset = text('button', t('action.reset'), 'small-button');
             reset.type = 'button';
             reset.dataset.resetStat = item.id;
+            reset.setAttribute('aria-label', t('aria.resetStat', { mode: item.name }));
             reset.disabled = stat.attempts === 0 && !stat.bestScore;
             action.appendChild(reset);
             row.appendChild(action);
@@ -692,14 +699,45 @@
             const item = core.DIFFICULTIES[mode];
             ui.mode_info.replaceChildren(
                 text('strong', item.name), text('span', item.description),
-                text('span', 'Operations: ' + item.operations.map(function (key) {
+                text('span', t('mode.operations', { operations: item.operations.map(function (key) {
                     return core.OPERATIONS[key].symbol;
-                }).join(' ')),
-                text('span', 'Base length: ' + item.length[0] + '–' + item.length[1])
+                }).join(' ') })),
+                text('span', t('mode.baseLength', { min: item.length[0], max: item.length[1] }))
             );
         } else {
             const item = descriptions[mode];
             ui.mode_info.replaceChildren(text('strong', item[0]), text('span', item[1]));
+        }
+    }
+
+    function setSidebarCollapsed(collapsed) {
+        const wrapper = document.getElementById('wrapper');
+        wrapper.classList.toggle('sidebar-collapsed', collapsed);
+        for (const button of [ui.sidebar_toggle, ui.sidebar_toggle_play]) {
+            button.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+        }
+        ui.sidebar_toggle.textContent = t(collapsed ? 'menu.expand' : 'menu.collapse');
+        ui.sidebar_toggle.title = t(collapsed ? 'menu.expandTitle' : 'menu.collapseTitle');
+    }
+
+    function showView(view, focusHeading) {
+        const screens = Array.from(document.querySelectorAll('[data-screen]'));
+        const selected = screens.find(function (screen) { return screen.dataset.screen === view; }) || screens[0];
+        for (const screen of screens) screen.hidden = screen !== selected;
+        document.getElementById('app_footer').hidden = selected.dataset.screen === 'play';
+        for (const button of ui.view_buttons.querySelectorAll('[data-view]')) {
+            const active = button.dataset.view === selected.dataset.screen;
+            button.classList.toggle('active', active);
+            if (active) button.setAttribute('aria-current', 'page');
+            else button.removeAttribute('aria-current');
+        }
+        if (selected.dataset.screen !== 'play') setSidebarCollapsed(false);
+        if (focusHeading) {
+            const heading = selected.querySelector('h2');
+            if (heading) {
+                heading.tabIndex = -1;
+                heading.focus();
+            }
         }
     }
 
@@ -713,10 +751,10 @@
         clearTimer();
         timeRemaining = TIMED_SECONDS;
         ui.timer_label.hidden = false;
-        ui.timer_label.textContent = timeRemaining + 's';
+        ui.timer_label.textContent = t('timer.seconds', { seconds: timeRemaining });
         timerId = window.setInterval(function () {
             timeRemaining--;
-            ui.timer_label.textContent = timeRemaining + 's';
+            ui.timer_label.textContent = t('timer.seconds', { seconds: timeRemaining });
             if (timeRemaining <= 0) {
                 finishSession('Time!', 'You solved ' + session.solved + ' puzzles in ' + TIMED_SECONDS + ' seconds.');
                 playSound('finish');
@@ -741,6 +779,8 @@
             candidate.setAttribute('aria-pressed', active ? 'true' : 'false');
         }
         ui.custom_panel.hidden = mode !== 'custom';
+        showView('play');
+        setSidebarCollapsed(mode !== 'custom');
         newSession();
         updateModeInfo();
         if (mode === 'custom') {
@@ -767,6 +807,7 @@
     function sharePuzzle() {
         const url = new URL(window.location.href);
         url.search = '';
+        url.searchParams.set('lang', i18n.getLocale());
         let shareText = 'You Only Get 1s';
         if (mode === 'daily') {
             url.searchParams.set('daily', utcDate());
@@ -840,7 +881,24 @@
         ui.setting_large_text.checked = !!settings.largeText;
         ui.setting_contrast.checked = !!settings.contrast;
         ui.setting_reduced_clutter.checked = !!settings.reducedClutter;
+        ui.setting_language.value = i18n.getLocale();
     }
+
+    function refreshLocalizedUi() {
+        i18n.apply();
+        applySettings();
+        updateModeInfo();
+        renderHistory();
+        renderStats();
+        renderAchievements();
+        renderSession();
+        if (currentProblem && mode !== 'custom') drawProblem();
+        if (timerId) ui.timer_label.textContent = t('timer.seconds', { seconds: timeRemaining });
+        if (awaitingAdvance) ui.submit.textContent = t('action.next');
+        else if (session && session.finished && mode === 'challenges') ui.submit.textContent = t('action.again');
+        setSidebarCollapsed(document.getElementById('wrapper').classList.contains('sidebar-collapsed'));
+    }
+    window.addEventListener('yog1localechange', refreshLocalizedUi);
 
     ui.problem.addEventListener('click', function (event) {
         const button = event.target.closest('[data-number-id]');
@@ -900,7 +958,7 @@
         recordAttempt(false);
         showExplanation(true);
         awaitingAdvance = true;
-        ui.submit.textContent = 'Next puzzle';
+        ui.submit.textContent = t('action.next');
         ui.hint.disabled = true;
         ui.skip.disabled = true;
         if (mode === 'daily') {
@@ -926,6 +984,16 @@
     });
 
     ui.share.addEventListener('click', sharePuzzle);
+    ui.sidebar_toggle.addEventListener('click', function () {
+        setSidebarCollapsed(!document.getElementById('wrapper').classList.contains('sidebar-collapsed'));
+    });
+    ui.sidebar_toggle_play.addEventListener('click', function () {
+        setSidebarCollapsed(!document.getElementById('wrapper').classList.contains('sidebar-collapsed'));
+    });
+    ui.view_buttons.addEventListener('click', function (event) {
+        const button = event.target.closest('[data-view]');
+        if (button) showView(button.dataset.view, true);
+    });
     ui.mode_buttons.addEventListener('click', function (event) {
         const button = event.target.closest('[data-mode]');
         if (button) activateMode(button.dataset.mode, button);
@@ -964,7 +1032,7 @@
     ui.history_prev.addEventListener('click', function () { historyPage--; renderHistory(); });
     ui.history_next.addEventListener('click', function () { historyPage++; renderHistory(); });
     ui.history_clear.addEventListener('click', function () {
-        if (window.confirm('Clear all locally saved problem history?')) {
+        if (window.confirm(t('confirm.clearHistory'))) {
             history = [];
             historyPage = 0;
             save(KEYS.history, history);
@@ -973,14 +1041,15 @@
     });
     ui.stats_rows.addEventListener('click', function (event) {
         const button = event.target.closest('[data-reset-stat]');
-        if (button && window.confirm('Reset stats for ' + button.dataset.resetStat + '?')) {
+        const modeName = button && button.closest('tr').querySelector('th').textContent;
+        if (button && window.confirm(t('confirm.resetStat', { mode: modeName }))) {
             delete stats[button.dataset.resetStat];
             save(KEYS.stats, stats);
             renderStats();
         }
     });
     ui.stats_reset_all.addEventListener('click', function () {
-        if (window.confirm('Reset stats for every mode?')) {
+        if (window.confirm(t('confirm.resetAll'))) {
             stats = {};
             save(KEYS.stats, stats);
             renderStats();
@@ -1000,6 +1069,9 @@
             if (input === ui.setting_sound && input.checked) playSound('flip');
         });
     }
+    ui.setting_language.addEventListener('change', function () {
+        i18n.setLocale(ui.setting_language.value);
+    });
 
     document.addEventListener('keydown', function (event) {
         if (event.target.matches('input, select, textarea')) return;
@@ -1091,6 +1163,7 @@
     }
 
     populateCustomForm();
+    i18n.apply();
     applySettings();
     renderHistory();
     renderStats();

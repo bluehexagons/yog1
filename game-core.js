@@ -19,29 +19,29 @@
 
     const DIFFICULTIES = {
         easy: {
-            id: 'easy', name: 'Easy', target: 9, length: [2, 4],
+            id: 'easy', name: 'Easy', target: 9, length: [1, 1], shortRoundChance: 1,
             operations: ['add', 'subtract'], maxNumber: 18,
-            description: 'Short addition and subtraction with small positive integers.'
+            description: 'Three-number addition and subtraction with small positive integers.'
         },
         normal: {
-            id: 'normal', name: 'Normal', target: 17, length: [3, 6],
+            id: 'normal', name: 'Normal', target: 17, length: [2, 4], shortRoundChance: 0.45,
             operations: ['add', 'subtract', 'multiply'], maxNumber: 30,
-            description: 'Longer expressions that introduce multiplication.'
+            description: 'Compact expressions that introduce multiplication, with frequent three-number warm-ups.'
         },
         hard: {
-            id: 'hard', name: 'Hard', target: 27, length: [4, 8],
+            id: 'hard', name: 'Hard', target: 27, length: [3, 5], shortRoundChance: 0.35,
             operations: ['add', 'subtract', 'multiply', 'divide'], maxNumber: 50,
-            description: 'Denser expressions with integer (whole-quotient) division.'
+            description: 'Compact expressions with integer (whole-quotient) division and some three-number rounds.'
         },
         expert: {
-            id: 'expert', name: 'Expert', target: 39, length: [5, 9],
+            id: 'expert', name: 'Expert', target: 39, length: [3, 6], shortRoundChance: 0.25,
             operations: ['add', 'subtract', 'multiply', 'divide', 'modulo', 'power'], maxNumber: 80,
-            description: 'Adds remainders and powers, with larger values.'
+            description: 'Adds remainders and powers, while retaining occasional three-number rounds.'
         },
         extreme: {
-            id: 'extreme', name: 'Extreme', target: 52, length: [6, 11],
+            id: 'extreme', name: 'Extreme', target: 52, length: [4, 8],
             operations: Object.keys(OPERATIONS), maxNumber: 120,
-            description: 'Every operation, including roots, in deep expressions.'
+            description: 'Every operation, including roots, in the longest expressions.'
         }
     };
 
@@ -391,15 +391,21 @@
             const position = (scheduled.factor - 0.7) / 0.6;
             scheduled.target = Math.round(min + (max - min) * position);
         }
-        const length = options.length || randomInt(options.random || Math.random, profile.length[0], profile.length[1]);
+        const random = options.random || Math.random;
+        const length = options.length || randomInt(random, profile.length[0], profile.length[1]);
+        const shortRound = !options.length && profile.shortRoundChance &&
+            random() < profile.shortRoundChance;
         return {
             profile: profile,
-            random: options.random || Math.random,
+            random: random,
             operations: (options.operations || profile.operations).filter(function (op) {
                 return Object.prototype.hasOwnProperty.call(OPERATIONS, op);
             }),
             maxNumber: options.maxNumber || profile.maxNumber,
-            operationCount: Math.max(2, Math.round(length * scheduled.factor + scheduled.target / 10)),
+            // Targets measure arithmetic complexity; they should not also make
+            // every high-level expression longer.  A one-operation identity
+            // yields exactly three selectable numbers.
+            operationCount: shortRound ? 1 : Math.max(2, Math.round(length * scheduled.factor)),
             scheduled: scheduled
         };
     }
@@ -427,11 +433,18 @@
         let guard = settings.operationCount * 4;
         // The newest operation in a standard profile is its signature feature.
         // Put it in every generated puzzle instead of leaving its appearance to luck.
-        expand(sides, [settings.operations[settings.operations.length - 1]], settings.random, settings.maxNumber);
-        while (countOperations(sides[0]) + countOperations(sides[1]) < settings.operationCount && guard-- > 0) {
+        // For three-number rounds, the one-flip identity itself carries that
+        // operation, so no preliminary expansion is needed.
+        if (settings.operationCount > 1) {
+            expand(sides, [settings.operations[settings.operations.length - 1]], settings.random, settings.maxNumber);
+        }
+        // Reserve one operation for the identity that supplies the solution.
+        while (countOperations(sides[0]) + countOperations(sides[1]) < settings.operationCount - 1 && guard-- > 0) {
             expand(sides, settings.operations, settings.random, settings.maxNumber);
         }
-        addSolution(sides, settings.operations, settings.random);
+        addSolution(sides, settings.operationCount === 1
+            ? [settings.operations[settings.operations.length - 1]]
+            : settings.operations, settings.random);
         disguiseOnes(sides, settings.random, settings.maxNumber);
         if (evaluate(sides[0]) === evaluate(sides[1]) && (options._attempt || 0) < 30) {
             return generateProblem(Object.assign({}, options, { _attempt: (options._attempt || 0) + 1 }));
