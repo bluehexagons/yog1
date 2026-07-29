@@ -4,7 +4,7 @@
     const STORAGE_KEY = 'yog1.locale.v1';
     // Only complete locales are selectable. Keep in-progress dictionaries here
     // for translators without presenting a mixed-language interface to players.
-    const AVAILABLE_LOCALES = ['en', 'es', 'zh', 'ar', 'bn', 'ja', 'hi'];
+    const AVAILABLE_LOCALES = ['en', 'es', 'zh', 'ar', 'bn', 'ja', 'hi', 'pt', 'ru'];
     const RTL_LOCALES = ['ar'];
     const messages = {
         en: {
@@ -107,6 +107,30 @@
             'history.correct': 'सही', 'history.incorrect': 'गलत', 'history.round': 'राउंड {round}',
             'mode.operations': 'क्रियाएँ: {operations}', 'mode.baseLength': 'आधार लंबाई: {min}–{max}',
             'confirm.clearHistory': 'सभी स्थानीय पहेली इतिहास मिटाएँ?', 'confirm.resetStat': '{mode} के आँकड़े रीसेट करें?', 'confirm.resetAll': 'सभी मोड के आँकड़े रीसेट करें?', 'aria.resetStat': '{mode} के आँकड़े रीसेट करें'
+        },
+        pt: {
+            'language.label': 'Idioma', 'sidebar.label': 'Lado da barra lateral', 'sidebar.auto': 'Automático (seguir idioma)', 'sidebar.left': 'Esquerda', 'sidebar.right': 'Direita',
+            'nav.view': 'Tela', 'nav.play': 'Jogar', 'nav.options': 'Opções', 'nav.stats': 'Estatísticas', 'nav.mode': 'Modo',
+            'menu.expand': 'Expandir', 'menu.collapse': 'Recolher', 'action.menu': 'Menu', 'action.reset': 'Redefinir',
+            'action.check': 'Verificar equação', 'action.next': 'Próximo problema', 'action.again': 'Jogar novamente',
+            'round.tutorial': 'Tutorial', 'round.score': 'Meta {target} · pontuação {score}', 'flip.one': 'inversão restante', 'flip.many': 'inversões restantes',
+            'session.solved': 'resolvidos', 'session.accuracy': 'precisão', 'session.average': 'média', 'session.hardest': 'mais difícil',
+            'timer.seconds': '{seconds}s', 'history.empty': 'Ainda não há problemas salvos.', 'history.page': 'Página {page}/{pages} · {count}/{limit} salvos',
+            'history.correct': 'Correto', 'history.incorrect': 'Incorreto', 'history.round': 'rodada {round}',
+            'mode.operations': 'Operações: {operations}', 'mode.baseLength': 'Comprimento base: {min}–{max}',
+            'confirm.clearHistory': 'Limpar todo o histórico local de problemas?', 'confirm.resetStat': 'Redefinir estatísticas de {mode}?', 'confirm.resetAll': 'Redefinir estatísticas de todos os modos?', 'aria.resetStat': 'Redefinir estatísticas de {mode}'
+        },
+        ru: {
+            'language.label': 'Язык', 'sidebar.label': 'Сторона боковой панели', 'sidebar.auto': 'Автоматически (по языку)', 'sidebar.left': 'Слева', 'sidebar.right': 'Справа',
+            'nav.view': 'Экран', 'nav.play': 'Играть', 'nav.options': 'Настройки', 'nav.stats': 'Статистика', 'nav.mode': 'Режим',
+            'menu.expand': 'Развернуть', 'menu.collapse': 'Свернуть', 'action.menu': 'Меню', 'action.reset': 'Сбросить',
+            'action.check': 'Проверить равенство', 'action.next': 'Следующая задача', 'action.again': 'Играть снова',
+            'round.tutorial': 'Обучение', 'round.score': 'Цель {target} · счёт {score}', 'flip.one': 'переворот остался', 'flip.many': 'переворотов осталось',
+            'session.solved': 'решено', 'session.accuracy': 'точность', 'session.average': 'среднее', 'session.hardest': 'самая сложная',
+            'timer.seconds': '{seconds}с', 'history.empty': 'Сохранённых задач пока нет.', 'history.page': 'Страница {page}/{pages} · сохранено {count}/{limit}',
+            'history.correct': 'Верно', 'history.incorrect': 'Неверно', 'history.round': 'раунд {round}',
+            'mode.operations': 'Операции: {operations}', 'mode.baseLength': 'Базовая длина: {min}–{max}',
+            'confirm.clearHistory': 'Очистить всю локальную историю задач?', 'confirm.resetStat': 'Сбросить статистику {mode}?', 'confirm.resetAll': 'Сбросить статистику всех режимов?', 'aria.resetStat': 'Сбросить статистику {mode}'
         }
     };
 

@@ -44,5 +44,9 @@ i18n.setLocale('ja');
 assert.strictEqual(i18n.t('action.check'), '式を確認', 'Japanese controls are available');
 i18n.setLocale('hi');
 assert.strictEqual(i18n.t('action.check'), 'समीकरण जाँचें', 'Hindi controls are available');
+i18n.setLocale('pt');
+assert.strictEqual(i18n.t('action.check'), 'Verificar equação', 'Brazilian Portuguese controls are available');
+i18n.setLocale('ru');
+assert.strictEqual(i18n.t('action.check'), 'Проверить равенство', 'Russian controls are available');
 
 console.log('Localization tests passed.');
