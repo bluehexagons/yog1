@@ -4,7 +4,7 @@
     const STORAGE_KEY = 'yog1.locale.v1';
     // Only complete locales are selectable. Keep in-progress dictionaries here
     // for translators without presenting a mixed-language interface to players.
-    const AVAILABLE_LOCALES = ['en', 'es', 'zh', 'ar'];
+    const AVAILABLE_LOCALES = ['en', 'es', 'zh', 'ar', 'bn', 'ja'];
     const RTL_LOCALES = ['ar'];
     const messages = {
         en: {
@@ -71,6 +71,30 @@
             'mode.operations': 'العمليات: {operations}', 'mode.baseLength': 'الطول الأساسي: {min}–{max}',
             'confirm.clearHistory': 'هل تريد مسح كل محفوظات المسائل المحلية؟', 'confirm.resetStat': 'هل تريد إعادة ضبط إحصاءات {mode}؟',
             'confirm.resetAll': 'هل تريد إعادة ضبط إحصاءات كل الأنماط؟', 'aria.resetStat': 'إعادة ضبط إحصاءات {mode}'
+        },
+        bn: {
+            'language.label': 'ভাষা', 'sidebar.label': 'সাইডবারের দিক', 'sidebar.auto': 'স্বয়ংক্রিয় (ভাষা অনুযায়ী)', 'sidebar.left': 'বাম', 'sidebar.right': 'ডান',
+            'nav.view': 'পৃষ্ঠা', 'nav.play': 'খেলুন', 'nav.options': 'বিকল্প', 'nav.stats': 'পরিসংখ্যান', 'nav.mode': 'মোড',
+            'menu.expand': 'প্রসারিত করুন', 'menu.collapse': 'সংকুচিত করুন', 'action.menu': 'মেনু', 'action.reset': 'রিসেট',
+            'action.check': 'সমীকরণ পরীক্ষা করুন', 'action.next': 'পরের প্রশ্ন', 'action.again': 'আবার খেলুন',
+            'round.tutorial': 'টিউটোরিয়াল', 'round.score': 'লক্ষ্য {target} · স্কোর {score}', 'flip.one': 'ফ্লিপ বাকি', 'flip.many': 'ফ্লিপ বাকি',
+            'session.solved': 'সমাধান', 'session.accuracy': 'নির্ভুলতা', 'session.average': 'গড়', 'session.hardest': 'সবচেয়ে কঠিন',
+            'timer.seconds': '{seconds}সে', 'history.empty': 'এখনও কোনো প্রশ্ন সংরক্ষিত নেই।', 'history.page': 'পৃষ্ঠা {page}/{pages} · {count}/{limit} সংরক্ষিত',
+            'history.correct': 'সঠিক', 'history.incorrect': 'ভুল', 'history.round': 'রাউন্ড {round}',
+            'mode.operations': 'ক্রিয়া: {operations}', 'mode.baseLength': 'মূল দৈর্ঘ্য: {min}–{max}',
+            'confirm.clearHistory': 'সব স্থানীয় প্রশ্নের ইতিহাস মুছবেন?', 'confirm.resetStat': '{mode} এর পরিসংখ্যান রিসেট করবেন?', 'confirm.resetAll': 'সব মোডের পরিসংখ্যান রিসেট করবেন?', 'aria.resetStat': '{mode} এর পরিসংখ্যান রিসেট করুন'
+        },
+        ja: {
+            'language.label': '言語', 'sidebar.label': 'サイドバーの位置', 'sidebar.auto': '自動（言語に従う）', 'sidebar.left': '左', 'sidebar.right': '右',
+            'nav.view': '画面', 'nav.play': 'プレイ', 'nav.options': 'オプション', 'nav.stats': '統計', 'nav.mode': 'モード',
+            'menu.expand': '展開', 'menu.collapse': '折りたたむ', 'action.menu': 'メニュー', 'action.reset': 'リセット',
+            'action.check': '式を確認', 'action.next': '次の問題', 'action.again': 'もう一度プレイ',
+            'round.tutorial': 'チュートリアル', 'round.score': '目標 {target} · スコア {score}', 'flip.one': '回の反転が残り', 'flip.many': '回の反転が残り',
+            'session.solved': '解答済み', 'session.accuracy': '正答率', 'session.average': '平均', 'session.hardest': '最高難度',
+            'timer.seconds': '{seconds}秒', 'history.empty': '保存された問題はありません。', 'history.page': '{page}/{pages} ページ · {count}/{limit} 件を保存',
+            'history.correct': '正解', 'history.incorrect': '不正解', 'history.round': 'ラウンド {round}',
+            'mode.operations': '演算：{operations}', 'mode.baseLength': '基本の長さ：{min}～{max}',
+            'confirm.clearHistory': 'ローカルに保存した問題履歴をすべて消去しますか？', 'confirm.resetStat': '{mode} の統計をリセットしますか？', 'confirm.resetAll': 'すべてのモードの統計をリセットしますか？', 'aria.resetStat': '{mode} の統計をリセット'
         }
     };
 
@@ -205,6 +229,26 @@
             'Solution revealed': 'تم إظهار الحل', 'This puzzle counts as incorrect. Review it, then continue.': 'تُحسب هذه المسألة غير صحيحة. راجعها ثم تابع.',
             'Correct': 'صحيح', 'Incorrect': 'غير صحيح', 'Copied': 'تم النسخ', 'Build a custom game': 'أنشئ لعبة مخصصة',
             'Choose the rules, then start the run. A seed makes it reproducible.': 'اختر القواعد ثم ابدأ. تجعل البذرة اللعبة قابلة للتكرار.'
+        },
+        bn: {
+            'One move. Make it count.': 'একটি চাল। সেটি গুরুত্বপূর্ণ করুন।', 'Round ': 'রাউন্ড ', 'Warm-up': 'ওয়ার্ম-আপ', 'Standard': 'সাধারণ', 'Challenge': 'চ্যালেঞ্জ',
+            'Tutorial': 'টিউটোরিয়াল', 'Easy': 'সহজ', 'Normal': 'সাধারণ', 'Hard': 'কঠিন', 'Expert': 'বিশেষজ্ঞ', 'Extreme': 'চরম',
+            'Daily': 'দৈনিক', 'Timed': 'সময়সীমা', 'Endless': 'অন্তহীন', 'Challenges': 'চ্যালেঞ্জ', 'Custom…': 'কাস্টম…',
+            'Options': 'বিকল্প', 'Stats': 'পরিসংখ্যান', 'Play': 'খেলুন', 'Mode': 'মোড', 'View': 'পৃষ্ঠা',
+            'How to play': 'কীভাবে খেলবেন', 'Your move': 'আপনার চাল', 'Hint': 'ইঙ্গিত', 'Reveal': 'দেখান', 'Share': 'শেয়ার করুন',
+            'Difficulty guide': 'কঠিনতার নির্দেশিকা', 'Accessibility & sound': 'সহায়ক সুবিধা ও শব্দ', 'Stats & history': 'পরিসংখ্যান ও ইতিহাস',
+            'Stats by difficulty': 'কঠিনতা অনুযায়ী পরিসংখ্যান', 'Problem history': 'প্রশ্নের ইতিহাস', 'Achievements': 'অর্জন',
+            'Previous': 'আগের', 'Next': 'পরের', 'Clear history': 'ইতিহাস মুছুন', 'Reset all stats': 'সব পরিসংখ্যান রিসেট করুন'
+        },
+        ja: {
+            'One move. Make it count.': '一手に集中しよう。', 'Round ': 'ラウンド ', 'Warm-up': 'ウォームアップ', 'Standard': '標準', 'Challenge': 'チャレンジ',
+            'Tutorial': 'チュートリアル', 'Easy': 'かんたん', 'Normal': 'ふつう', 'Hard': 'むずかしい', 'Expert': 'エキスパート', 'Extreme': 'エクストリーム',
+            'Daily': 'デイリー', 'Timed': 'タイムアタック', 'Endless': 'エンドレス', 'Challenges': 'チャレンジ', 'Custom…': 'カスタム…',
+            'Options': 'オプション', 'Stats': '統計', 'Play': 'プレイ', 'Mode': 'モード', 'View': '画面',
+            'How to play': '遊び方', 'Your move': 'あなたの手番', 'Hint': 'ヒント', 'Reveal': '答えを見る', 'Share': '共有',
+            'Difficulty guide': '難易度ガイド', 'Accessibility & sound': 'アクセシビリティとサウンド', 'Stats & history': '統計と履歴',
+            'Stats by difficulty': '難易度別の統計', 'Problem history': '問題履歴', 'Achievements': '実績',
+            'Previous': '前へ', 'Next': '次へ', 'Clear history': '履歴を消去', 'Reset all stats': 'すべての統計をリセット'
         }
     };
 
