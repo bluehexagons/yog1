@@ -381,7 +381,7 @@
         } else if (mode === 'timed') {
             setMessage('Timed sprint', 'Solve as many puzzles as you can before the 60-second clock reaches zero.');
         } else if (mode === 'endless') {
-            setMessage('Endless run', 'Keep solving as difficulty rises. An incorrect first guess costs one of three lives.');
+            setMessage('Endless run', 'Settle into a rising difficulty curve. If your first try does not fit, one of three chances is used.');
         } else if (mode === 'challenges') {
             setMessage(currentProblem.title, 'A handcrafted puzzle ' + round + ' of ' + CURATED.length + '.');
         } else {
@@ -553,7 +553,7 @@
             session.lives--;
             renderSession();
             if (session.lives <= 0) {
-                finishSession('Run over', 'You solved ' + session.solved + ' puzzles before running out of lives.');
+                finishSession('Run complete', 'You solved ' + session.solved + ' puzzles before all three chances were used.');
                 showExplanation(true, attemptedValues);
                 return;
             }
@@ -598,7 +598,7 @@
             ui.custom_progress.textContent = customRun.correct + '/' + activeCustomSettings.correct +
                 ' correct · ' + accuracy + '%/' + activeCustomSettings.rate + '%';
         } else if (mode === 'endless') {
-            ui.custom_progress.textContent = 'Lives: ' + '●'.repeat(session.lives) + '○'.repeat(3 - session.lives);
+            ui.custom_progress.textContent = 'Chances: ' + '●'.repeat(session.lives) + '○'.repeat(3 - session.lives);
         }
     }
 
@@ -981,7 +981,7 @@
                 session.lives--;
                 renderSession();
                 if (session.lives <= 0) {
-                    finishSession('Run over', 'The revealed puzzle used your final life.');
+                    finishSession('Run complete', 'The revealed puzzle used your final chance.');
                     return;
                 }
             }
