@@ -4,7 +4,7 @@
     const STORAGE_KEY = 'yog1.locale.v1';
     // Only complete locales are selectable. Keep in-progress dictionaries here
     // for translators without presenting a mixed-language interface to players.
-    const AVAILABLE_LOCALES = ['en', 'es', 'zh', 'ar', 'bn', 'ja'];
+    const AVAILABLE_LOCALES = ['en', 'es', 'zh', 'ar', 'bn', 'ja', 'hi'];
     const RTL_LOCALES = ['ar'];
     const messages = {
         en: {
@@ -95,6 +95,18 @@
             'history.correct': '正解', 'history.incorrect': '不正解', 'history.round': 'ラウンド {round}',
             'mode.operations': '演算：{operations}', 'mode.baseLength': '基本の長さ：{min}～{max}',
             'confirm.clearHistory': 'ローカルに保存した問題履歴をすべて消去しますか？', 'confirm.resetStat': '{mode} の統計をリセットしますか？', 'confirm.resetAll': 'すべてのモードの統計をリセットしますか？', 'aria.resetStat': '{mode} の統計をリセット'
+        },
+        hi: {
+            'language.label': 'भाषा', 'sidebar.label': 'साइडबार की स्थिति', 'sidebar.auto': 'स्वचालित (भाषा के अनुसार)', 'sidebar.left': 'बायाँ', 'sidebar.right': 'दायाँ',
+            'nav.view': 'स्क्रीन', 'nav.play': 'खेलें', 'nav.options': 'विकल्प', 'nav.stats': 'आँकड़े', 'nav.mode': 'मोड',
+            'menu.expand': 'खोलें', 'menu.collapse': 'समेटें', 'action.menu': 'मेनू', 'action.reset': 'रीसेट',
+            'action.check': 'समीकरण जाँचें', 'action.next': 'अगली पहेली', 'action.again': 'फिर खेलें',
+            'round.tutorial': 'ट्यूटोरियल', 'round.score': 'लक्ष्य {target} · स्कोर {score}', 'flip.one': 'फ्लिप बाकी', 'flip.many': 'फ्लिप बाकी',
+            'session.solved': 'हल किए', 'session.accuracy': 'सटीकता', 'session.average': 'औसत', 'session.hardest': 'सबसे कठिन',
+            'timer.seconds': '{seconds}से', 'history.empty': 'अभी तक कोई पहेली सहेजी नहीं गई है।', 'history.page': 'पृष्ठ {page}/{pages} · {count}/{limit} सहेजी गई',
+            'history.correct': 'सही', 'history.incorrect': 'गलत', 'history.round': 'राउंड {round}',
+            'mode.operations': 'क्रियाएँ: {operations}', 'mode.baseLength': 'आधार लंबाई: {min}–{max}',
+            'confirm.clearHistory': 'सभी स्थानीय पहेली इतिहास मिटाएँ?', 'confirm.resetStat': '{mode} के आँकड़े रीसेट करें?', 'confirm.resetAll': 'सभी मोड के आँकड़े रीसेट करें?', 'aria.resetStat': '{mode} के आँकड़े रीसेट करें'
         }
     };
 
@@ -249,6 +261,16 @@
             'Difficulty guide': '難易度ガイド', 'Accessibility & sound': 'アクセシビリティとサウンド', 'Stats & history': '統計と履歴',
             'Stats by difficulty': '難易度別の統計', 'Problem history': '問題履歴', 'Achievements': '実績',
             'Previous': '前へ', 'Next': '次へ', 'Clear history': '履歴を消去', 'Reset all stats': 'すべての統計をリセット'
+        },
+        hi: {
+            'One move. Make it count.': 'एक चाल। उसे सार्थक बनाएँ।', 'Round ': 'राउंड ', 'Warm-up': 'वार्म-अप', 'Standard': 'सामान्य', 'Challenge': 'चुनौती',
+            'Tutorial': 'ट्यूटोरियल', 'Easy': 'आसान', 'Normal': 'सामान्य', 'Hard': 'कठिन', 'Expert': 'विशेषज्ञ', 'Extreme': 'अत्यंत कठिन',
+            'Daily': 'दैनिक', 'Timed': 'समयबद्ध', 'Endless': 'अंतहीन', 'Challenges': 'चुनौतियाँ', 'Custom…': 'कस्टम…',
+            'Options': 'विकल्प', 'Stats': 'आँकड़े', 'Play': 'खेलें', 'Mode': 'मोड', 'View': 'स्क्रीन',
+            'How to play': 'कैसे खेलें', 'Your move': 'आपकी चाल', 'Hint': 'संकेत', 'Reveal': 'हल दिखाएँ', 'Share': 'साझा करें',
+            'Difficulty guide': 'कठिनाई गाइड', 'Accessibility & sound': 'सुगम्यता और ध्वनि', 'Stats & history': 'आँकड़े और इतिहास',
+            'Stats by difficulty': 'कठिनाई के अनुसार आँकड़े', 'Problem history': 'पहेली इतिहास', 'Achievements': 'उपलब्धियाँ',
+            'Previous': 'पिछला', 'Next': 'अगला', 'Clear history': 'इतिहास मिटाएँ', 'Reset all stats': 'सभी आँकड़े रीसेट करें'
         }
     };
 
