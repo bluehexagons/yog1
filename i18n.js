@@ -602,6 +602,22 @@
     };
     for (const code of AVAILABLE_LOCALES) Object.assign(messages[code], operationMessages[code]);
 
+    const modeMessages = {
+        en: { 'mode.tutorial': 'Tutorial', 'mode.easy': 'Easy', 'mode.normal': 'Normal', 'mode.hard': 'Hard', 'mode.expert': 'Expert', 'mode.extreme': 'Extreme', 'mode.custom': 'Custom', 'mode.daily': 'Daily', 'mode.timed': 'Timed', 'mode.endless': 'Endless', 'mode.challenges': 'Challenges' },
+        es: { 'mode.tutorial': 'Tutorial', 'mode.easy': 'Fácil', 'mode.normal': 'Normal', 'mode.hard': 'Difícil', 'mode.expert': 'Experto', 'mode.extreme': 'Extremo', 'mode.custom': 'Personalizado', 'mode.daily': 'Diario', 'mode.timed': 'Contrarreloj', 'mode.endless': 'Infinito', 'mode.challenges': 'Desafíos' },
+        zh: { 'mode.tutorial': '教程', 'mode.easy': '简单', 'mode.normal': '普通', 'mode.hard': '困难', 'mode.expert': '专家', 'mode.extreme': '极限', 'mode.custom': '自定义', 'mode.daily': '每日', 'mode.timed': '限时', 'mode.endless': '无尽', 'mode.challenges': '挑战' },
+        ar: { 'mode.tutorial': 'البرنامج التعليمي', 'mode.easy': 'سهل', 'mode.normal': 'عادي', 'mode.hard': 'صعب', 'mode.expert': 'خبير', 'mode.extreme': 'أقصى', 'mode.custom': 'مخصص', 'mode.daily': 'يومي', 'mode.timed': 'مؤقت', 'mode.endless': 'لا نهائي', 'mode.challenges': 'تحديات' },
+        bn: { 'mode.tutorial': 'টিউটোরিয়াল', 'mode.easy': 'সহজ', 'mode.normal': 'সাধারণ', 'mode.hard': 'কঠিন', 'mode.expert': 'বিশেষজ্ঞ', 'mode.extreme': 'চরম', 'mode.custom': 'কাস্টম', 'mode.daily': 'দৈনিক', 'mode.timed': 'সময়সীমা', 'mode.endless': 'অন্তহীন', 'mode.challenges': 'চ্যালেঞ্জ' },
+        ja: { 'mode.tutorial': 'チュートリアル', 'mode.easy': 'かんたん', 'mode.normal': 'ふつう', 'mode.hard': 'むずかしい', 'mode.expert': 'エキスパート', 'mode.extreme': 'エクストリーム', 'mode.custom': 'カスタム', 'mode.daily': 'デイリー', 'mode.timed': 'タイムアタック', 'mode.endless': 'エンドレス', 'mode.challenges': 'チャレンジ' },
+        hi: { 'mode.tutorial': 'ट्यूटोरियल', 'mode.easy': 'आसान', 'mode.normal': 'सामान्य', 'mode.hard': 'कठिन', 'mode.expert': 'विशेषज्ञ', 'mode.extreme': 'अत्यंत कठिन', 'mode.custom': 'कस्टम', 'mode.daily': 'दैनिक', 'mode.timed': 'समयबद्ध', 'mode.endless': 'अंतहीन', 'mode.challenges': 'चुनौतियाँ' },
+        pt: { 'mode.tutorial': 'Tutorial', 'mode.easy': 'Fácil', 'mode.normal': 'Normal', 'mode.hard': 'Difícil', 'mode.expert': 'Especialista', 'mode.extreme': 'Extremo', 'mode.custom': 'Personalizado', 'mode.daily': 'Diário', 'mode.timed': 'Cronometrado', 'mode.endless': 'Infinito', 'mode.challenges': 'Desafios' },
+        ru: { 'mode.tutorial': 'Обучение', 'mode.easy': 'Легко', 'mode.normal': 'Обычно', 'mode.hard': 'Сложно', 'mode.expert': 'Эксперт', 'mode.extreme': 'Экстрим', 'mode.custom': 'Своя игра', 'mode.daily': 'Ежедневно', 'mode.timed': 'На время', 'mode.endless': 'Бесконечно', 'mode.challenges': 'Испытания' },
+        vi: { 'mode.tutorial': 'Hướng dẫn', 'mode.easy': 'Dễ', 'mode.normal': 'Thường', 'mode.hard': 'Khó', 'mode.expert': 'Chuyên gia', 'mode.extreme': 'Cực khó', 'mode.custom': 'Tùy chỉnh', 'mode.daily': 'Hằng ngày', 'mode.timed': 'Tính giờ', 'mode.endless': 'Vô tận', 'mode.challenges': 'Thử thách' },
+        tr: { 'mode.tutorial': 'Eğitim', 'mode.easy': 'Kolay', 'mode.normal': 'Normal', 'mode.hard': 'Zor', 'mode.expert': 'Uzman', 'mode.extreme': 'Uç', 'mode.custom': 'Özel', 'mode.daily': 'Günlük', 'mode.timed': 'Süreli', 'mode.endless': 'Sonsuz', 'mode.challenges': 'Meydan okumalar' },
+        ur: { 'mode.tutorial': 'سبق', 'mode.easy': 'آسان', 'mode.normal': 'عام', 'mode.hard': 'مشکل', 'mode.expert': 'ماہر', 'mode.extreme': 'انتہائی', 'mode.custom': 'اپنی', 'mode.daily': 'روزانہ', 'mode.timed': 'وقت کے ساتھ', 'mode.endless': 'لامتناہی', 'mode.challenges': 'چیلنجز' }
+    };
+    for (const code of AVAILABLE_LOCALES) Object.assign(messages[code], modeMessages[code]);
+
     function translate(value) {
         if (typeof value !== 'string') return value;
         return (sourceTexts[locale] && sourceTexts[locale][value]) || value;

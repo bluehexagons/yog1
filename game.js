@@ -451,11 +451,7 @@
     }
 
     function modeLabel() {
-        if (core.DIFFICULTIES[mode]) return i18n.translate(core.DIFFICULTIES[mode].name);
-        return i18n.translate({
-            tutorial: 'Tutorial', custom: 'Custom', daily: 'Daily',
-            timed: 'Timed', endless: 'Endless', challenges: 'Challenges'
-        }[mode] || mode);
+        return t('mode.' + mode);
     }
 
     function recordAttempt(correct) {
@@ -649,11 +645,11 @@
     function renderStats() {
         ui.stats_rows.replaceChildren();
         const modes = Object.values(core.DIFFICULTIES).map(function (item) {
-            return { id: item.id, name: item.name };
+            return { id: item.id, name: t('mode.' + item.id) };
         }).concat([
-            { id: 'custom', name: 'Custom' }, { id: 'daily', name: 'Daily' },
-            { id: 'timed', name: 'Timed' }, { id: 'endless', name: 'Endless' },
-            { id: 'challenges', name: 'Challenges' }
+            { id: 'custom', name: t('mode.custom') }, { id: 'daily', name: t('mode.daily') },
+            { id: 'timed', name: t('mode.timed') }, { id: 'endless', name: t('mode.endless') },
+            { id: 'challenges', name: t('mode.challenges') }
         ]);
         for (const item of modes) {
             const stat = getStat(item.id);
