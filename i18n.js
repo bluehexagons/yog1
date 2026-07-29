@@ -75,7 +75,7 @@
         bn: {
             'language.label': 'ভাষা', 'sidebar.label': 'সাইডবারের দিক', 'sidebar.auto': 'স্বয়ংক্রিয় (ভাষা অনুযায়ী)', 'sidebar.left': 'বাম', 'sidebar.right': 'ডান',
             'nav.view': 'পৃষ্ঠা', 'nav.play': 'খেলুন', 'nav.options': 'বিকল্প', 'nav.stats': 'পরিসংখ্যান', 'nav.mode': 'মোড',
-            'menu.expand': 'প্রসারিত করুন', 'menu.collapse': 'সংকুচিত করুন', 'action.menu': 'মেনু', 'action.reset': 'রিসেট',
+            'menu.expand': 'প্রসারিত করুন', 'menu.collapse': 'সংকুচিত করুন', 'menu.expandTitle': 'গেম মেনু প্রসারিত করুন', 'menu.collapseTitle': 'গেম মেনু সংকুচিত করুন', 'action.menu': 'মেনু', 'action.reset': 'রিসেট',
             'action.check': 'সমীকরণ পরীক্ষা করুন', 'action.next': 'পরের প্রশ্ন', 'action.again': 'আবার খেলুন',
             'round.tutorial': 'টিউটোরিয়াল', 'round.score': 'লক্ষ্য {target} · স্কোর {score}', 'flip.one': 'পরিবর্তন বাকি', 'flip.many': 'পরিবর্তন বাকি',
             'session.solved': 'সমাধান', 'session.accuracy': 'নির্ভুলতা', 'session.average': 'গড়', 'session.hardest': 'সবচেয়ে কঠিন',
@@ -87,7 +87,7 @@
         ja: {
             'language.label': '言語', 'sidebar.label': 'サイドバーの位置', 'sidebar.auto': '自動（言語に従う）', 'sidebar.left': '左', 'sidebar.right': '右',
             'nav.view': '画面', 'nav.play': 'プレイ', 'nav.options': 'オプション', 'nav.stats': '統計', 'nav.mode': 'モード',
-            'menu.expand': '展開', 'menu.collapse': '折りたたむ', 'action.menu': 'メニュー', 'action.reset': 'リセット',
+            'menu.expand': '展開', 'menu.collapse': '折りたたむ', 'menu.expandTitle': 'ゲームメニューを展開', 'menu.collapseTitle': 'ゲームメニューを折りたたむ', 'action.menu': 'メニュー', 'action.reset': 'リセット',
             'action.check': '式を確認', 'action.next': '次の問題', 'action.again': 'もう一度プレイ',
             'round.tutorial': 'チュートリアル', 'round.score': '目標 {target} · スコア {score}', 'flip.one': '回の変更が残り', 'flip.many': '回の変更が残り',
             'session.solved': '解答済み', 'session.accuracy': '正答率', 'session.average': '平均', 'session.hardest': '最高難度',
@@ -99,7 +99,7 @@
         hi: {
             'language.label': 'भाषा', 'sidebar.label': 'साइडबार की स्थिति', 'sidebar.auto': 'स्वचालित (भाषा के अनुसार)', 'sidebar.left': 'बायाँ', 'sidebar.right': 'दायाँ',
             'nav.view': 'स्क्रीन', 'nav.play': 'खेलें', 'nav.options': 'विकल्प', 'nav.stats': 'आँकड़े', 'nav.mode': 'मोड',
-            'menu.expand': 'खोलें', 'menu.collapse': 'समेटें', 'action.menu': 'मेनू', 'action.reset': 'रीसेट',
+            'menu.expand': 'खोलें', 'menu.collapse': 'समेटें', 'menu.expandTitle': 'गेम मेनू खोलें', 'menu.collapseTitle': 'गेम मेनू समेटें', 'action.menu': 'मेनू', 'action.reset': 'रीसेट',
             'action.check': 'समीकरण जाँचें', 'action.next': 'अगली पहेली', 'action.again': 'फिर खेलें',
             'round.tutorial': 'ट्यूटोरियल', 'round.score': 'लक्ष्य {target} · स्कोर {score}', 'flip.one': 'बदलाव शेष', 'flip.many': 'बदलाव शेष',
             'session.solved': 'हल किए', 'session.accuracy': 'सटीकता', 'session.average': 'औसत', 'session.hardest': 'सबसे कठिन',
@@ -111,7 +111,7 @@
         pt: {
             'language.label': 'Idioma', 'sidebar.label': 'Lado da barra lateral', 'sidebar.auto': 'Automático (seguir idioma)', 'sidebar.left': 'Esquerda', 'sidebar.right': 'Direita',
             'nav.view': 'Tela', 'nav.play': 'Jogar', 'nav.options': 'Opções', 'nav.stats': 'Estatísticas', 'nav.mode': 'Modo',
-            'menu.expand': 'Expandir', 'menu.collapse': 'Recolher', 'action.menu': 'Menu', 'action.reset': 'Redefinir',
+            'menu.expand': 'Expandir', 'menu.collapse': 'Recolher', 'menu.expandTitle': 'Expandir menu do jogo', 'menu.collapseTitle': 'Recolher menu do jogo', 'action.menu': 'Menu', 'action.reset': 'Redefinir',
             'action.check': 'Verificar equação', 'action.next': 'Próximo problema', 'action.again': 'Jogar novamente',
             'round.tutorial': 'Tutorial', 'round.score': 'Meta {target} · pontuação {score}', 'flip.one': 'alteração restante', 'flip.many': 'alterações restantes',
             'session.solved': 'resolvidos', 'session.accuracy': 'precisão', 'session.average': 'média', 'session.hardest': 'mais difícil',
@@ -123,7 +123,7 @@
         ru: {
             'language.label': 'Язык', 'sidebar.label': 'Сторона боковой панели', 'sidebar.auto': 'Автоматически (по языку)', 'sidebar.left': 'Слева', 'sidebar.right': 'Справа',
             'nav.view': 'Экран', 'nav.play': 'Играть', 'nav.options': 'Настройки', 'nav.stats': 'Статистика', 'nav.mode': 'Режим',
-            'menu.expand': 'Развернуть', 'menu.collapse': 'Свернуть', 'action.menu': 'Меню', 'action.reset': 'Сбросить',
+            'menu.expand': 'Развернуть', 'menu.collapse': 'Свернуть', 'menu.expandTitle': 'Развернуть меню игры', 'menu.collapseTitle': 'Свернуть меню игры', 'action.menu': 'Меню', 'action.reset': 'Сбросить',
             'action.check': 'Проверить равенство', 'action.next': 'Следующая задача', 'action.again': 'Играть снова',
             'round.tutorial': 'Обучение', 'round.score': 'Цель {target} · счёт {score}', 'flip.one': 'изменение осталось', 'flip.many': 'изменений осталось',
             'session.solved': 'решено', 'session.accuracy': 'точность', 'session.average': 'среднее', 'session.hardest': 'самая сложная',
@@ -135,7 +135,7 @@
         vi: {
             'language.label': 'Ngôn ngữ', 'sidebar.label': 'Vị trí thanh bên', 'sidebar.auto': 'Tự động (theo ngôn ngữ)', 'sidebar.left': 'Trái', 'sidebar.right': 'Phải',
             'nav.view': 'Màn hình', 'nav.play': 'Chơi', 'nav.options': 'Tùy chọn', 'nav.stats': 'Thống kê', 'nav.mode': 'Chế độ',
-            'menu.expand': 'Mở rộng', 'menu.collapse': 'Thu gọn', 'action.menu': 'Menu', 'action.reset': 'Đặt lại', 'action.check': 'Kiểm tra phương trình', 'action.next': 'Câu tiếp theo', 'action.again': 'Chơi lại',
+            'menu.expand': 'Mở rộng', 'menu.collapse': 'Thu gọn', 'menu.expandTitle': 'Mở rộng menu trò chơi', 'menu.collapseTitle': 'Thu gọn menu trò chơi', 'action.menu': 'Menu', 'action.reset': 'Đặt lại', 'action.check': 'Kiểm tra phương trình', 'action.next': 'Câu tiếp theo', 'action.again': 'Chơi lại',
             'round.tutorial': 'Hướng dẫn', 'round.score': 'Mục tiêu {target} · điểm {score}', 'flip.one': 'lần thay đổi còn lại', 'flip.many': 'lần thay đổi còn lại',
             'session.solved': 'đã giải', 'session.accuracy': 'độ chính xác', 'session.average': 'trung bình', 'session.hardest': 'khó nhất', 'timer.seconds': '{seconds}giây',
             'history.empty': 'Chưa có câu hỏi nào được lưu.', 'history.page': 'Trang {page}/{pages} · đã lưu {count}/{limit}', 'history.correct': 'Đúng', 'history.incorrect': 'Sai', 'history.round': 'vòng {round}',
@@ -144,7 +144,7 @@
         tr: {
             'language.label': 'Dil', 'sidebar.label': 'Kenar çubuğu konumu', 'sidebar.auto': 'Otomatik (dile göre)', 'sidebar.left': 'Sol', 'sidebar.right': 'Sağ',
             'nav.view': 'Ekran', 'nav.play': 'Oyna', 'nav.options': 'Seçenekler', 'nav.stats': 'İstatistikler', 'nav.mode': 'Mod',
-            'menu.expand': 'Genişlet', 'menu.collapse': 'Daralt', 'action.menu': 'Menü', 'action.reset': 'Sıfırla', 'action.check': 'Denklemi kontrol et', 'action.next': 'Sonraki soru', 'action.again': 'Tekrar oyna',
+            'menu.expand': 'Genişlet', 'menu.collapse': 'Daralt', 'menu.expandTitle': 'Oyun menüsünü genişlet', 'menu.collapseTitle': 'Oyun menüsünü daralt', 'action.menu': 'Menü', 'action.reset': 'Sıfırla', 'action.check': 'Denklemi kontrol et', 'action.next': 'Sonraki soru', 'action.again': 'Tekrar oyna',
             'round.tutorial': 'Eğitim', 'round.score': 'Hedef {target} · puan {score}', 'flip.one': 'değişiklik kaldı', 'flip.many': 'değişiklik kaldı',
             'session.solved': 'çözüldü', 'session.accuracy': 'doğruluk', 'session.average': 'ortalama', 'session.hardest': 'en zor', 'timer.seconds': '{seconds}sn',
             'history.empty': 'Henüz kaydedilmiş soru yok.', 'history.page': 'Sayfa {page}/{pages} · {count}/{limit} kaydedildi', 'history.correct': 'Doğru', 'history.incorrect': 'Yanlış', 'history.round': 'tur {round}',
@@ -153,7 +153,7 @@
         ur: {
             'language.label': 'زبان', 'sidebar.label': 'سائیڈبار کی جگہ', 'sidebar.auto': 'خودکار (زبان کے مطابق)', 'sidebar.left': 'بائیں', 'sidebar.right': 'دائیں',
             'nav.view': 'صفحہ', 'nav.play': 'کھیلیں', 'nav.options': 'اختیارات', 'nav.stats': 'اعداد و شمار', 'nav.mode': 'موڈ',
-            'menu.expand': 'کھولیں', 'menu.collapse': 'سمیٹیں', 'action.menu': 'مینو', 'action.reset': 'ری سیٹ', 'action.check': 'مساوات چیک کریں', 'action.next': 'اگلا سوال', 'action.again': 'دوبارہ کھیلیں',
+            'menu.expand': 'کھولیں', 'menu.collapse': 'سمیٹیں', 'menu.expandTitle': 'گیم مینو کھولیں', 'menu.collapseTitle': 'گیم مینو سمیٹیں', 'action.menu': 'مینو', 'action.reset': 'ری سیٹ', 'action.check': 'مساوات چیک کریں', 'action.next': 'اگلا سوال', 'action.again': 'دوبارہ کھیلیں',
             'round.tutorial': 'سبق', 'round.score': 'ہدف {target} · اسکور {score}', 'flip.one': 'تبدیلی باقی', 'flip.many': 'تبدیلیاں باقی',
             'session.solved': 'حل شدہ', 'session.accuracy': 'درستگی', 'session.average': 'اوسط', 'session.hardest': 'سب سے مشکل', 'timer.seconds': '{seconds}ث',
             'history.empty': 'ابھی کوئی سوال محفوظ نہیں ہے۔', 'history.page': 'صفحہ {page}/{pages} · {count}/{limit} محفوظ', 'history.correct': 'درست', 'history.incorrect': 'غلط', 'history.round': 'راؤنڈ {round}',

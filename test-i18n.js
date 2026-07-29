@@ -54,5 +54,11 @@ i18n.setLocale('tr');
 assert.strictEqual(i18n.t('action.check'), 'Denklemi kontrol et', 'Turkish controls are available');
 i18n.setLocale('ur');
 assert.strictEqual(i18n.getDirection(), 'rtl', 'Urdu reuses right-to-left layout support');
+for (const locale of i18n.availableLocales) {
+    const missing = Object.keys(i18n.locales.en).filter(function (key) {
+        return !Object.prototype.hasOwnProperty.call(i18n.locales[locale], key);
+    });
+    assert.deepStrictEqual(missing, [], locale + ' provides every core catalog key');
+}
 
 console.log('Localization tests passed.');
