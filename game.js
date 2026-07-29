@@ -280,7 +280,8 @@
             button.dataset.numberId = expression.id;
             button.setAttribute('aria-pressed', selectedId === expression.id ? 'true' : 'false');
             button.setAttribute('aria-label', selectedId === expression.id
-                ? 'Restore ' + expression.value : 'Change ' + expression.value + ' to 1');
+                ? t('aria.restoreNumber', { number: expression.value })
+                : t('aria.changeNumber', { number: expression.value }));
             if (selectedId === expression.id) button.classList.add('flipped');
             if ((mode === 'tutorial' || hintLevel >= 2) && expression.solution) {
                 button.classList.add('hint-target');
@@ -354,11 +355,14 @@
             currentProblem.sides,
             attemptedValues === undefined ? currentValues : attemptedValues
         );
-        const current = text('p', 'Your totals: ' + details.currentTotals.join(' and ') + '.');
+        const current = text('p', t('feedback.totals', {
+            left: details.currentTotals[0], right: details.currentTotals[1]
+        }));
         ui.feedback.replaceChildren(current);
         if (revealSolution) {
-            const solution = text('p', 'Intended flip: change ' + details.solutionValue +
-                ' to 1. Then both sides equal ' + details.solvedTotals[0] + '.');
+            const solution = text('p', t('feedback.solution', {
+                number: details.solutionValue, total: details.solvedTotals[0]
+            }));
             const equation = text('code', details.solvedExpression);
             ui.feedback.append(solution, equation);
         }

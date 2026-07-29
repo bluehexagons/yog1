@@ -698,6 +698,22 @@
     };
     for (const code of AVAILABLE_LOCALES) Object.assign(messages[code], resultMessages[code]);
 
+    const feedbackMessages = {
+        en: { 'aria.changeNumber': 'Change {number} to 1', 'aria.restoreNumber': 'Restore {number}', 'feedback.totals': 'Your totals: {left} and {right}.', 'feedback.solution': 'Change {number} to 1. Both sides become {total}.' },
+        es: { 'aria.changeNumber': 'Cambiar {number} por 1', 'aria.restoreNumber': 'Restaurar {number}', 'feedback.totals': 'Tus totales: {left} y {right}.', 'feedback.solution': 'Cambia {number} por 1. Ambos lados quedan en {total}.' },
+        zh: { 'aria.changeNumber': '将 {number} 改为 1', 'aria.restoreNumber': '恢复 {number}', 'feedback.totals': '当前结果：{left} 和 {right}。', 'feedback.solution': '将 {number} 改为 1。两边都会变为 {total}。' },
+        ar: { 'aria.changeNumber': 'غيّر {number} إلى 1', 'aria.restoreNumber': 'استعد {number}', 'feedback.totals': 'المجموعان: {left} و{right}.', 'feedback.solution': 'غيّر {number} إلى 1. يصبح الطرفان {total}.' },
+        bn: { 'aria.changeNumber': '{number} কে 1 করুন', 'aria.restoreNumber': '{number} ফিরিয়ে আনুন', 'feedback.totals': 'আপনার যোগফল: {left} ও {right}।', 'feedback.solution': '{number} কে 1 করুন। দুই পাশ হবে {total}।' },
+        ja: { 'aria.changeNumber': '{number}を1に変える', 'aria.restoreNumber': '{number}に戻す', 'feedback.totals': '現在の値：{left} と {right}。', 'feedback.solution': '{number}を1に変えると、両辺が {total} になります。' },
+        hi: { 'aria.changeNumber': '{number} को 1 में बदलें', 'aria.restoreNumber': '{number} वापस करें', 'feedback.totals': 'आपके कुल: {left} और {right}।', 'feedback.solution': '{number} को 1 में बदलें। दोनों पक्ष {total} हो जाएँगे।' },
+        pt: { 'aria.changeNumber': 'Mudar {number} para 1', 'aria.restoreNumber': 'Restaurar {number}', 'feedback.totals': 'Seus totais: {left} e {right}.', 'feedback.solution': 'Mude {number} para 1. Os dois lados passam a ser {total}.' },
+        ru: { 'aria.changeNumber': 'Изменить {number} на 1', 'aria.restoreNumber': 'Вернуть {number}', 'feedback.totals': 'Ваши суммы: {left} и {right}.', 'feedback.solution': 'Измените {number} на 1. Обе стороны станут равны {total}.' },
+        vi: { 'aria.changeNumber': 'Đổi {number} thành 1', 'aria.restoreNumber': 'Khôi phục {number}', 'feedback.totals': 'Tổng hiện tại: {left} và {right}.', 'feedback.solution': 'Đổi {number} thành 1. Hai vế sẽ là {total}.' },
+        tr: { 'aria.changeNumber': '{number} sayısını 1 yap', 'aria.restoreNumber': '{number} sayısını geri al', 'feedback.totals': 'Toplamlarınız: {left} ve {right}.', 'feedback.solution': '{number} sayısını 1 yapın. İki taraf {total} olur.' },
+        ur: { 'aria.changeNumber': '{number} کو 1 میں بدلیں', 'aria.restoreNumber': '{number} بحال کریں', 'feedback.totals': 'آپ کے کل: {left} اور {right}۔', 'feedback.solution': '{number} کو 1 میں بدلیں۔ دونوں طرف {total} ہو جائیں گے۔' }
+    };
+    for (const code of AVAILABLE_LOCALES) Object.assign(messages[code], feedbackMessages[code]);
+
     function translate(value) {
         if (typeof value !== 'string') return value;
         return (sourceTexts[locale] && sourceTexts[locale][value]) || value;
