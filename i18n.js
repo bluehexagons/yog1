@@ -730,6 +730,22 @@
     };
     for (const code of AVAILABLE_LOCALES) Object.assign(messages[code], accessibilityMessages[code]);
 
+    const pageMessages = {
+        en: { 'tagline': 'One move. Make it count.', 'action.yourMove': 'Your move', 'page.statsHistory': 'Stats & history', 'page.statsDifficulty': 'Stats by difficulty', 'page.problemHistory': 'Problem history', 'page.achievements': 'Achievements' },
+        es: { 'tagline': 'Un movimiento. Haz que cuente.', 'action.yourMove': 'Tu movimiento', 'page.statsHistory': 'Estadísticas e historial', 'page.statsDifficulty': 'Estadísticas por dificultad', 'page.problemHistory': 'Historial de problemas', 'page.achievements': 'Logros' },
+        zh: { 'tagline': '一步到位。认真思考。', 'action.yourMove': '你的操作', 'page.statsHistory': '统计与历史', 'page.statsDifficulty': '按难度统计', 'page.problemHistory': '题目历史', 'page.achievements': '成就' },
+        ar: { 'tagline': 'حركة واحدة. اجعلها مؤثرة.', 'action.yourMove': 'حركتك', 'page.statsHistory': 'الإحصاءات والسجل', 'page.statsDifficulty': 'إحصاءات حسب الصعوبة', 'page.problemHistory': 'سجل المسائل', 'page.achievements': 'الإنجازات' },
+        bn: { 'tagline': 'একটি চাল। সেটি গুরুত্বপূর্ণ করুন।', 'action.yourMove': 'আপনার চাল', 'page.statsHistory': 'পরিসংখ্যান ও ইতিহাস', 'page.statsDifficulty': 'কঠিনতা অনুযায়ী পরিসংখ্যান', 'page.problemHistory': 'প্রশ্নের ইতিহাস', 'page.achievements': 'অর্জন' },
+        ja: { 'tagline': '一手に集中しよう。', 'action.yourMove': 'あなたの手番', 'page.statsHistory': '統計と履歴', 'page.statsDifficulty': '難易度別の統計', 'page.problemHistory': '問題履歴', 'page.achievements': '実績' },
+        hi: { 'tagline': 'एक चाल। उसे सार्थक बनाएँ।', 'action.yourMove': 'आपकी चाल', 'page.statsHistory': 'आँकड़े और इतिहास', 'page.statsDifficulty': 'कठिनाई के अनुसार आँकड़े', 'page.problemHistory': 'पहेली इतिहास', 'page.achievements': 'उपलब्धियाँ' },
+        pt: { 'tagline': 'Uma jogada. Faça valer.', 'action.yourMove': 'Sua jogada', 'page.statsHistory': 'Estatísticas e histórico', 'page.statsDifficulty': 'Estatísticas por dificuldade', 'page.problemHistory': 'Histórico de problemas', 'page.achievements': 'Conquistas' },
+        ru: { 'tagline': 'Один ход. Пусть он сработает.', 'action.yourMove': 'Ваш ход', 'page.statsHistory': 'Статистика и история', 'page.statsDifficulty': 'Статистика по сложности', 'page.problemHistory': 'История задач', 'page.achievements': 'Достижения' },
+        vi: { 'tagline': 'Một lần đổi. Hãy chọn kỹ.', 'action.yourMove': 'Lượt của bạn', 'page.statsHistory': 'Thống kê và lịch sử', 'page.statsDifficulty': 'Thống kê theo độ khó', 'page.problemHistory': 'Lịch sử câu đố', 'page.achievements': 'Thành tựu' },
+        tr: { 'tagline': 'Tek hamle. Değerli olsun.', 'action.yourMove': 'Sıranız', 'page.statsHistory': 'İstatistikler ve geçmiş', 'page.statsDifficulty': 'Zorluğa göre istatistikler', 'page.problemHistory': 'Bulmaca geçmişi', 'page.achievements': 'Başarılar' },
+        ur: { 'tagline': 'ایک چال۔ اسے اہم بنائیں۔', 'action.yourMove': 'آپ کی چال', 'page.statsHistory': 'اعداد و شمار اور تاریخ', 'page.statsDifficulty': 'مشکل کے لحاظ سے اعداد و شمار', 'page.problemHistory': 'پہیلی کی تاریخ', 'page.achievements': 'کامیابیاں' }
+    };
+    for (const code of AVAILABLE_LOCALES) Object.assign(messages[code], pageMessages[code]);
+
     function translate(value) {
         if (typeof value !== 'string') return value;
         return (sourceTexts[locale] && sourceTexts[locale][value]) || value;
