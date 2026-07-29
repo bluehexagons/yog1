@@ -2,8 +2,8 @@
     'use strict';
 
     const STORAGE_KEY = 'yog1.locale.v1';
-    // Only complete locales are selectable. Keep in-progress dictionaries here
-    // for translators without presenting a mixed-language interface to players.
+    // Locales shown in Options. English safely fills any copy that has not yet
+    // been added to a locale's catalog.
     const AVAILABLE_LOCALES = ['en', 'es', 'zh', 'ar', 'bn', 'ja', 'hi', 'pt', 'ru', 'vi', 'tr', 'ur'];
     const RTL_LOCALES = ['ar', 'ur'];
     const messages = {
@@ -64,7 +64,7 @@
             'nav.view': 'الصفحة', 'nav.play': 'العب', 'nav.options': 'الخيارات', 'nav.stats': 'الإحصاءات', 'nav.mode': 'النمط',
             'menu.expand': 'توسيع', 'menu.collapse': 'طي', 'menu.expandTitle': 'توسيع قائمة اللعبة', 'menu.collapseTitle': 'طي قائمة اللعبة',
             'action.menu': 'القائمة', 'action.reset': 'إعادة ضبط', 'action.check': 'تحقق من المعادلة', 'action.next': 'المسألة التالية', 'action.again': 'العب مجددًا',
-            'round.tutorial': 'البرنامج التعليمي', 'round.score': 'الهدف {target} · النتيجة {score}', 'flip.one': 'قلبة متبقية', 'flip.many': 'قلبات متبقية',
+            'round.tutorial': 'البرنامج التعليمي', 'round.score': 'الهدف {target} · النتيجة {score}', 'flip.one': 'تبديل متبقٍ', 'flip.many': 'تبديلات متبقية',
             'session.solved': 'محلول', 'session.accuracy': 'الدقة', 'session.average': 'المتوسط', 'session.hardest': 'الأصعب',
             'timer.seconds': '{seconds}ث', 'history.empty': 'لا توجد مسائل محفوظة بعد.', 'history.page': 'الصفحة {page} من {pages} · {count}/{limit} محفوظة',
             'history.correct': 'صحيح', 'history.incorrect': 'غير صحيح', 'history.round': 'الجولة {round}',
@@ -77,7 +77,7 @@
             'nav.view': 'পৃষ্ঠা', 'nav.play': 'খেলুন', 'nav.options': 'বিকল্প', 'nav.stats': 'পরিসংখ্যান', 'nav.mode': 'মোড',
             'menu.expand': 'প্রসারিত করুন', 'menu.collapse': 'সংকুচিত করুন', 'action.menu': 'মেনু', 'action.reset': 'রিসেট',
             'action.check': 'সমীকরণ পরীক্ষা করুন', 'action.next': 'পরের প্রশ্ন', 'action.again': 'আবার খেলুন',
-            'round.tutorial': 'টিউটোরিয়াল', 'round.score': 'লক্ষ্য {target} · স্কোর {score}', 'flip.one': 'ফ্লিপ বাকি', 'flip.many': 'ফ্লিপ বাকি',
+            'round.tutorial': 'টিউটোরিয়াল', 'round.score': 'লক্ষ্য {target} · স্কোর {score}', 'flip.one': 'পরিবর্তন বাকি', 'flip.many': 'পরিবর্তন বাকি',
             'session.solved': 'সমাধান', 'session.accuracy': 'নির্ভুলতা', 'session.average': 'গড়', 'session.hardest': 'সবচেয়ে কঠিন',
             'timer.seconds': '{seconds}সে', 'history.empty': 'এখনও কোনো প্রশ্ন সংরক্ষিত নেই।', 'history.page': 'পৃষ্ঠা {page}/{pages} · {count}/{limit} সংরক্ষিত',
             'history.correct': 'সঠিক', 'history.incorrect': 'ভুল', 'history.round': 'রাউন্ড {round}',
@@ -89,7 +89,7 @@
             'nav.view': '画面', 'nav.play': 'プレイ', 'nav.options': 'オプション', 'nav.stats': '統計', 'nav.mode': 'モード',
             'menu.expand': '展開', 'menu.collapse': '折りたたむ', 'action.menu': 'メニュー', 'action.reset': 'リセット',
             'action.check': '式を確認', 'action.next': '次の問題', 'action.again': 'もう一度プレイ',
-            'round.tutorial': 'チュートリアル', 'round.score': '目標 {target} · スコア {score}', 'flip.one': '回の反転が残り', 'flip.many': '回の反転が残り',
+            'round.tutorial': 'チュートリアル', 'round.score': '目標 {target} · スコア {score}', 'flip.one': '回の変更が残り', 'flip.many': '回の変更が残り',
             'session.solved': '解答済み', 'session.accuracy': '正答率', 'session.average': '平均', 'session.hardest': '最高難度',
             'timer.seconds': '{seconds}秒', 'history.empty': '保存された問題はありません。', 'history.page': '{page}/{pages} ページ · {count}/{limit} 件を保存',
             'history.correct': '正解', 'history.incorrect': '不正解', 'history.round': 'ラウンド {round}',
@@ -101,7 +101,7 @@
             'nav.view': 'स्क्रीन', 'nav.play': 'खेलें', 'nav.options': 'विकल्प', 'nav.stats': 'आँकड़े', 'nav.mode': 'मोड',
             'menu.expand': 'खोलें', 'menu.collapse': 'समेटें', 'action.menu': 'मेनू', 'action.reset': 'रीसेट',
             'action.check': 'समीकरण जाँचें', 'action.next': 'अगली पहेली', 'action.again': 'फिर खेलें',
-            'round.tutorial': 'ट्यूटोरियल', 'round.score': 'लक्ष्य {target} · स्कोर {score}', 'flip.one': 'फ्लिप बाकी', 'flip.many': 'फ्लिप बाकी',
+            'round.tutorial': 'ट्यूटोरियल', 'round.score': 'लक्ष्य {target} · स्कोर {score}', 'flip.one': 'बदलाव शेष', 'flip.many': 'बदलाव शेष',
             'session.solved': 'हल किए', 'session.accuracy': 'सटीकता', 'session.average': 'औसत', 'session.hardest': 'सबसे कठिन',
             'timer.seconds': '{seconds}से', 'history.empty': 'अभी तक कोई पहेली सहेजी नहीं गई है।', 'history.page': 'पृष्ठ {page}/{pages} · {count}/{limit} सहेजी गई',
             'history.correct': 'सही', 'history.incorrect': 'गलत', 'history.round': 'राउंड {round}',
@@ -113,7 +113,7 @@
             'nav.view': 'Tela', 'nav.play': 'Jogar', 'nav.options': 'Opções', 'nav.stats': 'Estatísticas', 'nav.mode': 'Modo',
             'menu.expand': 'Expandir', 'menu.collapse': 'Recolher', 'action.menu': 'Menu', 'action.reset': 'Redefinir',
             'action.check': 'Verificar equação', 'action.next': 'Próximo problema', 'action.again': 'Jogar novamente',
-            'round.tutorial': 'Tutorial', 'round.score': 'Meta {target} · pontuação {score}', 'flip.one': 'inversão restante', 'flip.many': 'inversões restantes',
+            'round.tutorial': 'Tutorial', 'round.score': 'Meta {target} · pontuação {score}', 'flip.one': 'alteração restante', 'flip.many': 'alterações restantes',
             'session.solved': 'resolvidos', 'session.accuracy': 'precisão', 'session.average': 'média', 'session.hardest': 'mais difícil',
             'timer.seconds': '{seconds}s', 'history.empty': 'Ainda não há problemas salvos.', 'history.page': 'Página {page}/{pages} · {count}/{limit} salvos',
             'history.correct': 'Correto', 'history.incorrect': 'Incorreto', 'history.round': 'rodada {round}',
@@ -125,7 +125,7 @@
             'nav.view': 'Экран', 'nav.play': 'Играть', 'nav.options': 'Настройки', 'nav.stats': 'Статистика', 'nav.mode': 'Режим',
             'menu.expand': 'Развернуть', 'menu.collapse': 'Свернуть', 'action.menu': 'Меню', 'action.reset': 'Сбросить',
             'action.check': 'Проверить равенство', 'action.next': 'Следующая задача', 'action.again': 'Играть снова',
-            'round.tutorial': 'Обучение', 'round.score': 'Цель {target} · счёт {score}', 'flip.one': 'переворот остался', 'flip.many': 'переворотов осталось',
+            'round.tutorial': 'Обучение', 'round.score': 'Цель {target} · счёт {score}', 'flip.one': 'изменение осталось', 'flip.many': 'изменений осталось',
             'session.solved': 'решено', 'session.accuracy': 'точность', 'session.average': 'среднее', 'session.hardest': 'самая сложная',
             'timer.seconds': '{seconds}с', 'history.empty': 'Сохранённых задач пока нет.', 'history.page': 'Страница {page}/{pages} · сохранено {count}/{limit}',
             'history.correct': 'Верно', 'history.incorrect': 'Неверно', 'history.round': 'раунд {round}',
@@ -136,7 +136,7 @@
             'language.label': 'Ngôn ngữ', 'sidebar.label': 'Vị trí thanh bên', 'sidebar.auto': 'Tự động (theo ngôn ngữ)', 'sidebar.left': 'Trái', 'sidebar.right': 'Phải',
             'nav.view': 'Màn hình', 'nav.play': 'Chơi', 'nav.options': 'Tùy chọn', 'nav.stats': 'Thống kê', 'nav.mode': 'Chế độ',
             'menu.expand': 'Mở rộng', 'menu.collapse': 'Thu gọn', 'action.menu': 'Menu', 'action.reset': 'Đặt lại', 'action.check': 'Kiểm tra phương trình', 'action.next': 'Câu tiếp theo', 'action.again': 'Chơi lại',
-            'round.tutorial': 'Hướng dẫn', 'round.score': 'Mục tiêu {target} · điểm {score}', 'flip.one': 'lần đổi còn lại', 'flip.many': 'lần đổi còn lại',
+            'round.tutorial': 'Hướng dẫn', 'round.score': 'Mục tiêu {target} · điểm {score}', 'flip.one': 'lần thay đổi còn lại', 'flip.many': 'lần thay đổi còn lại',
             'session.solved': 'đã giải', 'session.accuracy': 'độ chính xác', 'session.average': 'trung bình', 'session.hardest': 'khó nhất', 'timer.seconds': '{seconds}giây',
             'history.empty': 'Chưa có câu hỏi nào được lưu.', 'history.page': 'Trang {page}/{pages} · đã lưu {count}/{limit}', 'history.correct': 'Đúng', 'history.incorrect': 'Sai', 'history.round': 'vòng {round}',
             'mode.operations': 'Phép toán: {operations}', 'mode.baseLength': 'Độ dài cơ bản: {min}–{max}', 'confirm.clearHistory': 'Xóa toàn bộ lịch sử câu hỏi cục bộ?', 'confirm.resetStat': 'Đặt lại thống kê {mode}?', 'confirm.resetAll': 'Đặt lại thống kê mọi chế độ?', 'aria.resetStat': 'Đặt lại thống kê {mode}'
@@ -145,7 +145,7 @@
             'language.label': 'Dil', 'sidebar.label': 'Kenar çubuğu konumu', 'sidebar.auto': 'Otomatik (dile göre)', 'sidebar.left': 'Sol', 'sidebar.right': 'Sağ',
             'nav.view': 'Ekran', 'nav.play': 'Oyna', 'nav.options': 'Seçenekler', 'nav.stats': 'İstatistikler', 'nav.mode': 'Mod',
             'menu.expand': 'Genişlet', 'menu.collapse': 'Daralt', 'action.menu': 'Menü', 'action.reset': 'Sıfırla', 'action.check': 'Denklemi kontrol et', 'action.next': 'Sonraki soru', 'action.again': 'Tekrar oyna',
-            'round.tutorial': 'Eğitim', 'round.score': 'Hedef {target} · puan {score}', 'flip.one': 'çevirme kaldı', 'flip.many': 'çevirme kaldı',
+            'round.tutorial': 'Eğitim', 'round.score': 'Hedef {target} · puan {score}', 'flip.one': 'değişiklik kaldı', 'flip.many': 'değişiklik kaldı',
             'session.solved': 'çözüldü', 'session.accuracy': 'doğruluk', 'session.average': 'ortalama', 'session.hardest': 'en zor', 'timer.seconds': '{seconds}sn',
             'history.empty': 'Henüz kaydedilmiş soru yok.', 'history.page': 'Sayfa {page}/{pages} · {count}/{limit} kaydedildi', 'history.correct': 'Doğru', 'history.incorrect': 'Yanlış', 'history.round': 'tur {round}',
             'mode.operations': 'İşlemler: {operations}', 'mode.baseLength': 'Temel uzunluk: {min}–{max}', 'confirm.clearHistory': 'Tüm yerel soru geçmişi silinsin mi?', 'confirm.resetStat': '{mode} istatistikleri sıfırlansın mı?', 'confirm.resetAll': 'Tüm modların istatistikleri sıfırlansın mı?', 'aria.resetStat': '{mode} istatistiklerini sıfırla'
@@ -154,7 +154,7 @@
             'language.label': 'زبان', 'sidebar.label': 'سائیڈبار کی جگہ', 'sidebar.auto': 'خودکار (زبان کے مطابق)', 'sidebar.left': 'بائیں', 'sidebar.right': 'دائیں',
             'nav.view': 'صفحہ', 'nav.play': 'کھیلیں', 'nav.options': 'اختیارات', 'nav.stats': 'اعداد و شمار', 'nav.mode': 'موڈ',
             'menu.expand': 'کھولیں', 'menu.collapse': 'سمیٹیں', 'action.menu': 'مینو', 'action.reset': 'ری سیٹ', 'action.check': 'مساوات چیک کریں', 'action.next': 'اگلا سوال', 'action.again': 'دوبارہ کھیلیں',
-            'round.tutorial': 'سبق', 'round.score': 'ہدف {target} · اسکور {score}', 'flip.one': 'فلپ باقی', 'flip.many': 'فلپ باقی',
+            'round.tutorial': 'سبق', 'round.score': 'ہدف {target} · اسکور {score}', 'flip.one': 'تبدیلی باقی', 'flip.many': 'تبدیلیاں باقی',
             'session.solved': 'حل شدہ', 'session.accuracy': 'درستگی', 'session.average': 'اوسط', 'session.hardest': 'سب سے مشکل', 'timer.seconds': '{seconds}ث',
             'history.empty': 'ابھی کوئی سوال محفوظ نہیں ہے۔', 'history.page': 'صفحہ {page}/{pages} · {count}/{limit} محفوظ', 'history.correct': 'درست', 'history.incorrect': 'غلط', 'history.round': 'راؤنڈ {round}',
             'mode.operations': 'عملیات: {operations}', 'mode.baseLength': 'بنیادی لمبائی: {min}–{max}', 'confirm.clearHistory': 'تمام مقامی سوالوں کی تاریخ مٹائیں؟', 'confirm.resetStat': '{mode} کے اعداد و شمار ری سیٹ کریں؟', 'confirm.resetAll': 'تمام موڈ کے اعداد و شمار ری سیٹ کریں؟', 'aria.resetStat': '{mode} کے اعداد و شمار ری سیٹ کریں'
@@ -267,7 +267,7 @@
         },
         ar: {
             'One move. Make it count.': 'حركة واحدة. اجعلها مؤثرة.', 'Round ': 'الجولة ', 'Warm-up': 'إحماء', 'Standard': 'عادي', 'Challenge': 'تحدٍ', 'Guided': 'إرشادي',
-            'Tutorial': 'البرنامج التعليمي', 'Easy': 'سهل', 'Normal': 'عادي', 'Hard': 'صعب', 'Expert': 'خبير', 'Extreme': 'متطرف',
+            'Tutorial': 'البرنامج التعليمي', 'Easy': 'سهل', 'Normal': 'عادي', 'Hard': 'صعب', 'Expert': 'خبير', 'Extreme': 'أقصى',
             'Daily': 'يومي', 'Timed': 'مؤقت', 'Endless': 'لا نهائي', 'Challenges': 'تحديات', 'Custom…': 'مخصص…',
             'Options': 'الخيارات', 'Stats': 'الإحصاءات', 'Play': 'العب', 'Mode': 'النمط', 'View': 'الصفحة',
             'How to play': 'طريقة اللعب', 'Your move': 'حركتك', 'Hint': 'تلميح', 'Reveal': 'إظهار', 'Share': 'مشاركة',
