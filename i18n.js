@@ -682,6 +682,22 @@
     };
     for (const code of AVAILABLE_LOCALES) Object.assign(messages[code], curatedMessages[code]);
 
+    const resultMessages = {
+        en: { 'result.balanced': 'Balanced', 'result.balancedBody': 'Both sides match. Review, then continue.', 'result.retry': 'Not balanced', 'result.retryBody': 'The same puzzle is ready to try again.', 'result.solution': 'Solution shown', 'result.solutionBody': 'This one is not counted. Review, then continue.' },
+        es: { 'result.balanced': 'Equilibrado', 'result.balancedBody': 'Ambos lados coinciden. Revisa y continúa.', 'result.retry': 'Aún no está equilibrado', 'result.retryBody': 'El mismo problema está listo para otro intento.', 'result.solution': 'Solución mostrada', 'result.solutionBody': 'Este intento no cuenta. Revisa y continúa.' },
+        zh: { 'result.balanced': '已平衡', 'result.balancedBody': '等式两边相等。查看后继续。', 'result.retry': '尚未平衡', 'result.retryBody': '可以再试一次同一道题。', 'result.solution': '已显示解法', 'result.solutionBody': '这题不计入成绩。查看后继续。' },
+        ar: { 'result.balanced': 'متوازن', 'result.balancedBody': 'الطرفان متساويان. راجع ثم تابع.', 'result.retry': 'غير متوازن', 'result.retryBody': 'المسألة نفسها جاهزة لمحاولة أخرى.', 'result.solution': 'تم إظهار الحل', 'result.solutionBody': 'لا تُحسب هذه المحاولة. راجع ثم تابع.' },
+        bn: { 'result.balanced': 'সমান হয়েছে', 'result.balancedBody': 'দুই পাশ মিলে গেছে। দেখুন, তারপর এগোন।', 'result.retry': 'এখনও সমান নয়', 'result.retryBody': 'একই ধাঁধা আবার চেষ্টা করা যাবে।', 'result.solution': 'সমাধান দেখানো হয়েছে', 'result.solutionBody': 'এটি গণনা হবে না। দেখুন, তারপর এগোন।' },
+        ja: { 'result.balanced': 'つり合いました', 'result.balancedBody': '両辺が一致しました。確認して続けます。', 'result.retry': 'まだつり合っていません', 'result.retryBody': '同じ問題をもう一度試せます。', 'result.solution': '答えを表示しました', 'result.solutionBody': 'この問題は記録されません。確認して続けます。' },
+        hi: { 'result.balanced': 'संतुलित', 'result.balancedBody': 'दोनों पक्ष बराबर हैं। देखें, फिर आगे बढ़ें।', 'result.retry': 'अभी संतुलित नहीं', 'result.retryBody': 'इसी पहेली को फिर आज़मा सकते हैं।', 'result.solution': 'हल दिखाया गया', 'result.solutionBody': 'यह प्रयास नहीं गिना जाएगा। देखें, फिर आगे बढ़ें।' },
+        pt: { 'result.balanced': 'Equilibrado', 'result.balancedBody': 'Os dois lados são iguais. Confira e continue.', 'result.retry': 'Ainda não está equilibrado', 'result.retryBody': 'O mesmo problema está pronto para outra tentativa.', 'result.solution': 'Solução mostrada', 'result.solutionBody': 'Esta não conta. Confira e continue.' },
+        ru: { 'result.balanced': 'Равенство верно', 'result.balancedBody': 'Обе стороны совпали. Посмотрите и продолжайте.', 'result.retry': 'Пока не равно', 'result.retryBody': 'Эту же задачу можно попробовать ещё раз.', 'result.solution': 'Решение показано', 'result.solutionBody': 'Эта попытка не учитывается. Посмотрите и продолжайте.' },
+        vi: { 'result.balanced': 'Đã cân bằng', 'result.balancedBody': 'Hai vế khớp nhau. Xem lại rồi tiếp tục.', 'result.retry': 'Chưa cân bằng', 'result.retryBody': 'Bạn có thể thử lại câu đố này.', 'result.solution': 'Đã hiện lời giải', 'result.solutionBody': 'Lần này không được tính. Xem lại rồi tiếp tục.' },
+        tr: { 'result.balanced': 'Dengeli', 'result.balancedBody': 'İki taraf eşit. İnceleyip devam edin.', 'result.retry': 'Henüz dengeli değil', 'result.retryBody': 'Aynı bulmacayı yeniden deneyebilirsiniz.', 'result.solution': 'Çözüm gösterildi', 'result.solutionBody': 'Bu deneme sayılmaz. İnceleyip devam edin.' },
+        ur: { 'result.balanced': 'برابر ہے', 'result.balancedBody': 'دونوں طرف برابر ہیں۔ دیکھیں، پھر آگے بڑھیں۔', 'result.retry': 'ابھی برابر نہیں', 'result.retryBody': 'اسی پہیلی کو دوبارہ آزمایا جا سکتا ہے۔', 'result.solution': 'حل دکھا دیا گیا', 'result.solutionBody': 'یہ کوشش شمار نہیں ہوگی۔ دیکھیں، پھر آگے بڑھیں۔' }
+    };
+    for (const code of AVAILABLE_LOCALES) Object.assign(messages[code], resultMessages[code]);
+
     function translate(value) {
         if (typeof value !== 'string') return value;
         return (sourceTexts[locale] && sourceTexts[locale][value]) || value;

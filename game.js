@@ -542,7 +542,7 @@
             ui.submit.textContent = t('action.again');
             setMessage('Challenge set complete', 'You solved all ' + CURATED.length + ' handcrafted puzzles.');
         } else {
-            setMessage('Correct', 'Both sides balance. Review the solution, then continue.');
+            setCatalogMessage('result.balanced', 'result.balancedBody');
         }
     }
 
@@ -563,7 +563,7 @@
                 return;
             }
         }
-        setMessage('Not balanced—retry', 'The totals differed. The same puzzle is still here, and your move has been restored.');
+        setCatalogMessage('result.retry', 'result.retryBody');
     }
 
     function advanceRound() {
@@ -992,7 +992,7 @@
                 }
             }
         }
-        setMessage('Solution revealed', 'This puzzle counts as incorrect. Review it, then continue.');
+        setCatalogMessage('result.solution', 'result.solutionBody');
     });
 
     ui.share.addEventListener('click', sharePuzzle);
