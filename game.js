@@ -842,12 +842,12 @@
             navigator.share({ title: 'You Only Get 1s', text: shareText, url: url.toString() }).catch(function () {});
         } else if (navigator.clipboard) {
             navigator.clipboard.writeText(value).then(function () {
-                setMessage('Copied', 'The puzzle link and result are ready to paste.');
+                setCatalogMessage('share.copied', 'share.ready');
             }).catch(function () {
-                window.prompt('Copy this puzzle link:', value);
+                window.prompt(t('share.prompt'), value);
             });
         } else {
-            window.prompt('Copy this puzzle link:', value);
+            window.prompt(t('share.prompt'), value);
         }
     }
 

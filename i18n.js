@@ -778,6 +778,22 @@
     };
     for (const code of AVAILABLE_LOCALES) Object.assign(messages[code], achievementMessages[code]);
 
+    const shareMessages = {
+        en: { 'share.copied': 'Copied', 'share.ready': 'Link and result are ready to paste.', 'share.prompt': 'Copy this puzzle link:' },
+        es: { 'share.copied': 'Copiado', 'share.ready': 'El enlace y el resultado están listos para pegar.', 'share.prompt': 'Copia este enlace del problema:' },
+        zh: { 'share.copied': '已复制', 'share.ready': '链接和结果可以粘贴了。', 'share.prompt': '复制此题链接：' },
+        ar: { 'share.copied': 'تم النسخ', 'share.ready': 'الرابط والنتيجة جاهزان للّصق.', 'share.prompt': 'انسخ رابط المسألة:' },
+        bn: { 'share.copied': 'কপি হয়েছে', 'share.ready': 'লিংক ও ফলাফল পেস্ট করার জন্য প্রস্তুত।', 'share.prompt': 'এই ধাঁধার লিংক কপি করুন:' },
+        ja: { 'share.copied': 'コピーしました', 'share.ready': 'リンクと結果を貼り付けられます。', 'share.prompt': 'この問題のリンクをコピー:' },
+        hi: { 'share.copied': 'कॉपी किया गया', 'share.ready': 'लिंक और परिणाम चिपकाने के लिए तैयार हैं।', 'share.prompt': 'इस पहेली का लिंक कॉपी करें:' },
+        pt: { 'share.copied': 'Copiado', 'share.ready': 'O link e o resultado estão prontos para colar.', 'share.prompt': 'Copie este link do problema:' },
+        ru: { 'share.copied': 'Скопировано', 'share.ready': 'Ссылка и результат готовы к вставке.', 'share.prompt': 'Скопируйте ссылку на задачу:' },
+        vi: { 'share.copied': 'Đã sao chép', 'share.ready': 'Liên kết và kết quả đã sẵn sàng để dán.', 'share.prompt': 'Sao chép liên kết câu đố này:' },
+        tr: { 'share.copied': 'Kopyalandı', 'share.ready': 'Bağlantı ve sonuç yapıştırmaya hazır.', 'share.prompt': 'Bu bulmaca bağlantısını kopyalayın:' },
+        ur: { 'share.copied': 'کاپی ہو گیا', 'share.ready': 'لنک اور نتیجہ چسپاں کرنے کے لیے تیار ہیں۔', 'share.prompt': 'اس پہیلی کا لنک کاپی کریں:' }
+    };
+    for (const code of AVAILABLE_LOCALES) Object.assign(messages[code], shareMessages[code]);
+
     function translate(value) {
         if (typeof value !== 'string') return value;
         return (sourceTexts[locale] && sourceTexts[locale][value]) || value;
