@@ -810,6 +810,11 @@
     };
     for (const code of AVAILABLE_LOCALES) Object.assign(messages[code], customValidationMessages[code]);
 
+    const timedResultMessages = {
+        en: { 'timed.complete': 'Time is up', 'timed.result': 'Solved {count} in 60 seconds.' }, es: { 'timed.complete': 'Tiempo terminado', 'timed.result': 'Resolviste {count} en 60 segundos.' }, zh: { 'timed.complete': '时间到', 'timed.result': '在 60 秒内解开了 {count} 题。' }, ar: { 'timed.complete': 'انتهى الوقت', 'timed.result': 'حُلَّت {count} خلال 60 ثانية.' }, bn: { 'timed.complete': 'সময় শেষ', 'timed.result': '60 সেকেন্ডে {count}টি সমাধান করেছেন।' }, ja: { 'timed.complete': '時間切れ', 'timed.result': '60秒で {count} 問解きました。' }, hi: { 'timed.complete': 'समय समाप्त', 'timed.result': '60 सेकंड में {count} हल किए।' }, pt: { 'timed.complete': 'Tempo esgotado', 'timed.result': 'Resolveu {count} em 60 segundos.' }, ru: { 'timed.complete': 'Время вышло', 'timed.result': 'Решено за 60 секунд: {count}.' }, vi: { 'timed.complete': 'Hết giờ', 'timed.result': 'Đã giải {count} trong 60 giây.' }, tr: { 'timed.complete': 'Süre doldu', 'timed.result': '60 saniyede {count} çözüldü.' }, ur: { 'timed.complete': 'وقت ختم', 'timed.result': '60 سیکنڈ میں {count} حل کیے۔' }
+    };
+    for (const code of AVAILABLE_LOCALES) Object.assign(messages[code], timedResultMessages[code]);
+
     function translate(value) {
         if (typeof value !== 'string') return value;
         return (sourceTexts[locale] && sourceTexts[locale][value]) || value;

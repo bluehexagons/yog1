@@ -764,7 +764,7 @@
             timeRemaining--;
             ui.timer_label.textContent = t('timer.seconds', { seconds: timeRemaining });
             if (timeRemaining <= 0) {
-                finishSession('Time!', 'You solved ' + session.solved + ' puzzles in ' + TIMED_SECONDS + ' seconds.');
+                finishSession(t('timed.complete'), t('timed.result', { count: session.solved }));
                 playSound('finish');
             }
         }, 1000);
