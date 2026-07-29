@@ -72,27 +72,27 @@
 
     const CURATED = [
         {
-            title: 'The original',
+            titleKey: 'curated.original',
             sides: [binary('subtract', number(7, 'c00'), number(2, 'c01')),
                 binary('add', number(3, 'c02', true), number(4, 'c03'))]
         },
         {
-            title: 'Product placement',
+            titleKey: 'curated.product',
             sides: [binary('multiply', number(6, 'c10'), number(2, 'c11')),
                 binary('subtract', number(13, 'c12'), number(8, 'c13', true))]
         },
         {
-            title: 'Root and remainder',
+            titleKey: 'curated.root',
             sides: [binary('modulo', number(25, 'c20'), number(7, 'c21')),
                 binary('add', squareRoot(number(9, 'c22')), number(6, 'c23', true))]
         },
         {
-            title: 'A small power',
+            titleKey: 'curated.power',
             sides: [binary('power', number(2, 'c30'), number(3, 'c31')),
                 binary('subtract', number(9, 'c32'), number(7, 'c33', true))]
         },
         {
-            title: 'Evenly divided',
+            titleKey: 'curated.divide',
             sides: [binary('divide', number(42, 'c40'), number(6, 'c41')),
                 binary('subtract', number(8, 'c42'), number(5, 'c43', true))]
         }
@@ -217,7 +217,7 @@
             target: 10 + index * 8,
             roundKind: index + 1 === CURATED.length ? 'Challenge' : 'Curated',
             operationCount: core.countOperations(item.sides[0]) + core.countOperations(item.sides[1]),
-            title: item.title
+            title: t(item.titleKey)
         };
     }
 
@@ -339,6 +339,11 @@
         ui.message_text.textContent = i18n.translate(message);
     }
 
+    function setCatalogMessage(titleKey, messageKey, values) {
+        ui.message_title.textContent = t(titleKey, values);
+        ui.message_text.textContent = t(messageKey, values);
+    }
+
     function hideFeedback() {
         ui.feedback.hidden = true;
         ui.feedback.replaceChildren();
@@ -378,19 +383,20 @@
         drawProblem();
         updateProgress();
         if (mode === 'tutorial') {
-            setMessage('How to play', 'Change exactly one number into a 1 so both sides have the same integer value.');
+            setCatalogMessage('message.howToPlay', 'message.tutorial');
         } else if (mode === 'daily') {
-            setMessage('Daily challenge', 'Everyone gets this same seeded puzzle today. Solve it and share your result.');
+            setCatalogMessage('message.daily', 'message.dailyBody');
         } else if (mode === 'timed') {
-            setMessage('Timed sprint', 'Solve as many puzzles as you can before the 60-second clock reaches zero.');
+            setCatalogMessage('message.timed', 'message.timedBody');
         } else if (mode === 'endless') {
-            setMessage('Endless run', 'Settle into a rising difficulty curve. If your first try does not fit, one of three chances is used.');
+            setCatalogMessage('message.endless', 'message.endlessBody');
         } else if (mode === 'challenges') {
-            setMessage(currentProblem.title, 'A handcrafted puzzle ' + round + ' of ' + CURATED.length + '.');
+            setMessage(currentProblem.title, t('message.curated', { round: round, count: CURATED.length }));
         } else {
-            setMessage(currentProblem.roundKind + ' round',
-                currentProblem.roundKind === 'Challenge' ? 'A difficulty spike—take your time.' :
-                    'Change one number, then check the equation.');
+            setCatalogMessage('round.kindTitle', currentProblem.roundKind === 'Challenge' ?
+                'message.challengeBody' : 'message.standardBody', {
+                    kind: t('round.' + currentProblem.roundKind.toLowerCase())
+                });
         }
     }
 
