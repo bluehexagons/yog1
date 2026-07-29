@@ -634,6 +634,22 @@
     };
     for (const code of AVAILABLE_LOCALES) Object.assign(messages[code], difficultyMessages[code]);
 
+    const roundMessages = {
+        en: { 'round.number': 'Round {round}', 'round.guided': 'Guided', 'round.warmup': 'Warm-up', 'round.standard': 'Standard', 'round.challenge': 'Challenge', 'round.curated': 'Curated', 'round.kindTitle': '{kind} round' },
+        es: { 'round.number': 'Ronda {round}', 'round.guided': 'Guiada', 'round.warmup': 'Calentamiento', 'round.standard': 'Normal', 'round.challenge': 'Desafío', 'round.curated': 'Selección', 'round.kindTitle': 'Ronda {kind}' },
+        zh: { 'round.number': '第 {round} 轮', 'round.guided': '引导', 'round.warmup': '热身', 'round.standard': '标准', 'round.challenge': '挑战', 'round.curated': '精选', 'round.kindTitle': '{kind}轮' },
+        ar: { 'round.number': 'الجولة {round}', 'round.guided': 'إرشادية', 'round.warmup': 'تمهيد', 'round.standard': 'عادية', 'round.challenge': 'تحدٍّ', 'round.curated': 'مختارة', 'round.kindTitle': 'جولة {kind}' },
+        bn: { 'round.number': 'রাউন্ড {round}', 'round.guided': 'নির্দেশিত', 'round.warmup': 'ওয়ার্ম-আপ', 'round.standard': 'সাধারণ', 'round.challenge': 'চ্যালেঞ্জ', 'round.curated': 'বাছাই করা', 'round.kindTitle': '{kind} রাউন্ড' },
+        ja: { 'round.number': '{round} ラウンド', 'round.guided': 'ガイド', 'round.warmup': 'ウォームアップ', 'round.standard': '標準', 'round.challenge': 'チャレンジ', 'round.curated': '厳選', 'round.kindTitle': '{kind}ラウンド' },
+        hi: { 'round.number': 'राउंड {round}', 'round.guided': 'निर्देशित', 'round.warmup': 'वार्म-अप', 'round.standard': 'सामान्य', 'round.challenge': 'चुनौती', 'round.curated': 'चुना हुआ', 'round.kindTitle': '{kind} राउंड' },
+        pt: { 'round.number': 'Rodada {round}', 'round.guided': 'Guiada', 'round.warmup': 'Aquecimento', 'round.standard': 'Normal', 'round.challenge': 'Desafio', 'round.curated': 'Selecionada', 'round.kindTitle': 'Rodada {kind}' },
+        ru: { 'round.number': 'Раунд {round}', 'round.guided': 'С подсказками', 'round.warmup': 'Разминка', 'round.standard': 'Обычный', 'round.challenge': 'Испытание', 'round.curated': 'Отобранный', 'round.kindTitle': 'Раунд: {kind}' },
+        vi: { 'round.number': 'Vòng {round}', 'round.guided': 'Có hướng dẫn', 'round.warmup': 'Khởi động', 'round.standard': 'Thường', 'round.challenge': 'Thử thách', 'round.curated': 'Tuyển chọn', 'round.kindTitle': 'Vòng {kind}' },
+        tr: { 'round.number': '{round}. tur', 'round.guided': 'Yönlendirmeli', 'round.warmup': 'Isınma', 'round.standard': 'Standart', 'round.challenge': 'Meydan okuma', 'round.curated': 'Seçilmiş', 'round.kindTitle': '{kind} turu' },
+        ur: { 'round.number': 'راؤنڈ {round}', 'round.guided': 'رہنمائی والا', 'round.warmup': 'وارم اپ', 'round.standard': 'عام', 'round.challenge': 'چیلنج', 'round.curated': 'منتخب', 'round.kindTitle': '{kind} راؤنڈ' }
+    };
+    for (const code of AVAILABLE_LOCALES) Object.assign(messages[code], roundMessages[code]);
+
     function translate(value) {
         if (typeof value !== 'string') return value;
         return (sourceTexts[locale] && sourceTexts[locale][value]) || value;

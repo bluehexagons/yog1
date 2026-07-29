@@ -328,8 +328,8 @@
         ui.flip_count.textContent = selectedId ? '0' : '1';
         ui.flip_text.textContent = t(selectedId ? 'flip.many' : 'flip.one');
         ui.round_label.textContent = mode === 'tutorial' ? t('round.tutorial') :
-            (mode === 'daily' ? utcDate() : i18n.translate('Round ') + round);
-        ui.round_kind.textContent = i18n.translate(currentProblem.roundKind);
+            (mode === 'daily' ? utcDate() : t('round.number', { round: round }));
+        ui.round_kind.textContent = t('round.' + currentProblem.roundKind.toLowerCase());
         ui.round_kind.className = 'round-kind ' + currentProblem.roundKind.toLowerCase().replace('-', '');
         ui.score_label.textContent = t('round.score', { target: currentProblem.target, score: currentProblem.score });
     }
