@@ -4,10 +4,12 @@
     const STORAGE_KEY = 'yog1.locale.v1';
     // Only complete locales are selectable. Keep in-progress dictionaries here
     // for translators without presenting a mixed-language interface to players.
-    const AVAILABLE_LOCALES = ['en', 'es', 'zh'];
+    const AVAILABLE_LOCALES = ['en', 'es', 'zh', 'ar'];
+    const RTL_LOCALES = ['ar'];
     const messages = {
         en: {
             'language.label': 'Language',
+            'sidebar.label': 'Sidebar side', 'sidebar.auto': 'Automatic (follow language)', 'sidebar.left': 'Left', 'sidebar.right': 'Right',
             'nav.view': 'View', 'nav.play': 'Play', 'nav.options': 'Options', 'nav.stats': 'Stats', 'nav.mode': 'Mode',
             'menu.expand': 'Expand', 'menu.collapse': 'Collapse', 'menu.expandTitle': 'Expand game menu',
             'menu.collapseTitle': 'Collapse game menu',
@@ -26,6 +28,7 @@
         },
         es: {
             'language.label': 'Idioma',
+            'sidebar.label': 'Lado de la barra lateral', 'sidebar.auto': 'Automático (según el idioma)', 'sidebar.left': 'Izquierda', 'sidebar.right': 'Derecha',
             'nav.view': 'Vista', 'nav.play': 'Jugar', 'nav.options': 'Opciones', 'nav.stats': 'Estadísticas', 'nav.mode': 'Modo',
             'menu.expand': 'Expandir', 'menu.collapse': 'Contraer', 'menu.expandTitle': 'Expandir el menú del juego',
             'menu.collapseTitle': 'Contraer el menú del juego', 'action.menu': 'Menú', 'action.reset': 'Restablecer',
@@ -43,6 +46,7 @@
         },
         zh: {
             'language.label': '语言',
+            'sidebar.label': '侧边栏位置', 'sidebar.auto': '自动（跟随语言）', 'sidebar.left': '左侧', 'sidebar.right': '右侧',
             'nav.view': '页面', 'nav.play': '游戏', 'nav.options': '选项', 'nav.stats': '统计', 'nav.mode': '模式',
             'menu.expand': '展开', 'menu.collapse': '收起', 'menu.expandTitle': '展开游戏菜单', 'menu.collapseTitle': '收起游戏菜单',
             'action.menu': '菜单', 'action.reset': '重置', 'action.check': '检查等式', 'action.next': '下一题', 'action.again': '再玩一次',
@@ -53,6 +57,20 @@
             'mode.operations': '运算：{operations}', 'mode.baseLength': '基础长度：{min}–{max}',
             'confirm.clearHistory': '清除所有本地保存的题目历史吗？', 'confirm.resetStat': '重置 {mode} 的统计数据吗？',
             'confirm.resetAll': '重置所有模式的统计数据吗？', 'aria.resetStat': '重置 {mode} 的统计数据'
+        },
+        ar: {
+            'language.label': 'اللغة', 'sidebar.label': 'موضع الشريط الجانبي',
+            'sidebar.auto': 'تلقائي (حسب اللغة)', 'sidebar.left': 'اليسار', 'sidebar.right': 'اليمين',
+            'nav.view': 'الصفحة', 'nav.play': 'العب', 'nav.options': 'الخيارات', 'nav.stats': 'الإحصاءات', 'nav.mode': 'النمط',
+            'menu.expand': 'توسيع', 'menu.collapse': 'طي', 'menu.expandTitle': 'توسيع قائمة اللعبة', 'menu.collapseTitle': 'طي قائمة اللعبة',
+            'action.menu': 'القائمة', 'action.reset': 'إعادة ضبط', 'action.check': 'تحقق من المعادلة', 'action.next': 'المسألة التالية', 'action.again': 'العب مجددًا',
+            'round.tutorial': 'البرنامج التعليمي', 'round.score': 'الهدف {target} · النتيجة {score}', 'flip.one': 'قلبة متبقية', 'flip.many': 'قلبات متبقية',
+            'session.solved': 'محلول', 'session.accuracy': 'الدقة', 'session.average': 'المتوسط', 'session.hardest': 'الأصعب',
+            'timer.seconds': '{seconds}ث', 'history.empty': 'لا توجد مسائل محفوظة بعد.', 'history.page': 'الصفحة {page} من {pages} · {count}/{limit} محفوظة',
+            'history.correct': 'صحيح', 'history.incorrect': 'غير صحيح', 'history.round': 'الجولة {round}',
+            'mode.operations': 'العمليات: {operations}', 'mode.baseLength': 'الطول الأساسي: {min}–{max}',
+            'confirm.clearHistory': 'هل تريد مسح كل محفوظات المسائل المحلية؟', 'confirm.resetStat': 'هل تريد إعادة ضبط إحصاءات {mode}؟',
+            'confirm.resetAll': 'هل تريد إعادة ضبط إحصاءات كل الأنماط؟', 'aria.resetStat': 'إعادة ضبط إحصاءات {mode}'
         }
     };
 
@@ -159,6 +177,34 @@
             'Correct': '正确', 'Incorrect': '错误', 'Copied': '已复制',
             'Build a custom game': '创建自定义游戏', 'Choose the rules, then start the run. A seed makes it reproducible.': '选择规则，然后开始游戏。种子可使题目可复现。',
             'Check the targets': '检查目标', 'The minimum target cannot exceed the maximum.': '最小目标不能超过最大目标。'
+        },
+        ar: {
+            'One move. Make it count.': 'حركة واحدة. اجعلها مؤثرة.', 'Round ': 'الجولة ', 'Warm-up': 'إحماء', 'Standard': 'عادي', 'Challenge': 'تحدٍ', 'Guided': 'إرشادي',
+            'Tutorial': 'البرنامج التعليمي', 'Easy': 'سهل', 'Normal': 'عادي', 'Hard': 'صعب', 'Expert': 'خبير', 'Extreme': 'متطرف',
+            'Daily': 'يومي', 'Timed': 'مؤقت', 'Endless': 'لا نهائي', 'Challenges': 'تحديات', 'Custom…': 'مخصص…',
+            'Options': 'الخيارات', 'Stats': 'الإحصاءات', 'Play': 'العب', 'Mode': 'النمط', 'View': 'الصفحة',
+            'How to play': 'طريقة اللعب', 'Your move': 'حركتك', 'Hint': 'تلميح', 'Reveal': 'إظهار', 'Share': 'مشاركة',
+            'Difficulty guide': 'دليل الصعوبة', 'Accessibility & sound': 'إتاحة وصوت', 'Stats & history': 'الإحصاءات والسجل',
+            'Stats by difficulty': 'إحصاءات حسب الصعوبة', 'Problem history': 'سجل المسائل', 'Achievements': 'الإنجازات',
+            'Previous': 'السابق', 'Next': 'التالي', 'Clear history': 'مسح السجل', 'Reset all stats': 'إعادة ضبط كل الإحصاءات',
+            'Waveform sound effects (off by default)': 'مؤثرات صوتية موجية (متوقفة افتراضيًا)', 'Larger text': 'نص أكبر',
+            'Higher contrast': 'تباين أعلى', 'Reduced clutter': 'تقليل التشتيت', 'Install offline app': 'تثبيت تطبيق دون اتصال',
+            'Three values only; small + and − puzzles.': 'ثلاث قيم فقط؛ مسائل جمع وطرح صغيرة.',
+            'Compact puzzles; adds × and frequent three-value rounds.': 'مسائل مدمجة؛ تضيف × وجولات متكررة من ثلاث قيم.',
+            'Compact puzzles; adds integer ÷ and some three-value rounds.': 'مسائل مدمجة؛ تضيف ÷ الصحيحة وبعض جولات ثلاث قيم.',
+            'Adds modulus % and powers ^, with occasional three-value rounds.': 'تضيف الباقي % والأسس ^ مع جولات عرضية من ثلاث قيم.',
+            'Largest values and every operation, including √, in the longest puzzles.': 'أكبر القيم وكل العمليات، بما فيها √، في أطول المسائل.',
+            'Three-number addition and subtraction with small positive integers.': 'جمع وطرح بثلاثة أعداد صحيحة موجبة صغيرة.',
+            'Compact expressions that introduce multiplication, with frequent three-number warm-ups.': 'تعبيرات مدمجة تقدم الضرب مع إحماءات متكررة بثلاثة أعداد.',
+            'Compact expressions with integer (whole-quotient) division and some three-number rounds.': 'تعبيرات مدمجة بقسمة صحيحة وبعض جولات ثلاثة أعداد.',
+            'Adds remainders and powers, while retaining occasional three-number rounds.': 'تضيف البواقي والأسس مع الاحتفاظ بجولات عرضية من ثلاثة أعداد.',
+            'Every operation, including roots, in the longest expressions.': 'كل العمليات، بما فيها الجذور، في أطول التعبيرات.',
+            'Change exactly one number into a 1 so both sides have the same integer value.': 'غيّر رقمًا واحدًا بالضبط إلى 1 ليصبح للطرفين نفس القيمة الصحيحة.',
+            'Change one number, then check the equation.': 'غيّر رقمًا واحدًا ثم تحقق من المعادلة.', 'A difficulty spike—take your time.': 'قفزة في الصعوبة—خذ وقتك.',
+            'Both sides balance. Review the solution, then continue.': 'الطرفان متساويان. راجع الحل ثم تابع.', 'Not balanced—retry': 'غير متوازن—حاول ثانيةً',
+            'Solution revealed': 'تم إظهار الحل', 'This puzzle counts as incorrect. Review it, then continue.': 'تُحسب هذه المسألة غير صحيحة. راجعها ثم تابع.',
+            'Correct': 'صحيح', 'Incorrect': 'غير صحيح', 'Copied': 'تم النسخ', 'Build a custom game': 'أنشئ لعبة مخصصة',
+            'Choose the rules, then start the run. A seed makes it reproducible.': 'اختر القواعد ثم ابدأ. تجعل البذرة اللعبة قابلة للتكرار.'
         }
     };
 
@@ -186,6 +232,7 @@
             element.textContent = translate(element.dataset.sourceText);
         }
         document.documentElement.lang = locale;
+        document.documentElement.dir = RTL_LOCALES.includes(locale) ? 'rtl' : 'ltr';
     }
 
     function setLocale(nextLocale) {
@@ -205,6 +252,7 @@
         t: t,
         translate: translate,
         locales: messages,
-        availableLocales: AVAILABLE_LOCALES
+        availableLocales: AVAILABLE_LOCALES,
+        getDirection: function () { return RTL_LOCALES.includes(locale) ? 'rtl' : 'ltr'; }
     };
 }(window));

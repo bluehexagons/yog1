@@ -35,5 +35,8 @@ i18n.setLocale('en');
 assert.strictEqual(i18n.getLocale(), 'en', 'the selected locale can be changed and persisted');
 i18n.setLocale('zh');
 assert.strictEqual(i18n.t('action.check'), '检查等式', 'Simplified Chinese controls are available');
+i18n.setLocale('ar');
+assert.strictEqual(i18n.getDirection(), 'rtl', 'Arabic selects right-to-left layout support');
+assert.strictEqual(i18n.t('sidebar.right'), 'اليمين', 'Arabic sidebar controls are available');
 
 console.log('Localization tests passed.');

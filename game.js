@@ -27,7 +27,7 @@
         'history', 'history_page', 'history_prev', 'history_next', 'history_clear',
         'stats_rows', 'stats_reset_all', 'session_summary', 'achievement_list',
         'achievement_notice', 'setting_sound', 'setting_large_text', 'setting_contrast',
-        'setting_reduced_clutter', 'setting_language', 'install_app'
+        'setting_reduced_clutter', 'setting_language', 'setting_sidebar_side', 'install_app'
     ]) {
         ui[id] = document.getElementById(id);
     }
@@ -112,7 +112,7 @@
     let stats = load(KEYS.stats, {});
     let achievementState = load(KEYS.achievements, { unlocked: [], operations: [], solved: 0 });
     const defaultSettings = {
-        sound: false, largeText: false, contrast: false, reducedClutter: false
+        sound: false, largeText: false, contrast: false, reducedClutter: false, sidebarSide: 'auto'
     };
     let settings = load(KEYS.settings, defaultSettings);
     let dailyResults = load(KEYS.daily, {});
@@ -877,11 +877,17 @@
         document.body.classList.toggle('large-text', !!settings.largeText);
         document.body.classList.toggle('high-contrast', !!settings.contrast);
         document.body.classList.toggle('reduced-clutter', !!settings.reducedClutter);
+        const requestedSide = ['auto', 'left', 'right'].includes(settings.sidebarSide) ? settings.sidebarSide : 'auto';
+        const sidebarSide = requestedSide === 'auto'
+            ? (i18n.getDirection() === 'rtl' ? 'right' : 'left') : requestedSide;
+        document.body.classList.toggle('sidebar-left', sidebarSide === 'left');
+        document.body.classList.toggle('sidebar-right', sidebarSide === 'right');
         ui.setting_sound.checked = !!settings.sound;
         ui.setting_large_text.checked = !!settings.largeText;
         ui.setting_contrast.checked = !!settings.contrast;
         ui.setting_reduced_clutter.checked = !!settings.reducedClutter;
         ui.setting_language.value = i18n.getLocale();
+        ui.setting_sidebar_side.value = requestedSide;
     }
 
     function refreshLocalizedUi() {
@@ -1062,7 +1068,8 @@
                 sound: ui.setting_sound.checked,
                 largeText: ui.setting_large_text.checked,
                 contrast: ui.setting_contrast.checked,
-                reducedClutter: ui.setting_reduced_clutter.checked
+                reducedClutter: ui.setting_reduced_clutter.checked,
+                sidebarSide: ui.setting_sidebar_side.value
             };
             save(KEYS.settings, settings);
             applySettings();
@@ -1071,6 +1078,11 @@
     }
     ui.setting_language.addEventListener('change', function () {
         i18n.setLocale(ui.setting_language.value);
+    });
+    ui.setting_sidebar_side.addEventListener('change', function () {
+        settings.sidebarSide = ui.setting_sidebar_side.value;
+        save(KEYS.settings, settings);
+        applySettings();
     });
 
     document.addEventListener('keydown', function (event) {

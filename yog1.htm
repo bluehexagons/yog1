@@ -20,6 +20,7 @@
             font: 16px/1.45 Verdana, Geneva, sans-serif;
         }
         html[lang="zh"] body { font-family: "Microsoft YaHei", "Noto Sans CJK SC", PingFang SC, sans-serif; }
+        html[lang="ar"] body { font-family: Tahoma, Arial, "Noto Naskh Arabic", sans-serif; }
         button, input, select { font: inherit; color: inherit; }
         button { cursor: pointer; }
         button:disabled { cursor: not-allowed; opacity: .5; }
@@ -29,10 +30,15 @@
             display: flex; margin: 24px auto; border: 2px solid var(--ink);
             box-shadow: 6px 6px #000; background: var(--game);
         }
+        body.sidebar-right #wrapper, html[dir="rtl"] #wrapper { flex-direction: row-reverse; }
+        body.sidebar-left #wrapper { flex-direction: row; }
         #menu {
             width: 340px; flex: none; padding: 18px 16px; background: var(--menu);
             border-right: 2px solid var(--ink);
         }
+        body.sidebar-right #menu, html[dir="rtl"] #menu { border-right: 0; border-left: 2px solid var(--ink); }
+        body.sidebar-left #menu { border-left: 0; border-right: 2px solid var(--ink); }
+        html[dir="rtl"] #menu, html[dir="rtl"] #game { text-align: right; }
         .menu-heading { display: flex; align-items: start; gap: 10px; }
         .menu-heading > div { min-width: 0; flex: 1; }
         #sidebar_toggle { flex: none; padding: 5px 8px; }
@@ -71,6 +77,9 @@
         #flips strong { margin-right: auto; color: var(--ink); font: bold .75rem "Courier New", monospace; letter-spacing: .08em; text-transform: uppercase; }
         #flip_count { color: var(--ink); font-weight: bold; }
         #problem { min-height: 90px; display: flex; align-items: center; overflow-x: auto; padding: 10px 2px 16px; white-space: nowrap; font: 1.45rem "Courier New", monospace; }
+        html[dir="rtl"] #problem { direction: ltr; text-align: left; }
+        html[dir="rtl"] #round_label { margin-right: 0; margin-left: auto; }
+        html[dir="rtl"] #session_summary { margin-left: 0; margin-right: auto; }
         #problem .number {
             padding: 1px 6px; border: 1px solid var(--ink); background: var(--paper); color: var(--blue);
             box-shadow: 2px 2px var(--ink); font: 1.65rem "Courier New", monospace;
@@ -142,6 +151,7 @@
         @media (max-width: 760px) {
             #wrapper { flex-direction: column; margin: 10px; max-width: calc(100vw - 20px); }
             #menu { width: 100%; border-right: 0; border-bottom: 2px solid var(--ink); }
+            body.sidebar-right #menu, html[dir="rtl"] #menu { border-left: 0; border-bottom: 2px solid var(--ink); }
             #mode_buttons { grid-template-columns: repeat(2, 1fr); }
             #game { padding: 16px 13px; }
             .difficulty-grid { grid-template-columns: 1fr; }
@@ -259,7 +269,8 @@
             <section class="screen-panel">
                 <h3 data-localize>Accessibility &amp; sound</h3>
                 <div class="settings-grid">
-                    <label><span data-i18n="language.label">Language</span><select id="setting_language" aria-label="Language" data-i18n-aria-label="language.label"><option value="en">English</option><option value="es">Español</option><option value="zh">简体中文</option></select></label>
+                    <label><span data-i18n="language.label">Language</span><select id="setting_language" aria-label="Language" data-i18n-aria-label="language.label"><option value="en">English</option><option value="es">Español</option><option value="zh">简体中文</option><option value="ar">العربية</option></select></label>
+                    <label><span data-i18n="sidebar.label">Sidebar side</span><select id="setting_sidebar_side"><option value="auto" data-i18n="sidebar.auto">Automatic (follow language)</option><option value="left" data-i18n="sidebar.left">Left</option><option value="right" data-i18n="sidebar.right">Right</option></select></label>
                     <label><input id="setting_sound" type="checkbox"><span data-localize>Waveform sound effects (off by default)</span></label>
                     <label><input id="setting_large_text" type="checkbox"><span data-localize>Larger text</span></label>
                     <label><input id="setting_contrast" type="checkbox"><span data-localize>Higher contrast</span></label>
