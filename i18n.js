@@ -714,6 +714,22 @@
     };
     for (const code of AVAILABLE_LOCALES) Object.assign(messages[code], feedbackMessages[code]);
 
+    const accessibilityMessages = {
+        en: { 'page.accessibility': 'Accessibility & sound', 'setting.sound': 'Sound effects', 'setting.largeText': 'Larger text', 'setting.contrast': 'Higher contrast', 'setting.clutter': 'Reduced clutter' },
+        es: { 'page.accessibility': 'Accesibilidad y sonido', 'setting.sound': 'Efectos de sonido', 'setting.largeText': 'Texto más grande', 'setting.contrast': 'Mayor contraste', 'setting.clutter': 'Interfaz simplificada' },
+        zh: { 'page.accessibility': '无障碍与声音', 'setting.sound': '音效', 'setting.largeText': '更大文字', 'setting.contrast': '更高对比度', 'setting.clutter': '减少干扰' },
+        ar: { 'page.accessibility': 'الإتاحة والصوت', 'setting.sound': 'مؤثرات صوتية', 'setting.largeText': 'نص أكبر', 'setting.contrast': 'تباين أعلى', 'setting.clutter': 'تقليل التشتيت' },
+        bn: { 'page.accessibility': 'সহায়ক সুবিধা ও শব্দ', 'setting.sound': 'শব্দের প্রভাব', 'setting.largeText': 'বড় লেখা', 'setting.contrast': 'বেশি বৈপরীত্য', 'setting.clutter': 'কম উপাদান' },
+        ja: { 'page.accessibility': 'アクセシビリティとサウンド', 'setting.sound': '効果音', 'setting.largeText': '大きい文字', 'setting.contrast': '高コントラスト', 'setting.clutter': '表示を減らす' },
+        hi: { 'page.accessibility': 'सुगम्यता और ध्वनि', 'setting.sound': 'ध्वनि प्रभाव', 'setting.largeText': 'बड़ा पाठ', 'setting.contrast': 'अधिक कंट्रास्ट', 'setting.clutter': 'कम अव्यवस्था' },
+        pt: { 'page.accessibility': 'Acessibilidade e som', 'setting.sound': 'Efeitos sonoros', 'setting.largeText': 'Texto maior', 'setting.contrast': 'Maior contraste', 'setting.clutter': 'Menos elementos' },
+        ru: { 'page.accessibility': 'Доступность и звук', 'setting.sound': 'Звуковые эффекты', 'setting.largeText': 'Крупнее текст', 'setting.contrast': 'Выше контраст', 'setting.clutter': 'Меньше деталей' },
+        vi: { 'page.accessibility': 'Trợ năng và âm thanh', 'setting.sound': 'Hiệu ứng âm thanh', 'setting.largeText': 'Chữ lớn hơn', 'setting.contrast': 'Tương phản cao hơn', 'setting.clutter': 'Ít chi tiết hơn' },
+        tr: { 'page.accessibility': 'Erişilebilirlik ve ses', 'setting.sound': 'Ses efektleri', 'setting.largeText': 'Daha büyük metin', 'setting.contrast': 'Daha yüksek kontrast', 'setting.clutter': 'Daha az öğe' },
+        ur: { 'page.accessibility': 'رسائی اور آواز', 'setting.sound': 'صوتی اثرات', 'setting.largeText': 'بڑا متن', 'setting.contrast': 'زیادہ تضاد', 'setting.clutter': 'کم عناصر' }
+    };
+    for (const code of AVAILABLE_LOCALES) Object.assign(messages[code], accessibilityMessages[code]);
+
     function translate(value) {
         if (typeof value !== 'string') return value;
         return (sourceTexts[locale] && sourceTexts[locale][value]) || value;
