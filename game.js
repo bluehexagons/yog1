@@ -1018,18 +1018,17 @@
         event.preventDefault();
         const chosen = customSettings();
         if (!chosen.operations.length) {
-            setMessage('Choose an operation', 'Custom games need at least one mathematical operation.');
+            setCatalogMessage('custom.chooseOperation', 'custom.chooseOperationBody');
             return;
         }
         if (!chosen.operations.some(function (operation) {
             return ['add', 'subtract', 'multiply', 'divide', 'power'].includes(operation);
         })) {
-            setMessage('Choose an identity operation',
-                'Include +, −, ×, ÷, or powers so the one-flip solution can use only your selected operations.');
+            setCatalogMessage('custom.chooseIdentity', 'custom.chooseIdentityBody');
             return;
         }
         if (chosen.min > chosen.max) {
-            setMessage('Check the targets', 'The minimum target cannot exceed the maximum.');
+            setCatalogMessage('custom.checkTargets', 'custom.checkTargetsBody');
             return;
         }
         save(KEYS.custom, chosen);
