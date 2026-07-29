@@ -59,10 +59,18 @@ for (const locale of i18n.availableLocales) {
         return !Object.prototype.hasOwnProperty.call(i18n.locales[locale], key);
     });
     assert.deepStrictEqual(missing, [], locale + ' provides every core catalog key');
+    for (const key of Object.keys(i18n.locales.en)) {
+        const englishPlaceholders = Array.from(i18n.locales.en[key].matchAll(/\{(\w+)\}/g))
+            .map(function (match) { return match[1]; }).sort();
+        const localePlaceholders = Array.from(i18n.locales[locale][key].matchAll(/\{(\w+)\}/g))
+            .map(function (match) { return match[1]; }).sort();
+        assert.deepStrictEqual(localePlaceholders, englishPlaceholders,
+            locale + ' preserves placeholders for ' + key);
+    }
 }
 
 const html = fs.readFileSync('yog1.htm', 'utf8');
-const catalogKeys = Array.from(html.matchAll(/\bdata-i18n(?:-aria-label|-title|-placeholder)?="([^"]+)"/g))
+const catalogKeys = Array.from(html.matchAll(/\bdata-i18n(?:-aria-label|-title|-placeholder|-content)?="([^"]+)"/g))
     .map(function (match) { return match[1]; });
 for (const locale of i18n.availableLocales) {
     const missing = catalogKeys.filter(function (key) {
@@ -70,5 +78,39 @@ for (const locale of i18n.availableLocales) {
     });
     assert.deepStrictEqual(missing, [], locale + ' provides every catalog key used in the document');
 }
+
+const optionLocales = Array.from(new Set(
+    Array.from(html.matchAll(/<option value="([a-z]{2})">/g)).map(function (match) { return match[1]; })
+));
+assert.deepStrictEqual(optionLocales, Array.from(i18n.availableLocales),
+    'language selectors expose every supported locale');
+
+i18n.setLocale('es');
+const localizedMeta = {
+    dataset: { i18nContent: 'meta.description' },
+    setAttribute: function (name, value) { this[name] = value; }
+};
+i18n.apply({
+    querySelectorAll: function (selector) {
+        return selector === '[data-i18n-content]' ? [localizedMeta] : [];
+    }
+});
+assert.strictEqual(localizedMeta.content,
+    'Equilibra ecuaciones con enteros cambiando exactamente un número por 1.',
+    'localized metadata is applied');
+
+const game = fs.readFileSync('game.js', 'utf8');
+assert.strictEqual(game.includes('i18n.translate('), false,
+    'generated UI uses catalog keys instead of partial source-text translation');
+const catalogPrefixes = new Set(Object.keys(i18n.locales.en).map(function (key) {
+    return key.split('.')[0];
+}));
+const gameKeys = Array.from(game.matchAll(/'([a-z][A-Za-z]*(?:\.[A-Za-z]+)+)'/g))
+    .map(function (match) { return match[1]; })
+    .filter(function (key) { return catalogPrefixes.has(key.split('.')[0]); });
+const missingGameKeys = Array.from(new Set(gameKeys)).filter(function (key) {
+    return !Object.prototype.hasOwnProperty.call(i18n.locales.en, key);
+});
+assert.deepStrictEqual(missingGameKeys, [], 'generated UI only references cataloged message keys');
 
 console.log('Localization tests passed.');

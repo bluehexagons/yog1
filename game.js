@@ -51,7 +51,7 @@
 
     function text(type, value, className) {
         const element = document.createElement(type);
-        element.textContent = i18n.translate(value);
+        element.textContent = value;
         if (className) {
             element.className = className;
         }
@@ -146,6 +146,7 @@
     let installPrompt = null;
     let audioContext = null;
     let session = null;
+    let currentMessage = null;
 
     function newSession() {
         session = {
@@ -200,7 +201,7 @@
     function tutorialProblem() {
         return {
             sides: CURATED[0].sides, score: 4, target: 4,
-            roundKind: 'Guided', operationCount: 2, title: 'Tutorial'
+            roundKind: 'Guided', operationCount: 2
         };
     }
 
@@ -212,7 +213,7 @@
             target: 10 + index * 8,
             roundKind: index + 1 === CURATED.length ? 'Challenge' : 'Curated',
             operationCount: core.countOperations(item.sides[0]) + core.countOperations(item.sides[1]),
-            title: t(item.titleKey)
+            titleKey: item.titleKey
         };
     }
 
@@ -330,14 +331,20 @@
         ui.score_label.textContent = t('round.score', { target: currentProblem.target, score: currentProblem.score });
     }
 
-    function setMessage(title, message) {
-        ui.message_title.textContent = i18n.translate(title);
-        ui.message_text.textContent = i18n.translate(message);
+    function renderCatalogMessage() {
+        if (!currentMessage) return;
+        const values = {};
+        for (const key of Object.keys(currentMessage.values)) {
+            const value = currentMessage.values[key];
+            values[key] = typeof value === 'function' ? value() : value;
+        }
+        ui.message_title.textContent = t(currentMessage.titleKey, values);
+        ui.message_text.textContent = t(currentMessage.messageKey, values);
     }
 
     function setCatalogMessage(titleKey, messageKey, values) {
-        ui.message_title.textContent = t(titleKey, values);
-        ui.message_text.textContent = t(messageKey, values);
+        currentMessage = { titleKey: titleKey, messageKey: messageKey, values: values || {} };
+        renderCatalogMessage();
     }
 
     function hideFeedback() {
@@ -390,11 +397,15 @@
         } else if (mode === 'endless') {
             setCatalogMessage('message.endless', 'message.endlessBody');
         } else if (mode === 'challenges') {
-            setMessage(currentProblem.title, t('message.curated', { round: round, count: CURATED.length }));
+            setCatalogMessage(currentProblem.titleKey, 'message.curated', {
+                round: round, count: CURATED.length
+            });
         } else {
             setCatalogMessage('round.kindTitle', currentProblem.roundKind === 'Challenge' ?
                 'message.challengeBody' : 'message.standardBody', {
-                    kind: t('round.' + currentProblem.roundKind.toLowerCase())
+                    kind: function () {
+                        return t('round.' + currentProblem.roundKind.toLowerCase());
+                    }
                 });
         }
     }
@@ -444,7 +455,7 @@
             expression: currentProblem.sides.map(function (side) {
                 return core.serialize(side, currentValues);
             }).join(' = '),
-            mode: modeLabel(),
+            mode: mode,
             round: round,
             seed: currentSeed,
             at: new Date().toISOString()
@@ -524,7 +535,9 @@
             };
             save(KEYS.daily, dailyResults);
             ui.submit.disabled = true;
-            setMessage('Daily complete', dailyShareText());
+            setCatalogMessage('daily.complete', 'daily.completeBody', {
+                attempts: session.attempts, hints: session.hints
+            });
             return;
         }
         if (mode === 'custom') {
@@ -532,14 +545,19 @@
             if (customRun.correct >= activeCustomSettings.correct && accuracy >= activeCustomSettings.rate) {
                 customRun.won = true;
                 ui.submit.disabled = true;
-                setMessage('Custom game won!',
-                    customRun.correct + '/' + customRun.attempts + ' correct (' + Math.round(accuracy) + '%).');
+                setCatalogMessage('custom.won', 'custom.wonBody', {
+                    correct: customRun.correct,
+                    attempts: customRun.attempts,
+                    accuracy: Math.round(accuracy)
+                });
                 return;
             }
         }
         if (mode === 'challenges' && round === CURATED.length) {
             ui.submit.textContent = t('action.again');
-            setMessage('Challenge set complete', 'You solved all ' + CURATED.length + ' handcrafted puzzles.');
+            setCatalogMessage('challenges.complete', 'challenges.completeBody', {
+                count: CURATED.length
+            });
         } else {
             setCatalogMessage('result.balanced', 'result.balancedBody');
         }
@@ -557,7 +575,9 @@
             session.lives--;
             renderSession();
             if (session.lives <= 0) {
-                finishSession('Run complete', 'You solved ' + session.solved + ' puzzles before all three chances were used.');
+                finishSession('endless.complete', 'endless.completeBody', {
+                    count: session.solved
+                });
                 showExplanation(true, attemptedValues);
                 return;
             }
@@ -576,7 +596,7 @@
         startRound();
     }
 
-    function finishSession(title, message) {
+    function finishSession(titleKey, messageKey, values) {
         session.finished = true;
         clearTimer();
         ui.submit.disabled = true;
@@ -587,7 +607,7 @@
         save(KEYS.stats, stats);
         renderStats();
         renderSession();
-        setMessage(title, message);
+        setCatalogMessage(titleKey, messageKey, values);
     }
 
     function updateProgress() {
@@ -615,18 +635,33 @@
         const accuracy = session.attempts ? Math.round(session.correct / session.attempts * 100) : 0;
         const average = session.durations.length
             ? (session.durations.reduce(function (sum, value) { return sum + value; }, 0) /
-                session.durations.length / 1000).toFixed(1) + 's' : '—';
+                session.durations.length / 1000).toFixed(1) : null;
         ui.session_summary.replaceChildren(
             text('div', String(session.solved), 'summary-value'),
             text('div', t('session.solved'), 'summary-label'),
             text('div', accuracy + '%', 'summary-value'),
             text('div', t('session.accuracy'), 'summary-label'),
-            text('div', average, 'summary-value'),
+            text('div', average === null ? '—' : t('timer.seconds', { seconds: average }), 'summary-value'),
             text('div', t('session.average'), 'summary-label'),
             text('div', String(Math.round(session.hardest)), 'summary-value'),
             text('div', t('session.hardest'), 'summary-label')
         );
         updateProgress();
+    }
+
+    function historyModeLabel(value) {
+        if (Object.prototype.hasOwnProperty.call(i18n.locales.en, 'mode.' + value)) {
+            return t('mode.' + value);
+        }
+        const modeIds = Object.values(core.DIFFICULTIES).map(function (item) {
+            return item.id;
+        }).concat(['custom', 'daily', 'timed', 'endless', 'challenges']);
+        const modeId = modeIds.find(function (id) {
+            return i18n.availableLocales.some(function (localeCode) {
+                return i18n.locales[localeCode]['mode.' + id] === value;
+            });
+        });
+        return modeId ? t('mode.' + modeId) : value;
     }
 
     function renderHistory() {
@@ -637,7 +672,8 @@
             const li = document.createElement('li');
             li.className = item.correct ? 'correct' : 'incorrect';
             const summary = text('div', (item.correct ? t('history.correct') : t('history.incorrect')) +
-                ' · ' + item.mode + ' · ' + t('history.round', { round: item.round }), 'history-summary');
+                ' · ' + historyModeLabel(item.mode) + ' · ' +
+                t('history.round', { round: item.round }), 'history-summary');
             summary.appendChild(text('time', ' ' + new Date(item.at).toLocaleString(i18n.getLocale()), 'history-date'));
             li.append(summary, text('code', item.expression));
             ui.history.appendChild(li);
@@ -695,14 +731,6 @@
     }
 
     function updateModeInfo() {
-        const descriptions = {
-            tutorial: ['Tutorial', 'A guided introduction to the one-flip rule.'],
-            daily: ['Daily', 'One shared seeded puzzle each UTC day.'],
-            timed: ['Timed', 'Score as many correct answers as possible in 60 seconds.'],
-            endless: ['Endless', 'Three lives while difficulty rises every eight rounds.'],
-            challenges: ['Challenges', 'Five handcrafted puzzles featuring different operations.'],
-            custom: ['Custom', 'Your operations, length, seed, targets, and victory goal.']
-        };
         if (core.DIFFICULTIES[mode]) {
             const item = core.DIFFICULTIES[mode];
             ui.mode_info.replaceChildren(
@@ -713,8 +741,10 @@
                 text('span', t('mode.baseLength', { min: item.length[0], max: item.length[1] }))
             );
         } else {
-            const item = descriptions[mode];
-            ui.mode_info.replaceChildren(text('strong', item[0]), text('span', item[1]));
+            ui.mode_info.replaceChildren(
+                text('strong', t('mode.' + mode)),
+                text('span', t('modeDescription.' + mode))
+            );
         }
     }
 
@@ -764,7 +794,7 @@
             timeRemaining--;
             ui.timer_label.textContent = t('timer.seconds', { seconds: timeRemaining });
             if (timeRemaining <= 0) {
-                finishSession(t('timed.complete'), t('timed.result', { count: session.solved }));
+                finishSession('timed.complete', 'timed.result', { count: session.solved });
                 playSound('finish');
             }
         }, 1000);
@@ -795,7 +825,7 @@
             ui.submit.disabled = true;
             ui.problem.replaceChildren();
             hideFeedback();
-            setMessage('Build a custom game', 'Choose the rules, then start the run. A seed makes it reproducible.');
+            setCatalogMessage('custom.builder', 'custom.builderBody');
         } else {
             startRound();
             if (mode === 'timed') startTimer();
@@ -804,12 +834,10 @@
 
     function dailyShareText() {
         const result = dailyResults[utcDate()];
-        return result
-            ? 'YOG1 ' + utcDate() + ' · ' +
-                (result.success === false ? 'solution revealed after ' : 'solved in ') + result.attempts +
-                (result.attempts === 1 ? ' attempt' : ' attempts') +
-                (result.hints ? ' · ' + result.hints + ' hints' : ' · no hints')
-            : 'YOG1 Daily ' + utcDate();
+        if (!result) return t('share.dailyDefault', { date: utcDate() });
+        return t(result.success === false ? 'share.dailyRevealed' : 'share.dailySolved', {
+            date: utcDate(), attempts: result.attempts, hints: result.hints
+        });
     }
 
     function sharePuzzle() {
@@ -822,7 +850,7 @@
             shareText = dailyShareText();
         } else if (mode === 'challenges') {
             url.searchParams.set('challenge', String(round));
-            shareText += ' · handcrafted challenge ' + round;
+            shareText += ' · ' + t('share.challenge', { round: round });
         } else {
             url.searchParams.set('seed', currentSeed);
             if (mode === 'custom') {
@@ -835,7 +863,7 @@
                 url.searchParams.set('difficulty', modeProfile().id);
             }
             url.searchParams.set('round', String(round));
-            shareText += ' · ' + modeLabel() + ' puzzle';
+            shareText += ' · ' + t('share.puzzle', { mode: modeLabel() });
         }
         const value = shareText + '\n' + url.toString();
         if (navigator.share) {
@@ -911,6 +939,7 @@
         if (timerId) ui.timer_label.textContent = t('timer.seconds', { seconds: timeRemaining });
         if (awaitingAdvance) ui.submit.textContent = t('action.next');
         else if (session && session.finished && mode === 'challenges') ui.submit.textContent = t('action.again');
+        renderCatalogMessage();
         setSidebarCollapsed(document.getElementById('wrapper').classList.contains('sidebar-collapsed'));
     }
     window.addEventListener('yog1localechange', refreshLocalizedUi);
@@ -926,9 +955,8 @@
         const replacement = ui.problem.querySelector('[data-number-id="' + id + '"]');
         if (replacement) replacement.focus();
         if (mode === 'tutorial') {
-            setMessage(isSolved() ? 'Good move' : 'Try the outlined number',
-                isSolved() ? 'The equation balances. Check it to finish.' :
-                    'Click the selected number again to restore it.');
+            setCatalogMessage(isSolved() ? 'tutorial.good' : 'tutorial.restore',
+                isSolved() ? 'tutorial.goodBody' : 'tutorial.restoreBody');
         }
     });
 
@@ -942,7 +970,7 @@
             if (mode === 'tutorial') {
                 const easyButton = ui.mode_buttons.querySelector('[data-mode="easy"]');
                 activateMode('easy', easyButton);
-                setMessage('Tutorial complete', 'Your first Easy round is ready.');
+                setCatalogMessage('tutorial.complete', 'tutorial.completeBody');
             } else {
                 correctAnswer();
             }
@@ -950,7 +978,7 @@
             selectedId = null;
             currentValues = {};
             drawProblem();
-            setMessage('Not quite', 'Try changing the outlined 3, then check again.');
+            setCatalogMessage('tutorial.retry', 'tutorial.retryBody');
             playSound('incorrect');
         } else {
             incorrectAnswer();
@@ -963,9 +991,8 @@
         session.hints++;
         ui.hint.disabled = hintLevel >= 2;
         drawProblem();
-        setMessage(hintLevel === 1 ? 'Hint: choose a side' : 'Hint: the number',
-            hintLevel === 1 ? 'The outlined side contains the intended flip.' :
-                'The outlined number is the one used by the generated solution.');
+        setCatalogMessage(hintLevel === 1 ? 'hint.side' : 'hint.number',
+            hintLevel === 1 ? 'hint.sideBody' : 'hint.numberBody');
     });
 
     ui.skip.addEventListener('click', function () {
@@ -982,7 +1009,7 @@
             };
             save(KEYS.daily, dailyResults);
             ui.submit.disabled = true;
-            setMessage('Daily solution revealed', 'The shared result records this as a reveal.');
+            setCatalogMessage('daily.revealed', 'daily.revealedBody');
             return;
         }
         if (mode === 'endless') {
@@ -990,7 +1017,7 @@
                 session.lives--;
                 renderSession();
                 if (session.lives <= 0) {
-                    finishSession('Run complete', 'The revealed puzzle used your final chance.');
+                    finishSession('endless.complete', 'endless.revealedBody');
                     return;
                 }
             }
@@ -1144,7 +1171,7 @@
             activateMode('challenges', button, {
                 round: Math.max(1, Math.min(CURATED.length, Number(challenge) || 1))
             });
-            setMessage('Shared handcrafted puzzle', currentProblem.title);
+            setCatalogMessage('shared.challenge', currentProblem.titleKey);
             return;
         }
         if (seed) {
@@ -1169,7 +1196,7 @@
                     Math.min(100, Number(params.get('max')) || 35));
                 ui.custom_form.requestSubmit();
                 if (!activeCustomSettings) return;
-                setMessage('Shared custom puzzle', 'This custom puzzle is reproduced from a shared link.');
+                setCatalogMessage('shared.custom', 'shared.customBody');
                 return;
             }
             const difficulty = core.DIFFICULTIES[requested] ? requested : 'normal';
@@ -1178,7 +1205,7 @@
                 seed: safeSeed,
                 round: Math.max(1, Number(params.get('round')) || 1)
             });
-            setMessage('Shared seeded puzzle', 'This puzzle is reproduced from a shared link.');
+            setCatalogMessage('shared.seeded', 'shared.seededBody');
             return;
         }
         const button = ui.mode_buttons.querySelector('[data-mode="tutorial"]');

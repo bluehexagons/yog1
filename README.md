@@ -33,14 +33,16 @@ it installable and available offline.
 
 ## Localization
 
-`i18n.js` contains English, Spanish, Simplified Chinese, and Arabic catalogs
-and safely falls back to English. The Options screen remembers the chosen
-language, preserves it in shared links, and lets players choose the sidebar
-side. Arabic enables the RTL layout while equations remain left-to-right. Use
-`data-i18n` for static markup and `Yog1I18n.t(key, values)` for generated text.
+`i18n.js` contains complete catalogs for English, Spanish, Simplified Chinese,
+Arabic, Bengali, Japanese, Hindi, Brazilian Portuguese, Russian, Vietnamese,
+Turkish, and Urdu. The Options screen remembers the chosen language, preserves
+it in shared links, and lets players choose the sidebar side. Arabic and Urdu
+enable the RTL layout while equations remain left-to-right. Use `data-i18n` for
+static markup and `Yog1I18n.t(key, values)` for generated text.
 
-Run the generator tests with:
+Run the generator and localization tests with:
 
 ```sh
 node test-core.js
+node test-i18n.js
 ```
