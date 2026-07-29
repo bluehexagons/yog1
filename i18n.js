@@ -4,7 +4,7 @@
     const STORAGE_KEY = 'yog1.locale.v1';
     // Only complete locales are selectable. Keep in-progress dictionaries here
     // for translators without presenting a mixed-language interface to players.
-    const AVAILABLE_LOCALES = ['en', 'es'];
+    const AVAILABLE_LOCALES = ['en', 'es', 'zh'];
     const messages = {
         en: {
             'language.label': 'Language',
@@ -40,6 +40,19 @@
             'confirm.clearHistory': '¿Borrar todo el historial guardado localmente?',
             'confirm.resetStat': '¿Restablecer las estadísticas de {mode}?', 'confirm.resetAll': '¿Restablecer las estadísticas de todos los modos?',
             'aria.resetStat': 'Restablecer las estadísticas de {mode}'
+        },
+        zh: {
+            'language.label': '语言',
+            'nav.view': '页面', 'nav.play': '游戏', 'nav.options': '选项', 'nav.stats': '统计', 'nav.mode': '模式',
+            'menu.expand': '展开', 'menu.collapse': '收起', 'menu.expandTitle': '展开游戏菜单', 'menu.collapseTitle': '收起游戏菜单',
+            'action.menu': '菜单', 'action.reset': '重置', 'action.check': '检查等式', 'action.next': '下一题', 'action.again': '再玩一次',
+            'round.tutorial': '教程', 'round.score': '目标 {target} · 分数 {score}', 'flip.one': '次翻转剩余', 'flip.many': '次翻转剩余',
+            'session.solved': '已解决', 'session.accuracy': '正确率', 'session.average': '平均', 'session.hardest': '最高难度',
+            'timer.seconds': '{seconds}秒', 'history.empty': '尚无保存的题目。',
+            'history.page': '第 {page}/{pages} 页 · 已保存 {count}/{limit}', 'history.correct': '正确', 'history.incorrect': '错误', 'history.round': '第 {round} 轮',
+            'mode.operations': '运算：{operations}', 'mode.baseLength': '基础长度：{min}–{max}',
+            'confirm.clearHistory': '清除所有本地保存的题目历史吗？', 'confirm.resetStat': '重置 {mode} 的统计数据吗？',
+            'confirm.resetAll': '重置所有模式的统计数据吗？', 'aria.resetStat': '重置 {mode} 的统计数据'
         }
     };
 
@@ -114,6 +127,38 @@
             'Include +, −, ×, ÷, or powers so the one-flip solution can use only your selected operations.': 'Incluye +, −, ×, ÷ o potencias para que la solución de un cambio use solo las operaciones elegidas.',
             'Shared handcrafted puzzle': 'Problema artesanal compartido', 'Shared custom puzzle': 'Problema personalizado compartido',
             'Shared seeded puzzle': 'Problema generado compartido'
+        },
+        zh: {
+            'One move. Make it count.': '一步到位。认真思考。',
+            'Round ': '第 ', 'Warm-up': '热身', 'Standard': '标准', 'Challenge': '挑战', 'Guided': '引导',
+            'Tutorial': '教程', 'Easy': '简单', 'Normal': '普通', 'Hard': '困难', 'Expert': '专家', 'Extreme': '极限',
+            'Daily': '每日', 'Timed': '限时', 'Endless': '无尽', 'Challenges': '挑战', 'Custom…': '自定义…',
+            'Options': '选项', 'Stats': '统计', 'Play': '游戏', 'Mode': '模式', 'View': '页面',
+            'How to play': '玩法说明', 'Your move': '你的操作', 'Hint': '提示', 'Reveal': '揭晓', 'Share': '分享',
+            'Difficulty guide': '难度说明', 'Accessibility & sound': '无障碍与声音', 'Stats & history': '统计与历史',
+            'Stats by difficulty': '按难度统计', 'Problem history': '题目历史', 'Achievements': '成就',
+            'Previous': '上一页', 'Next': '下一页', 'Clear history': '清除历史', 'Reset all stats': '重置所有统计数据',
+            'Waveform sound effects (off by default)': '波形音效（默认关闭）', 'Larger text': '更大文字', 'Higher contrast': '更高对比度',
+            'Reduced clutter': '减少干扰', 'Install offline app': '安装离线应用',
+            'Three values only; small + and − puzzles.': '只有三个数值；小型加减题。',
+            'Compact puzzles; adds × and frequent three-value rounds.': '紧凑题目；加入 ×，并经常出现三个数值的回合。',
+            'Compact puzzles; adds integer ÷ and some three-value rounds.': '紧凑题目；加入整数 ÷，并有一些三个数值的回合。',
+            'Adds modulus % and powers ^, with occasional three-value rounds.': '加入取模 % 和幂 ^，偶尔有三个数值的回合。',
+            'Largest values and every operation, including √, in the longest puzzles.': '数值最大、包含所有运算（包括 √）的最长题目。',
+            'Three-number addition and subtraction with small positive integers.': '用较小正整数进行三数加减。',
+            'Compact expressions that introduce multiplication, with frequent three-number warm-ups.': '加入乘法的紧凑表达式，并经常有三数热身题。',
+            'Compact expressions with integer (whole-quotient) division and some three-number rounds.': '使用整除的紧凑表达式，并有一些三数回合。',
+            'Adds remainders and powers, while retaining occasional three-number rounds.': '加入余数和幂，同时保留偶尔的三数回合。',
+            'Every operation, including roots, in the longest expressions.': '最长表达式中包含所有运算，包括平方根。',
+            'Change exactly one number into a 1 so both sides have the same integer value.': '将恰好一个数字改为 1，使等式两边得到相同的整数值。',
+            'Change one number, then check the equation.': '改变一个数字，然后检查等式。',
+            'A difficulty spike—take your time.': '难度会提高——慢慢来。',
+            'Both sides balance. Review the solution, then continue.': '等式两边相等。查看解法后继续。',
+            'Not balanced—retry': '尚未平衡——再试一次', 'Solution revealed': '已揭晓解法',
+            'This puzzle counts as incorrect. Review it, then continue.': '此题计为错误。查看后继续。',
+            'Correct': '正确', 'Incorrect': '错误', 'Copied': '已复制',
+            'Build a custom game': '创建自定义游戏', 'Choose the rules, then start the run. A seed makes it reproducible.': '选择规则，然后开始游戏。种子可使题目可复现。',
+            'Check the targets': '检查目标', 'The minimum target cannot exceed the maximum.': '最小目标不能超过最大目标。'
         }
     };
 
