@@ -746,6 +746,22 @@
     };
     for (const code of AVAILABLE_LOCALES) Object.assign(messages[code], pageMessages[code]);
 
+    const progressMessages = {
+        en: { 'progress.custom': '{correct}/{goal} correct · {accuracy}%/{rate}%', 'progress.chances': 'Chances: {chances}' },
+        es: { 'progress.custom': '{correct}/{goal} correctas · {accuracy}%/{rate}%', 'progress.chances': 'Oportunidades: {chances}' },
+        zh: { 'progress.custom': '正确 {correct}/{goal} · {accuracy}%/{rate}%', 'progress.chances': '机会：{chances}' },
+        ar: { 'progress.custom': '{correct}/{goal} صحيح · {accuracy}%/{rate}%', 'progress.chances': 'الفرص: {chances}' },
+        bn: { 'progress.custom': 'সঠিক {correct}/{goal} · {accuracy}%/{rate}%', 'progress.chances': 'সুযোগ: {chances}' },
+        ja: { 'progress.custom': '正解 {correct}/{goal} · {accuracy}%/{rate}%', 'progress.chances': 'チャンス：{chances}' },
+        hi: { 'progress.custom': '{correct}/{goal} सही · {accuracy}%/{rate}%', 'progress.chances': 'मौके: {chances}' },
+        pt: { 'progress.custom': '{correct}/{goal} corretas · {accuracy}%/{rate}%', 'progress.chances': 'Chances: {chances}' },
+        ru: { 'progress.custom': 'верно {correct}/{goal} · {accuracy}%/{rate}%', 'progress.chances': 'Шансы: {chances}' },
+        vi: { 'progress.custom': 'đúng {correct}/{goal} · {accuracy}%/{rate}%', 'progress.chances': 'Cơ hội: {chances}' },
+        tr: { 'progress.custom': '{correct}/{goal} doğru · %{accuracy}/%{rate}', 'progress.chances': 'Şanslar: {chances}' },
+        ur: { 'progress.custom': 'درست {correct}/{goal} · {accuracy}%/{rate}%', 'progress.chances': 'موقعے: {chances}' }
+    };
+    for (const code of AVAILABLE_LOCALES) Object.assign(messages[code], progressMessages[code]);
+
     function translate(value) {
         if (typeof value !== 'string') return value;
         return (sourceTexts[locale] && sourceTexts[locale][value]) || value;

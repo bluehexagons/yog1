@@ -604,10 +604,14 @@
             }
             const accuracy = customRun.attempts
                 ? Math.round(customRun.correct / customRun.attempts * 100) : 0;
-            ui.custom_progress.textContent = customRun.correct + '/' + activeCustomSettings.correct +
-                ' correct · ' + accuracy + '%/' + activeCustomSettings.rate + '%';
+            ui.custom_progress.textContent = t('progress.custom', {
+                correct: customRun.correct, goal: activeCustomSettings.correct,
+                accuracy: accuracy, rate: activeCustomSettings.rate
+            });
         } else if (mode === 'endless') {
-            ui.custom_progress.textContent = 'Chances: ' + '●'.repeat(session.lives) + '○'.repeat(3 - session.lives);
+            ui.custom_progress.textContent = t('progress.chances', {
+                chances: '●'.repeat(session.lives) + '○'.repeat(3 - session.lives)
+            });
         }
     }
 
