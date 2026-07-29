@@ -586,6 +586,22 @@
     };
     for (const code of AVAILABLE_LOCALES) Object.assign(messages[code], aboutMessages[code]);
 
+    const operationMessages = {
+        en: { 'operation.add': 'Addition', 'operation.subtract': 'Subtraction', 'operation.multiply': 'Multiplication', 'operation.divide': 'Integer division', 'operation.modulo': 'Remainder', 'operation.power': 'Powers', 'operation.root': 'Square roots' },
+        es: { 'operation.add': 'Suma', 'operation.subtract': 'Resta', 'operation.multiply': 'Multiplicación', 'operation.divide': 'División entera', 'operation.modulo': 'Resto', 'operation.power': 'Potencias', 'operation.root': 'Raíces cuadradas' },
+        zh: { 'operation.add': '加法', 'operation.subtract': '减法', 'operation.multiply': '乘法', 'operation.divide': '整数除法', 'operation.modulo': '余数', 'operation.power': '幂', 'operation.root': '平方根' },
+        ar: { 'operation.add': 'الجمع', 'operation.subtract': 'الطرح', 'operation.multiply': 'الضرب', 'operation.divide': 'القسمة الصحيحة', 'operation.modulo': 'الباقي', 'operation.power': 'الأسس', 'operation.root': 'الجذور التربيعية' },
+        bn: { 'operation.add': 'যোগ', 'operation.subtract': 'বিয়োগ', 'operation.multiply': 'গুণ', 'operation.divide': 'পূর্ণসংখ্যা ভাগ', 'operation.modulo': 'ভাগশেষ', 'operation.power': 'ঘাত', 'operation.root': 'বর্গমূল' },
+        ja: { 'operation.add': '足し算', 'operation.subtract': '引き算', 'operation.multiply': '掛け算', 'operation.divide': '整数除算', 'operation.modulo': '余り', 'operation.power': 'べき乗', 'operation.root': '平方根' },
+        hi: { 'operation.add': 'जोड़', 'operation.subtract': 'घटाव', 'operation.multiply': 'गुणा', 'operation.divide': 'पूर्णांक भाग', 'operation.modulo': 'शेषफल', 'operation.power': 'घात', 'operation.root': 'वर्गमूल' },
+        pt: { 'operation.add': 'Adição', 'operation.subtract': 'Subtração', 'operation.multiply': 'Multiplicação', 'operation.divide': 'Divisão inteira', 'operation.modulo': 'Resto', 'operation.power': 'Potências', 'operation.root': 'Raízes quadradas' },
+        ru: { 'operation.add': 'Сложение', 'operation.subtract': 'Вычитание', 'operation.multiply': 'Умножение', 'operation.divide': 'Целочисленное деление', 'operation.modulo': 'Остаток', 'operation.power': 'Степени', 'operation.root': 'Квадратные корни' },
+        vi: { 'operation.add': 'Cộng', 'operation.subtract': 'Trừ', 'operation.multiply': 'Nhân', 'operation.divide': 'Chia nguyên', 'operation.modulo': 'Số dư', 'operation.power': 'Lũy thừa', 'operation.root': 'Căn bậc hai' },
+        tr: { 'operation.add': 'Toplama', 'operation.subtract': 'Çıkarma', 'operation.multiply': 'Çarpma', 'operation.divide': 'Tam sayı bölmesi', 'operation.modulo': 'Kalan', 'operation.power': 'Üsler', 'operation.root': 'Karekökler' },
+        ur: { 'operation.add': 'جمع', 'operation.subtract': 'تفریق', 'operation.multiply': 'ضرب', 'operation.divide': 'صحیح تقسیم', 'operation.modulo': 'باقی', 'operation.power': 'طاقتیں', 'operation.root': 'مربع جذر' }
+    };
+    for (const code of AVAILABLE_LOCALES) Object.assign(messages[code], operationMessages[code]);
+
     function translate(value) {
         if (typeof value !== 'string') return value;
         return (sourceTexts[locale] && sourceTexts[locale][value]) || value;

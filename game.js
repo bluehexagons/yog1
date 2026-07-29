@@ -179,10 +179,13 @@
         for (const key of Object.keys(core.OPERATIONS)) {
             const label = text('label', '', 'check-option');
             const input = document.createElement('input');
+            const labelText = document.createElement('span');
             input.type = 'checkbox';
             input.value = key;
             input.checked = ['add', 'subtract', 'multiply'].includes(key);
-            label.append(input, document.createTextNode(' ' + core.OPERATIONS[key].label));
+            labelText.dataset.i18n = 'operation.' + key;
+            labelText.textContent = t(labelText.dataset.i18n);
+            label.append(input, document.createTextNode(' '), labelText);
             ui.custom_operations.appendChild(label);
         }
         const saved = load(KEYS.custom, null);
