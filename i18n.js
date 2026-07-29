@@ -4,8 +4,8 @@
     const STORAGE_KEY = 'yog1.locale.v1';
     // Only complete locales are selectable. Keep in-progress dictionaries here
     // for translators without presenting a mixed-language interface to players.
-    const AVAILABLE_LOCALES = ['en', 'es', 'zh', 'ar', 'bn', 'ja', 'hi', 'pt', 'ru'];
-    const RTL_LOCALES = ['ar'];
+    const AVAILABLE_LOCALES = ['en', 'es', 'zh', 'ar', 'bn', 'ja', 'hi', 'pt', 'ru', 'vi', 'tr', 'ur'];
+    const RTL_LOCALES = ['ar', 'ur'];
     const messages = {
         en: {
             'language.label': 'Language',
@@ -131,6 +131,33 @@
             'history.correct': 'Верно', 'history.incorrect': 'Неверно', 'history.round': 'раунд {round}',
             'mode.operations': 'Операции: {operations}', 'mode.baseLength': 'Базовая длина: {min}–{max}',
             'confirm.clearHistory': 'Очистить всю локальную историю задач?', 'confirm.resetStat': 'Сбросить статистику {mode}?', 'confirm.resetAll': 'Сбросить статистику всех режимов?', 'aria.resetStat': 'Сбросить статистику {mode}'
+        },
+        vi: {
+            'language.label': 'Ngôn ngữ', 'sidebar.label': 'Vị trí thanh bên', 'sidebar.auto': 'Tự động (theo ngôn ngữ)', 'sidebar.left': 'Trái', 'sidebar.right': 'Phải',
+            'nav.view': 'Màn hình', 'nav.play': 'Chơi', 'nav.options': 'Tùy chọn', 'nav.stats': 'Thống kê', 'nav.mode': 'Chế độ',
+            'menu.expand': 'Mở rộng', 'menu.collapse': 'Thu gọn', 'action.menu': 'Menu', 'action.reset': 'Đặt lại', 'action.check': 'Kiểm tra phương trình', 'action.next': 'Câu tiếp theo', 'action.again': 'Chơi lại',
+            'round.tutorial': 'Hướng dẫn', 'round.score': 'Mục tiêu {target} · điểm {score}', 'flip.one': 'lần đổi còn lại', 'flip.many': 'lần đổi còn lại',
+            'session.solved': 'đã giải', 'session.accuracy': 'độ chính xác', 'session.average': 'trung bình', 'session.hardest': 'khó nhất', 'timer.seconds': '{seconds}giây',
+            'history.empty': 'Chưa có câu hỏi nào được lưu.', 'history.page': 'Trang {page}/{pages} · đã lưu {count}/{limit}', 'history.correct': 'Đúng', 'history.incorrect': 'Sai', 'history.round': 'vòng {round}',
+            'mode.operations': 'Phép toán: {operations}', 'mode.baseLength': 'Độ dài cơ bản: {min}–{max}', 'confirm.clearHistory': 'Xóa toàn bộ lịch sử câu hỏi cục bộ?', 'confirm.resetStat': 'Đặt lại thống kê {mode}?', 'confirm.resetAll': 'Đặt lại thống kê mọi chế độ?', 'aria.resetStat': 'Đặt lại thống kê {mode}'
+        },
+        tr: {
+            'language.label': 'Dil', 'sidebar.label': 'Kenar çubuğu konumu', 'sidebar.auto': 'Otomatik (dile göre)', 'sidebar.left': 'Sol', 'sidebar.right': 'Sağ',
+            'nav.view': 'Ekran', 'nav.play': 'Oyna', 'nav.options': 'Seçenekler', 'nav.stats': 'İstatistikler', 'nav.mode': 'Mod',
+            'menu.expand': 'Genişlet', 'menu.collapse': 'Daralt', 'action.menu': 'Menü', 'action.reset': 'Sıfırla', 'action.check': 'Denklemi kontrol et', 'action.next': 'Sonraki soru', 'action.again': 'Tekrar oyna',
+            'round.tutorial': 'Eğitim', 'round.score': 'Hedef {target} · puan {score}', 'flip.one': 'çevirme kaldı', 'flip.many': 'çevirme kaldı',
+            'session.solved': 'çözüldü', 'session.accuracy': 'doğruluk', 'session.average': 'ortalama', 'session.hardest': 'en zor', 'timer.seconds': '{seconds}sn',
+            'history.empty': 'Henüz kaydedilmiş soru yok.', 'history.page': 'Sayfa {page}/{pages} · {count}/{limit} kaydedildi', 'history.correct': 'Doğru', 'history.incorrect': 'Yanlış', 'history.round': 'tur {round}',
+            'mode.operations': 'İşlemler: {operations}', 'mode.baseLength': 'Temel uzunluk: {min}–{max}', 'confirm.clearHistory': 'Tüm yerel soru geçmişi silinsin mi?', 'confirm.resetStat': '{mode} istatistikleri sıfırlansın mı?', 'confirm.resetAll': 'Tüm modların istatistikleri sıfırlansın mı?', 'aria.resetStat': '{mode} istatistiklerini sıfırla'
+        },
+        ur: {
+            'language.label': 'زبان', 'sidebar.label': 'سائیڈبار کی جگہ', 'sidebar.auto': 'خودکار (زبان کے مطابق)', 'sidebar.left': 'بائیں', 'sidebar.right': 'دائیں',
+            'nav.view': 'صفحہ', 'nav.play': 'کھیلیں', 'nav.options': 'اختیارات', 'nav.stats': 'اعداد و شمار', 'nav.mode': 'موڈ',
+            'menu.expand': 'کھولیں', 'menu.collapse': 'سمیٹیں', 'action.menu': 'مینو', 'action.reset': 'ری سیٹ', 'action.check': 'مساوات چیک کریں', 'action.next': 'اگلا سوال', 'action.again': 'دوبارہ کھیلیں',
+            'round.tutorial': 'سبق', 'round.score': 'ہدف {target} · اسکور {score}', 'flip.one': 'فلپ باقی', 'flip.many': 'فلپ باقی',
+            'session.solved': 'حل شدہ', 'session.accuracy': 'درستگی', 'session.average': 'اوسط', 'session.hardest': 'سب سے مشکل', 'timer.seconds': '{seconds}ث',
+            'history.empty': 'ابھی کوئی سوال محفوظ نہیں ہے۔', 'history.page': 'صفحہ {page}/{pages} · {count}/{limit} محفوظ', 'history.correct': 'درست', 'history.incorrect': 'غلط', 'history.round': 'راؤنڈ {round}',
+            'mode.operations': 'عملیات: {operations}', 'mode.baseLength': 'بنیادی لمبائی: {min}–{max}', 'confirm.clearHistory': 'تمام مقامی سوالوں کی تاریخ مٹائیں؟', 'confirm.resetStat': '{mode} کے اعداد و شمار ری سیٹ کریں؟', 'confirm.resetAll': 'تمام موڈ کے اعداد و شمار ری سیٹ کریں؟', 'aria.resetStat': '{mode} کے اعداد و شمار ری سیٹ کریں'
         }
     };
 

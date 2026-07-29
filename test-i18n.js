@@ -48,5 +48,11 @@ i18n.setLocale('pt');
 assert.strictEqual(i18n.t('action.check'), 'Verificar equação', 'Brazilian Portuguese controls are available');
 i18n.setLocale('ru');
 assert.strictEqual(i18n.t('action.check'), 'Проверить равенство', 'Russian controls are available');
+i18n.setLocale('vi');
+assert.strictEqual(i18n.t('action.check'), 'Kiểm tra phương trình', 'Vietnamese controls are available');
+i18n.setLocale('tr');
+assert.strictEqual(i18n.t('action.check'), 'Denklemi kontrol et', 'Turkish controls are available');
+i18n.setLocale('ur');
+assert.strictEqual(i18n.getDirection(), 'rtl', 'Urdu reuses right-to-left layout support');
 
 console.log('Localization tests passed.');
