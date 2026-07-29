@@ -99,13 +99,8 @@
     ];
 
     const ACHIEVEMENTS = [
-        { id: 'first', name: 'The First 1', description: 'Solve your first puzzle.' },
-        { id: 'streak5', name: 'Ones in a Row', description: 'Reach a five-puzzle streak.' },
-        { id: 'twenty', name: 'Mental Arithmetic', description: 'Solve 20 puzzles.' },
-        { id: 'explorer', name: 'Operator', description: 'Solve puzzles using every operation.' },
-        { id: 'daily', name: 'Today’s One', description: 'Complete a Daily challenge.' },
-        { id: 'nohint', name: 'Unaided', description: 'Solve a Challenge round without a hint.' },
-        { id: 'curated', name: 'Gallery Walk', description: 'Finish all curated challenges.' }
+        { id: 'first' }, { id: 'streak5' }, { id: 'twenty' }, { id: 'explorer' },
+        { id: 'daily' }, { id: 'nohint' }, { id: 'curated' }
     ];
 
     let history = load(KEYS.history, []);
@@ -491,7 +486,7 @@
         achievementState.unlocked.push(id);
         save(KEYS.achievements, achievementState);
         const item = ACHIEVEMENTS.find(function (achievement) { return achievement.id === id; });
-        ui.achievement_notice.textContent = 'Achievement unlocked: ' + item.name;
+        ui.achievement_notice.textContent = t('page.achievements') + ': ' + t('achievement.' + item.id + '.name');
         ui.achievement_notice.hidden = false;
         playSound('achievement');
         renderAchievements();
@@ -693,8 +688,8 @@
             const unlocked = achievementState.unlocked.includes(item.id);
             const li = document.createElement('li');
             li.className = unlocked ? 'unlocked' : 'locked';
-            li.append(text('strong', (unlocked ? '✓ ' : '○ ') + item.name),
-                text('span', item.description));
+            li.append(text('strong', (unlocked ? '✓ ' : '○ ') + t('achievement.' + item.id + '.name')),
+                text('span', t('achievement.' + item.id + '.description')));
             ui.achievement_list.appendChild(li);
         }
     }
