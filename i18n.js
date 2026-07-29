@@ -486,6 +486,106 @@
     };
     for (const code of AVAILABLE_LOCALES) Object.assign(messages[code], uiMessages[code]);
 
+    const aboutMessages = {
+        en: {
+            'about.title': 'About', 'about.summary': 'Change one number to 1 to balance an equation.',
+            'about.origin': 'A refreshed version of bluehexagons’ Ludum Dare 28 game, with generated puzzles, settings, offline play, and local stats.',
+            'about.translations': 'Translations', 'about.note': 'Translations are drafted and checked with a large language model.',
+            'about.contribute': 'Help improve translations on GitHub.', 'about.review': 'Native-speaker review is especially welcome.',
+            'footer.made': 'Made by bluehexagons for Ludum Dare 28.', 'footer.source': 'View the source on GitHub.',
+            'footer.local': 'History and stats stay in this browser.'
+        },
+        es: {
+            'about.title': 'Acerca de', 'about.summary': 'Cambia un número por 1 para equilibrar una ecuación.',
+            'about.origin': 'Una versión renovada del juego de Ludum Dare 28 de bluehexagons, con problemas generados, opciones, uso sin conexión y estadísticas locales.',
+            'about.translations': 'Traducciones', 'about.note': 'Las traducciones se redactan y revisan con ayuda de un modelo de lenguaje grande.',
+            'about.contribute': 'Ayuda a mejorar las traducciones en GitHub.', 'about.review': 'Las revisiones de hablantes nativos son especialmente bienvenidas.',
+            'footer.made': 'Creado por bluehexagons para Ludum Dare 28.', 'footer.source': 'Consulta el código fuente en GitHub.',
+            'footer.local': 'El historial y las estadísticas se guardan en este navegador.'
+        },
+        zh: {
+            'about.title': '关于', 'about.summary': '把一个数字改为 1，让等式平衡。',
+            'about.origin': '这是 bluehexagons 为 Ludum Dare 28 制作的游戏的更新版，包含生成题目、设置、离线游玩和本地统计。',
+            'about.translations': '翻译', 'about.note': '翻译由大型语言模型协助起草和检查。',
+            'about.contribute': '在 GitHub 上帮助改进翻译。', 'about.review': '尤其欢迎母语者审阅。',
+            'footer.made': '由 bluehexagons 为 Ludum Dare 28 制作。', 'footer.source': '在 GitHub 上查看源代码。',
+            'footer.local': '历史和统计保存在此浏览器中。'
+        },
+        ar: {
+            'about.title': 'حول', 'about.summary': 'غيّر رقمًا واحدًا إلى 1 لموازنة معادلة.',
+            'about.origin': 'نسخة مجددة من لعبة bluehexagons في Ludum Dare 28، تضم مسائل مولدة وإعدادات ولعبًا دون اتصال وإحصاءات محلية.',
+            'about.translations': 'الترجمات', 'about.note': 'تُصاغ الترجمات وتُراجع بمساعدة نموذج لغوي كبير.',
+            'about.contribute': 'ساعد في تحسين الترجمات على GitHub.', 'about.review': 'مراجعة المتحدثين الأصليين مرحب بها كثيرًا.',
+            'footer.made': 'صنعها bluehexagons لـ Ludum Dare 28.', 'footer.source': 'اعرض المصدر على GitHub.',
+            'footer.local': 'يبقى السجل والإحصاءات في هذا المتصفح.'
+        },
+        bn: {
+            'about.title': 'পরিচিতি', 'about.summary': 'একটি সংখ্যা 1 করে সমীকরণটি সমান করুন।',
+            'about.origin': 'এটি bluehexagons-এর Ludum Dare 28 গেমের নবায়িত সংস্করণ; এতে তৈরি করা ধাঁধা, সেটিংস, অফলাইন খেলা ও স্থানীয় পরিসংখ্যান আছে।',
+            'about.translations': 'অনুবাদ', 'about.note': 'বৃহৎ ভাষা মডেলের সহায়তায় অনুবাদ খসড়া ও পরীক্ষা করা হয়।',
+            'about.contribute': 'GitHub-এ অনুবাদ উন্নত করতে সাহায্য করুন।', 'about.review': 'স্থানীয় ভাষাভাষীর পর্যালোচনা বিশেষভাবে স্বাগত।',
+            'footer.made': 'Ludum Dare 28-এর জন্য bluehexagons তৈরি করেছেন।', 'footer.source': 'GitHub-এ উৎস দেখুন।',
+            'footer.local': 'ইতিহাস ও পরিসংখ্যান এই ব্রাউজারেই থাকে।'
+        },
+        ja: {
+            'about.title': 'このゲームについて', 'about.summary': '数を一つだけ1に変えて、式をつり合わせます。',
+            'about.origin': 'bluehexagons の Ludum Dare 28 作品を、生成問題、設定、オフラインプレイ、ローカル統計とともに更新した版です。',
+            'about.translations': '翻訳', 'about.note': '翻訳は大規模言語モデルの支援で下書き・確認されています。',
+            'about.contribute': 'GitHub で翻訳の改善にご協力ください。', 'about.review': '母語話者による確認を特に歓迎します。',
+            'footer.made': 'bluehexagons が Ludum Dare 28 向けに制作。', 'footer.source': 'GitHub でソースを見る。',
+            'footer.local': '履歴と統計はこのブラウザに保存されます。'
+        },
+        hi: {
+            'about.title': 'परिचय', 'about.summary': 'समीकरण संतुलित करने के लिए एक संख्या को 1 में बदलें।',
+            'about.origin': 'bluehexagons के Ludum Dare 28 गेम का नया रूप, जिसमें बनाई गई पहेलियाँ, सेटिंग्स, ऑफ़लाइन खेल और स्थानीय आँकड़े हैं।',
+            'about.translations': 'अनुवाद', 'about.note': 'अनुवाद बड़े भाषा मॉडल की सहायता से तैयार और जाँचे जाते हैं।',
+            'about.contribute': 'GitHub पर अनुवाद बेहतर बनाने में मदद करें।', 'about.review': 'मातृभाषी समीक्षा का विशेष स्वागत है।',
+            'footer.made': 'bluehexagons ने Ludum Dare 28 के लिए बनाया।', 'footer.source': 'GitHub पर स्रोत देखें।',
+            'footer.local': 'इतिहास और आँकड़े इसी ब्राउज़र में रहते हैं।'
+        },
+        pt: {
+            'about.title': 'Sobre', 'about.summary': 'Mude um número para 1 e equilibre a equação.',
+            'about.origin': 'Uma versão renovada do jogo de Ludum Dare 28 da bluehexagons, com problemas gerados, configurações, jogo offline e estatísticas locais.',
+            'about.translations': 'Traduções', 'about.note': 'As traduções são redigidas e verificadas com ajuda de um grande modelo de linguagem.',
+            'about.contribute': 'Ajude a melhorar as traduções no GitHub.', 'about.review': 'Revisões de falantes nativos são muito bem-vindas.',
+            'footer.made': 'Feito por bluehexagons para Ludum Dare 28.', 'footer.source': 'Veja o código-fonte no GitHub.',
+            'footer.local': 'O histórico e as estatísticas ficam neste navegador.'
+        },
+        ru: {
+            'about.title': 'О игре', 'about.summary': 'Измените одно число на 1, чтобы уравнять выражение.',
+            'about.origin': 'Обновлённая версия игры bluehexagons для Ludum Dare 28: с генерируемыми задачами, настройками, офлайн-игрой и локальной статистикой.',
+            'about.translations': 'Переводы', 'about.note': 'Переводы создаются и проверяются с помощью большой языковой модели.',
+            'about.contribute': 'Помогите улучшить переводы на GitHub.', 'about.review': 'Проверка носителями языка особенно приветствуется.',
+            'footer.made': 'Создано bluehexagons для Ludum Dare 28.', 'footer.source': 'Открыть исходный код на GitHub.',
+            'footer.local': 'История и статистика хранятся в этом браузере.'
+        },
+        vi: {
+            'about.title': 'Giới thiệu', 'about.summary': 'Đổi một số thành 1 để cân bằng phương trình.',
+            'about.origin': 'Phiên bản làm mới của trò chơi Ludum Dare 28 của bluehexagons, với câu đố được tạo, tùy chọn, chơi ngoại tuyến và thống kê cục bộ.',
+            'about.translations': 'Bản dịch', 'about.note': 'Bản dịch được soạn và kiểm tra với sự hỗ trợ của một mô hình ngôn ngữ lớn.',
+            'about.contribute': 'Hãy giúp cải thiện bản dịch trên GitHub.', 'about.review': 'Đặc biệt hoan nghênh người bản ngữ xem lại.',
+            'footer.made': 'Do bluehexagons tạo cho Ludum Dare 28.', 'footer.source': 'Xem mã nguồn trên GitHub.',
+            'footer.local': 'Lịch sử và thống kê được giữ trong trình duyệt này.'
+        },
+        tr: {
+            'about.title': 'Hakkında', 'about.summary': 'Denklemi dengelemek için bir sayıyı 1 yapın.',
+            'about.origin': 'bluehexagons’ın Ludum Dare 28 oyununun; üretilen bulmacalar, ayarlar, çevrimdışı oynama ve yerel istatistiklerle yenilenmiş sürümü.',
+            'about.translations': 'Çeviriler', 'about.note': 'Çeviriler, büyük bir dil modelinin yardımıyla hazırlanır ve kontrol edilir.',
+            'about.contribute': 'GitHub’da çevirilerin iyileşmesine yardım edin.', 'about.review': 'Ana dilini konuşanların incelemesi özellikle memnuniyetle karşılanır.',
+            'footer.made': 'Ludum Dare 28 için bluehexagons tarafından yapıldı.', 'footer.source': 'Kaynak kodunu GitHub’da görün.',
+            'footer.local': 'Geçmiş ve istatistikler bu tarayıcıda kalır.'
+        },
+        ur: {
+            'about.title': 'تعارف', 'about.summary': 'مساوات کو برابر کرنے کے لیے ایک عدد کو 1 میں بدلیں۔',
+            'about.origin': 'bluehexagons کے Ludum Dare 28 گیم کا تازہ ورژن، جس میں بنائی گئی پہیلیاں، سیٹنگز، آف لائن کھیل اور مقامی اعداد و شمار شامل ہیں۔',
+            'about.translations': 'ترجمے', 'about.note': 'ترجمے بڑے زبان کے ماڈل کی مدد سے تیار اور جانچے جاتے ہیں۔',
+            'about.contribute': 'GitHub پر ترجموں کو بہتر بنانے میں مدد کریں۔', 'about.review': 'مادری زبان بولنے والوں کا جائزہ خاص طور پر خوش آئند ہے۔',
+            'footer.made': 'bluehexagons نے Ludum Dare 28 کے لیے بنایا۔', 'footer.source': 'GitHub پر ماخذ دیکھیں۔',
+            'footer.local': 'تاریخ اور اعداد و شمار اسی براؤزر میں رہتے ہیں۔'
+        }
+    };
+    for (const code of AVAILABLE_LOCALES) Object.assign(messages[code], aboutMessages[code]);
+
     function translate(value) {
         if (typeof value !== 'string') return value;
         return (sourceTexts[locale] && sourceTexts[locale][value]) || value;

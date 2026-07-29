@@ -314,23 +314,24 @@
         </section>
 
         <section id="about_screen" class="screen" data-screen="about" aria-label="About" data-i18n-aria-label="aria.about" hidden>
-            <h2>About</h2>
+            <h2 data-i18n="about.title">About</h2>
             <section class="screen-panel about-copy">
                 <h3>You Only Get 1s</h3>
-                <p>A compact arithmetic puzzle game: change exactly one number to 1 and make both sides of the equation match.</p>
-                <p>This version builds on the original Ludum Dare 28 game by bluehexagons, with replayable generated puzzles, accessibility settings, offline play, and local statistics.</p>
+                <p data-i18n="about.summary">Change one number to 1 to balance an equation.</p>
+                <p data-i18n="about.origin">A refreshed version of bluehexagons’ Ludum Dare 28 game, with generated puzzles, settings, offline play, and local stats.</p>
             </section>
             <section class="screen-panel about-copy">
-                <h3>Translations</h3>
-                <p>Translations are drafted and checked with the help of a large language model. They are a work in progress, and some less-common text may fall back to English.</p>
-                <p>Please <a href="https://github.com/bluehexagons/yog1/issues">report translation issues or contribute fixes on GitHub</a>. Native-speaker review is especially welcome.</p>
+                <h3 data-i18n="about.translations">Translations</h3>
+                <p data-i18n="about.note">Translations are drafted and checked with a large language model.</p>
+                <p><a href="https://github.com/bluehexagons/yog1/issues" data-i18n="about.contribute">Help improve translations on GitHub.</a></p>
+                <p data-i18n="about.review">Native-speaker review is especially welcome.</p>
             </section>
         </section>
 
         <footer id="app_footer" hidden>
-            Made by <a href="https://bluehexagons.com/">bluehexagons</a> for Ludum Dare 28.
-            Open source on <a href="https://github.com/bluehexagons/yog1">GitHub</a>.
-            History and stats stay in this browser.
+            <p data-i18n="footer.made">Made by bluehexagons for Ludum Dare 28.</p>
+            <p><a href="https://github.com/bluehexagons/yog1" data-i18n="footer.source">View the source on GitHub.</a></p>
+            <p data-i18n="footer.local">History and stats stay in this browser.</p>
         </footer>
     </main>
 </div>
