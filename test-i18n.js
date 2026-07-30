@@ -5,9 +5,12 @@ const fs = require('fs');
 const vm = require('vm');
 const core = require('./game-core.js');
 
+const manifestLink = {};
 const document = {
     documentElement: {},
-    querySelectorAll: function () { return []; }
+    querySelectorAll: function (selector) {
+        return selector === 'link[rel="manifest"]' ? [manifestLink] : [];
+    }
 };
 const storage = new Map();
 const context = {
@@ -36,6 +39,8 @@ i18n.setLocale('en');
 assert.strictEqual(i18n.getLocale(), 'en', 'the selected locale can be changed and persisted');
 i18n.setLocale('zh');
 assert.strictEqual(i18n.t('action.check'), '检查等式', 'Simplified Chinese controls are available');
+assert.strictEqual(manifestLink.href, 'manifest.zh.webmanifest',
+    'the install manifest follows the selected locale');
 i18n.setLocale('ar');
 assert.strictEqual(i18n.getDirection(), 'rtl', 'Arabic selects right-to-left layout support');
 assert.strictEqual(i18n.t('sidebar.right'), 'اليمين', 'Arabic sidebar controls are available');
@@ -55,6 +60,8 @@ i18n.setLocale('tr');
 assert.strictEqual(i18n.t('action.check'), 'Denklemi kontrol et', 'Turkish controls are available');
 i18n.setLocale('ur');
 assert.strictEqual(i18n.getDirection(), 'rtl', 'Urdu reuses right-to-left layout support');
+assert.strictEqual(manifestLink.href, 'manifest.ur.webmanifest',
+    'right-to-left locales select their localized install manifest');
 
 const modeIds = Object.keys(core.DIFFICULTIES)
     .concat(['tutorial', 'custom', 'daily', 'timed', 'endless', 'challenges']);
@@ -111,6 +118,7 @@ for (const locale of i18n.availableLocales) {
 }
 
 const html = fs.readFileSync('yog1.htm', 'utf8');
+const serviceWorker = fs.readFileSync('sw.js', 'utf8');
 const catalogKeys = Array.from(html.matchAll(/\bdata-i18n(?:-aria-label|-title|-placeholder|-content)?="([^"]+)"/g))
     .map(function (match) { return match[1]; });
 for (const locale of i18n.availableLocales) {
@@ -125,6 +133,21 @@ const optionLocales = Array.from(new Set(
 ));
 assert.deepStrictEqual(optionLocales, Array.from(i18n.availableLocales),
     'language selectors expose every supported locale');
+
+for (const locale of i18n.availableLocales) {
+    const filename = locale === 'en' ? 'manifest.webmanifest' :
+        'manifest.' + locale + '.webmanifest';
+    const manifest = JSON.parse(fs.readFileSync(filename, 'utf8'));
+    assert.strictEqual(manifest.lang, locale, filename + ' declares its locale');
+    assert.strictEqual(manifest.description, i18n.locales[locale]['meta.description'],
+        filename + ' uses the cataloged localized description');
+    assert.strictEqual(new URL(manifest.start_url, 'https://example.test/').searchParams.get('lang'),
+        locale, filename + ' preserves its locale when the installed app launches');
+    assert.strictEqual(manifest.dir, ['ar', 'ur'].includes(locale) ? 'rtl' : undefined,
+        filename + ' declares right-to-left direction only when needed');
+    assert(serviceWorker.includes("'./" + filename + "'"),
+        filename + ' is available offline');
+}
 
 i18n.setLocale('es');
 const localizedMeta = {
@@ -151,6 +174,19 @@ assert(game.includes("i18n.getMessageId('mode', item.modeId || item.mode)"),
     'localized mode labels in existing history are migrated to stable identifiers');
 assert(game.includes('renderExplanation();'),
     'language changes rerender generated explanation copy');
+assert(game.includes('const replayingChallenges'),
+    'the submit label preserves the final Challenge replay state');
+assert.strictEqual(game.includes("session.finished && mode === 'challenges'"), false,
+    'Challenge replay localization does not depend on an unrelated session state');
+
+i18n.setLocale('en');
+assert.strictEqual(i18n.t('endless.completeBody', { count: 1 }).includes('1 puzzles'), false,
+    'variable completion counts use count-neutral wording');
+
+assert(html.includes('#problem, #feedback code, #history code { direction: ltr;'),
+    'all rendered equations are isolated left-to-right');
+assert(html.includes('text-align: start;') && html.includes('margin-inline-end: auto;'),
+    'localized layout uses logical alignment and margins');
 const catalogPrefixes = new Set(Object.keys(i18n.locales.en).map(function (key) {
     return key.split('.')[0];
 }));

@@ -1,12 +1,23 @@
 'use strict';
 
-const CACHE = 'yog1-v7';
+const CACHE = 'yog1-v8';
 const FILES = [
     './yog1.htm',
     './game-core.js',
     './i18n.js',
     './game.js',
     './manifest.webmanifest',
+    './manifest.es.webmanifest',
+    './manifest.zh.webmanifest',
+    './manifest.ar.webmanifest',
+    './manifest.bn.webmanifest',
+    './manifest.ja.webmanifest',
+    './manifest.hi.webmanifest',
+    './manifest.pt.webmanifest',
+    './manifest.ru.webmanifest',
+    './manifest.vi.webmanifest',
+    './manifest.tr.webmanifest',
+    './manifest.ur.webmanifest',
     './icon.svg',
     './icon-192.png',
     './icon-512.png'

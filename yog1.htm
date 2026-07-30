@@ -55,7 +55,7 @@
         #mode_buttons button, .primary, .secondary, .small-button {
             border: 1px solid var(--ink); background: var(--paper); box-shadow: 2px 2px var(--ink);
         }
-        #mode_buttons button { padding: 8px 9px; text-align: left; }
+        #mode_buttons button { padding: 8px 9px; text-align: start; }
         #mode_buttons button:hover, .primary:hover, .secondary:hover { background: #edede7; }
         #mode_buttons button.active { background: #aaa9a2; font-weight: bold; box-shadow: inset 3px 0 var(--ink), 2px 2px var(--ink); }
         #mode_info { display: grid; gap: 6px; padding: 10px; border: 1px solid var(--ink); background: #d6d5ce; font-size: .72rem; }
@@ -71,18 +71,16 @@
         #message_text { font-size: .85rem; }
         #achievement_notice { margin-top: 7px; color: var(--green); font: bold .75rem "Courier New", monospace; }
         #round_bar { display: flex; gap: 10px; align-items: center; margin: 16px 0 8px; font-size: .76rem; color: var(--muted); }
-        #round_label { margin-right: auto; color: var(--ink); font: bold .82rem "Courier New", monospace; text-transform: uppercase; }
+        #round_label { margin-inline-end: auto; color: var(--ink); font: bold .82rem "Courier New", monospace; text-transform: uppercase; }
         .round-kind { padding: 2px 7px; border: 1px solid var(--line); background: var(--paper); }
         .round-kind.challenge { color: var(--red); border-color: var(--red); }
         .round-kind.warmup { color: var(--green); border-color: var(--green); }
         #workspace { padding: 17px 19px; border: 2px solid var(--ink); background: #f7f6ee; box-shadow: 4px 4px #b4b3ac; }
         #flips { display: flex; gap: 6px; color: var(--muted); font-size: .78rem; }
-        #flips strong { margin-right: auto; color: var(--ink); font: bold .75rem "Courier New", monospace; letter-spacing: .08em; text-transform: uppercase; }
+        #flips strong { margin-inline-end: auto; color: var(--ink); font: bold .75rem "Courier New", monospace; letter-spacing: .08em; text-transform: uppercase; }
         #flip_count { color: var(--ink); font-weight: bold; }
         #problem { min-height: 90px; display: flex; align-items: center; overflow-x: auto; padding: 10px 2px 16px; white-space: nowrap; font: 1.45rem "Courier New", monospace; }
-        html[dir="rtl"] #problem { direction: ltr; text-align: left; }
-        html[dir="rtl"] #round_label { margin-right: 0; margin-left: auto; }
-        html[dir="rtl"] #session_summary { margin-left: 0; margin-right: auto; }
+        #problem, #feedback code, #history code { direction: ltr; text-align: left; unicode-bidi: isolate; }
         #problem .number {
             padding: 1px 6px; border: 1px solid var(--ink); background: var(--paper); color: var(--blue);
             box-shadow: 2px 2px var(--ink); font: 1.65rem "Courier New", monospace;
@@ -93,15 +91,15 @@
         .equation-side.hint-side { background: #f3e5c8; outline: 2px dashed var(--warm); outline-offset: 4px; }
         .operator, .equals { font-weight: bold; }
         #actions { display: flex; flex-wrap: wrap; align-items: center; gap: 9px; border-top: 1px solid var(--line); padding-top: 13px; }
-        #custom_progress { margin-right: auto; font: bold .78rem "Courier New", monospace; }
+        #custom_progress { margin-inline-end: auto; font: bold .78rem "Courier New", monospace; }
         #feedback { margin-top: 14px; padding: 10px; border: 1px solid var(--line); background: #eeede6; font-size: .78rem; }
         #feedback p { margin: 0 0 5px; }
         #feedback code { display: block; overflow-x: auto; color: var(--blue); white-space: nowrap; }
         #timer_label { padding: 2px 8px; color: var(--red); border: 1px solid var(--red); background: var(--paper); font-weight: bold; }
         .primary { padding: 9px 14px; font: bold .85rem "Courier New", monospace; text-transform: uppercase; }
-        #session_summary { display: flex; align-items: baseline; gap: 5px; margin-left: auto; color: var(--muted); }
+        #session_summary { display: flex; align-items: baseline; gap: 5px; margin-inline-start: auto; color: var(--muted); }
         #session_summary .summary-value { color: var(--ink); font-size: .78rem; }
-        #session_summary .summary-label { font-size: .62rem; margin-right: 5px; }
+        #session_summary .summary-label { font-size: .62rem; margin-inline-end: 5px; }
         .panel-body { padding: 8px 3px 18px; overflow-x: auto; }
         .difficulty-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 7px; }
         .difficulty-grid article { padding: 9px; border: 1px solid var(--line); background: #eeeDE6; font-size: .72rem; }
@@ -123,11 +121,11 @@
         .history-summary { font-size: .72rem; font-weight: bold; }
         .history-date { color: var(--muted); font-weight: normal; }
         .history-controls { display: flex; gap: 8px; align-items: center; margin-top: 10px; }
-        #history_page { margin-right: auto; font-size: .72rem; color: var(--muted); }
+        #history_page { margin-inline-end: auto; font-size: .72rem; color: var(--muted); }
         .secondary, .small-button { padding: 5px 9px; font-size: .72rem; }
         table { width: 100%; min-width: 610px; border-collapse: collapse; font-size: .78rem; }
-        th, td { padding: 7px; border-bottom: 1px solid var(--line); text-align: left; }
-        .stats-actions { margin-top: 10px; text-align: right; }
+        th, td { padding: 7px; border-bottom: 1px solid var(--line); text-align: start; }
+        .stats-actions { margin-top: 10px; text-align: end; }
         .summary-value { color: var(--blue); font: bold 1.05rem "Courier New", monospace; }
         .summary-label { color: var(--muted); font-size: .68rem; text-transform: uppercase; }
         #achievement_list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 7px; margin: 0; padding: 0; }
@@ -164,7 +162,7 @@
             #score_label { display: none; }
             #problem { font-size: 1.05rem; }
             #problem .number { font-size: 1.2rem; }
-            #session_summary { width: 100%; order: 5; margin-left: 0; }
+            #session_summary { width: 100%; order: 5; margin-inline-start: 0; }
             #achievement_list, .settings-grid { grid-template-columns: 1fr; }
             .options-grid { grid-template-columns: 1fr; }
             #wrapper.sidebar-collapsed #menu { width: 100%; padding: 8px; }

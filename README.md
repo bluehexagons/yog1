@@ -36,9 +36,10 @@ it installable and available offline.
 `i18n.js` contains complete catalogs for English, Spanish, Simplified Chinese,
 Arabic, Bengali, Japanese, Hindi, Brazilian Portuguese, Russian, Vietnamese,
 Turkish, and Urdu. The Options screen remembers the chosen language, preserves
-it in shared links, and lets players choose the sidebar side. Arabic and Urdu
-enable the RTL layout while equations remain left-to-right. Use `data-i18n` for
-static markup and `Yog1I18n.t(key, values)` for generated text.
+it in shared links and installed-app metadata, and lets players choose the
+sidebar side. Arabic and Urdu enable the RTL layout while equations remain
+left-to-right. Use `data-i18n` for static markup and
+`Yog1I18n.t(key, values)` for generated text.
 
 Run the generator and localization tests with:
 

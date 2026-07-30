@@ -830,7 +830,7 @@
             'daily.complete': 'Daily complete', 'daily.completeBody': 'Attempts: {attempts} · hints: {hints}',
             'daily.revealed': 'Daily solution revealed', 'daily.revealedBody': 'The shared result records this as a reveal.',
             'challenges.complete': 'Challenge set complete', 'challenges.completeBody': 'You solved all {count} handcrafted puzzles.',
-            'endless.complete': 'Run complete', 'endless.completeBody': 'You solved {count} puzzles before all three chances were used.',
+            'endless.complete': 'Run complete', 'endless.completeBody': 'Puzzles solved: {count}. All three chances were used.',
             'endless.revealedBody': 'The revealed puzzle used your final chance.',
             'tutorial.good': 'Good move', 'tutorial.goodBody': 'The equation balances. Check it to finish.',
             'tutorial.restore': 'Try the outlined number', 'tutorial.restoreBody': 'Click the selected number again to restore it.',
@@ -860,7 +860,7 @@
             'daily.complete': 'Reto diario completado', 'daily.completeBody': 'Intentos: {attempts} · pistas: {hints}',
             'daily.revealed': 'Solución diaria mostrada', 'daily.revealedBody': 'El resultado compartido lo registra como solución mostrada.',
             'challenges.complete': 'Serie de desafíos completada', 'challenges.completeBody': 'Resolviste los {count} problemas artesanales.',
-            'endless.complete': 'Partida terminada', 'endless.completeBody': 'Resolviste {count} problemas antes de agotar las tres oportunidades.',
+            'endless.complete': 'Partida terminada', 'endless.completeBody': 'Problemas resueltos: {count}. Agotaste las tres oportunidades.',
             'endless.revealedBody': 'El problema mostrado agotó tu última oportunidad.',
             'tutorial.good': 'Buen movimiento', 'tutorial.goodBody': 'La ecuación está equilibrada. Compruébala para terminar.',
             'tutorial.restore': 'Prueba el número resaltado', 'tutorial.restoreBody': 'Haz clic de nuevo en el número seleccionado para restaurarlo.',
@@ -890,7 +890,7 @@
             'daily.complete': '每日题目完成', 'daily.completeBody': '尝试：{attempts} · 提示：{hints}',
             'daily.revealed': '已显示每日题解', 'daily.revealedBody': '共享结果会记录为已显示题解。',
             'challenges.complete': '挑战组完成', 'challenges.completeBody': '你解开了全部 {count} 道精选题目。',
-            'endless.complete': '本局结束', 'endless.completeBody': '三次机会用完前，你解开了 {count} 道题。',
+            'endless.complete': '本局结束', 'endless.completeBody': '已解题数：{count}。三次机会已用完。',
             'endless.revealedBody': '显示这道题的解法用掉了最后一次机会。',
             'tutorial.good': '做得好', 'tutorial.goodBody': '等式已平衡。点击检查即可完成。',
             'tutorial.restore': '试试标出的数字', 'tutorial.restoreBody': '再次点击所选数字可恢复原值。',
@@ -920,7 +920,7 @@
             'daily.complete': 'اكتملت مسألة اليوم', 'daily.completeBody': 'المحاولات: {attempts} · التلميحات: {hints}',
             'daily.revealed': 'أُظهر حل مسألة اليوم', 'daily.revealedBody': 'تسجل النتيجة المشتركة أن الحل قد أُظهر.',
             'challenges.complete': 'اكتملت مجموعة التحديات', 'challenges.completeBody': 'حللت جميع المسائل المصنوعة يدويًا وعددها {count}.',
-            'endless.complete': 'اكتملت الجولة', 'endless.completeBody': 'حللت {count} من المسائل قبل نفاد الفرص الثلاث.',
+            'endless.complete': 'اكتملت الجولة', 'endless.completeBody': 'المسائل المحلولة: {count}. استُخدمت الفرص الثلاث.',
             'endless.revealedBody': 'استخدم إظهار الحل فرصتك الأخيرة.',
             'tutorial.good': 'حركة جيدة', 'tutorial.goodBody': 'المعادلة متوازنة. تحقق منها للإنهاء.',
             'tutorial.restore': 'جرّب الرقم المحدد', 'tutorial.restoreBody': 'انقر الرقم المحدد مرة أخرى لاستعادته.',
@@ -950,7 +950,7 @@
             'daily.complete': 'দৈনিক ধাঁধা সম্পূর্ণ', 'daily.completeBody': 'চেষ্টা: {attempts} · ইঙ্গিত: {hints}',
             'daily.revealed': 'দৈনিক সমাধান দেখানো হয়েছে', 'daily.revealedBody': 'শেয়ার করা ফলে এটি সমাধান দেখানো হিসেবে লেখা থাকবে।',
             'challenges.complete': 'চ্যালেঞ্জ সেট সম্পূর্ণ', 'challenges.completeBody': 'আপনি {count}টি হাতে তৈরি ধাঁধাই সমাধান করেছেন।',
-            'endless.complete': 'খেলা সম্পূর্ণ', 'endless.completeBody': 'তিনটি সুযোগ শেষ হওয়ার আগে {count}টি ধাঁধা সমাধান করেছেন।',
+            'endless.complete': 'খেলা সম্পূর্ণ', 'endless.completeBody': 'সমাধান করা ধাঁধা: {count}। তিনটি সুযোগই শেষ হয়েছে।',
             'endless.revealedBody': 'সমাধান দেখানোয় আপনার শেষ সুযোগটি শেষ হয়েছে।',
             'tutorial.good': 'ভালো চাল', 'tutorial.goodBody': 'সমীকরণটি সমান হয়েছে। শেষ করতে পরীক্ষা করুন।',
             'tutorial.restore': 'চিহ্নিত সংখ্যাটি চেষ্টা করুন', 'tutorial.restoreBody': 'আগের মান ফেরাতে নির্বাচিত সংখ্যায় আবার ক্লিক করুন।',
@@ -980,7 +980,7 @@
             'daily.complete': 'デイリー問題クリア', 'daily.completeBody': '試行：{attempts} · ヒント：{hints}',
             'daily.revealed': 'デイリー問題の答えを表示', 'daily.revealedBody': '共有結果には答えを表示したことが記録されます。',
             'challenges.complete': 'チャレンジセット完了', 'challenges.completeBody': '手作り問題 {count} 問をすべて解きました。',
-            'endless.complete': 'プレイ終了', 'endless.completeBody': '3回のチャンスを使い切るまでに {count} 問解きました。',
+            'endless.complete': 'プレイ終了', 'endless.completeBody': '解いた問題：{count}問。3回のチャンスを使い切りました。',
             'endless.revealedBody': '答えを表示したため最後のチャンスを使いました。',
             'tutorial.good': 'いい手です', 'tutorial.goodBody': '式がつり合いました。確認して完了します。',
             'tutorial.restore': '囲まれた数を試す', 'tutorial.restoreBody': '選んだ数をもう一度クリックすると元に戻ります。',
@@ -1010,7 +1010,7 @@
             'daily.complete': 'दैनिक पहेली पूरी', 'daily.completeBody': 'प्रयास: {attempts} · संकेत: {hints}',
             'daily.revealed': 'दैनिक हल दिखाया गया', 'daily.revealedBody': 'साझा परिणाम इसे हल दिखाए जाने के रूप में दर्ज करता है।',
             'challenges.complete': 'चुनौती सेट पूरा', 'challenges.completeBody': 'आपने सभी {count} हाथ से बनाई पहेलियाँ हल कीं।',
-            'endless.complete': 'खेल पूरा', 'endless.completeBody': 'तीनों मौके खत्म होने से पहले आपने {count} पहेलियाँ हल कीं।',
+            'endless.complete': 'खेल पूरा', 'endless.completeBody': 'हल की गई पहेलियाँ: {count}। तीनों मौके इस्तेमाल हो गए।',
             'endless.revealedBody': 'हल दिखाने में आपका आखिरी मौका चला गया।',
             'tutorial.good': 'अच्छी चाल', 'tutorial.goodBody': 'समीकरण संतुलित है। पूरा करने के लिए जाँचें।',
             'tutorial.restore': 'चिह्नित संख्या आज़माएँ', 'tutorial.restoreBody': 'चुनी संख्या को वापस लाने के लिए उस पर फिर क्लिक करें।',
@@ -1040,7 +1040,7 @@
             'daily.complete': 'Problema diário concluído', 'daily.completeBody': 'Tentativas: {attempts} · dicas: {hints}',
             'daily.revealed': 'Solução diária mostrada', 'daily.revealedBody': 'O resultado compartilhado registra que a solução foi mostrada.',
             'challenges.complete': 'Conjunto de desafios concluído', 'challenges.completeBody': 'Você resolveu os {count} problemas feitos à mão.',
-            'endless.complete': 'Partida concluída', 'endless.completeBody': 'Você resolveu {count} problemas antes de usar as três chances.',
+            'endless.complete': 'Partida concluída', 'endless.completeBody': 'Problemas resolvidos: {count}. As três chances foram usadas.',
             'endless.revealedBody': 'Mostrar a solução usou sua última chance.',
             'tutorial.good': 'Boa jogada', 'tutorial.goodBody': 'A equação está equilibrada. Verifique para concluir.',
             'tutorial.restore': 'Tente o número destacado', 'tutorial.restoreBody': 'Clique novamente no número selecionado para restaurá-lo.',
@@ -1070,7 +1070,7 @@
             'daily.complete': 'Задача дня решена', 'daily.completeBody': 'Попытки: {attempts} · подсказки: {hints}',
             'daily.revealed': 'Решение задачи дня показано', 'daily.revealedBody': 'В общем результате будет отмечен показ решения.',
             'challenges.complete': 'Набор испытаний пройден', 'challenges.completeBody': 'Вы решили все ручные задачи: {count}.',
-            'endless.complete': 'Забег завершён', 'endless.completeBody': 'До исчерпания трёх шансов решено задач: {count}.',
+            'endless.complete': 'Забег завершён', 'endless.completeBody': 'Решено задач: {count}. Все три шанса использованы.',
             'endless.revealedBody': 'Показ решения использовал последний шанс.',
             'tutorial.good': 'Хороший ход', 'tutorial.goodBody': 'Равенство верно. Проверьте его для завершения.',
             'tutorial.restore': 'Попробуйте выделенное число', 'tutorial.restoreBody': 'Нажмите выбранное число ещё раз, чтобы вернуть его.',
@@ -1100,7 +1100,7 @@
             'daily.complete': 'Hoàn thành câu đố hằng ngày', 'daily.completeBody': 'Lần thử: {attempts} · gợi ý: {hints}',
             'daily.revealed': 'Đã hiện lời giải hằng ngày', 'daily.revealedBody': 'Kết quả chia sẻ ghi nhận rằng lời giải đã được hiện.',
             'challenges.complete': 'Hoàn thành bộ thử thách', 'challenges.completeBody': 'Bạn đã giải cả {count} câu đố làm tay.',
-            'endless.complete': 'Kết thúc lượt chơi', 'endless.completeBody': 'Bạn đã giải {count} câu trước khi dùng hết ba cơ hội.',
+            'endless.complete': 'Kết thúc lượt chơi', 'endless.completeBody': 'Số câu đã giải: {count}. Cả ba cơ hội đã được dùng.',
             'endless.revealedBody': 'Việc hiện lời giải đã dùng cơ hội cuối cùng.',
             'tutorial.good': 'Nước đi tốt', 'tutorial.goodBody': 'Phương trình đã cân bằng. Hãy kiểm tra để hoàn tất.',
             'tutorial.restore': 'Thử số được đánh dấu', 'tutorial.restoreBody': 'Nhấp lại số đã chọn để khôi phục.',
@@ -1130,7 +1130,7 @@
             'daily.complete': 'Günlük bulmaca tamamlandı', 'daily.completeBody': 'Deneme: {attempts} · ipucu: {hints}',
             'daily.revealed': 'Günlük çözüm gösterildi', 'daily.revealedBody': 'Paylaşılan sonuç, çözümün gösterildiğini kaydeder.',
             'challenges.complete': 'Meydan okuma seti tamamlandı', 'challenges.completeBody': '{count} el yapımı bulmacanın hepsini çözdünüz.',
-            'endless.complete': 'Koşu tamamlandı', 'endless.completeBody': 'Üç şans bitmeden önce {count} bulmaca çözdünüz.',
+            'endless.complete': 'Koşu tamamlandı', 'endless.completeBody': 'Çözülen bulmaca: {count}. Üç şansın tamamı kullanıldı.',
             'endless.revealedBody': 'Çözümü göstermek son şansınızı kullandı.',
             'tutorial.good': 'İyi hamle', 'tutorial.goodBody': 'Denklem dengeli. Bitirmek için kontrol edin.',
             'tutorial.restore': 'İşaretli sayıyı deneyin', 'tutorial.restoreBody': 'Geri almak için seçili sayıya tekrar tıklayın.',
@@ -1160,7 +1160,7 @@
             'daily.complete': 'روزانہ پہیلی مکمل', 'daily.completeBody': 'کوششیں: {attempts} · اشارے: {hints}',
             'daily.revealed': 'روزانہ حل دکھا دیا گیا', 'daily.revealedBody': 'مشترک نتیجے میں حل دکھانا درج ہوگا۔',
             'challenges.complete': 'چیلنج سیٹ مکمل', 'challenges.completeBody': 'آپ نے تمام {count} ہاتھ سے بنائی پہیلیاں حل کر لیں۔',
-            'endless.complete': 'کھیل مکمل', 'endless.completeBody': 'تینوں موقعے ختم ہونے سے پہلے آپ نے {count} پہیلیاں حل کیں۔',
+            'endless.complete': 'کھیل مکمل', 'endless.completeBody': 'حل شدہ پہیلیاں: {count}۔ تینوں موقعے استعمال ہو گئے۔',
             'endless.revealedBody': 'حل دکھانے سے آپ کا آخری موقع ختم ہو گیا۔',
             'tutorial.good': 'اچھی چال', 'tutorial.goodBody': 'مساوات برابر ہے۔ مکمل کرنے کے لیے جانچیں۔',
             'tutorial.restore': 'نمایاں عدد آزمائیں', 'tutorial.restoreBody': 'منتخب عدد واپس لانے کے لیے اسے دوبارہ کلک کریں۔',
@@ -1220,6 +1220,10 @@
         for (const element of scope.querySelectorAll('[data-localize]')) {
             if (!element.dataset.sourceText) element.dataset.sourceText = element.textContent;
             element.textContent = translate(element.dataset.sourceText);
+        }
+        for (const element of document.querySelectorAll('link[rel="manifest"]')) {
+            element.href = locale === 'en' ? 'manifest.webmanifest' :
+                'manifest.' + locale + '.webmanifest';
         }
         document.documentElement.lang = locale;
         document.documentElement.dir = RTL_LOCALES.includes(locale) ? 'rtl' : 'ltr';

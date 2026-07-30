@@ -345,6 +345,13 @@
         ui.score_label.textContent = t('round.score', { target: currentProblem.target, score: currentProblem.score });
     }
 
+    function renderSubmitLabel() {
+        const replayingChallenges = mode === 'challenges' &&
+            round === CURATED.length && awaitingAdvance;
+        ui.submit.textContent = t(replayingChallenges ? 'action.again' :
+            (awaitingAdvance ? 'action.next' : 'action.check'));
+    }
+
     function renderCatalogMessage() {
         if (!currentMessage) return;
         const values = {};
@@ -404,7 +411,7 @@
         currentSeed = problemSeed();
         currentProblem = generateCurrentProblem();
         session.puzzleStartedAt = Date.now();
-        ui.submit.textContent = t('action.check');
+        renderSubmitLabel();
         ui.submit.disabled = session.finished;
         ui.hint.disabled = mode === 'tutorial' || session.finished;
         ui.skip.disabled = mode === 'tutorial' || session.finished;
@@ -555,7 +562,7 @@
         playSound('correct');
         showExplanation(true);
         awaitingAdvance = true;
-        ui.submit.textContent = t('action.next');
+        renderSubmitLabel();
         ui.hint.disabled = true;
         ui.skip.disabled = true;
 
@@ -584,7 +591,6 @@
             }
         }
         if (mode === 'challenges' && round === CURATED.length) {
-            ui.submit.textContent = t('action.again');
             setCatalogMessage('challenges.complete', 'challenges.completeBody', {
                 count: CURATED.length
             });
@@ -960,8 +966,7 @@
         renderExplanation();
         renderAchievementNotice();
         if (timerId) ui.timer_label.textContent = t('timer.seconds', { seconds: timeRemaining });
-        if (awaitingAdvance) ui.submit.textContent = t('action.next');
-        else if (session && session.finished && mode === 'challenges') ui.submit.textContent = t('action.again');
+        renderSubmitLabel();
         renderCatalogMessage();
         setSidebarCollapsed(document.getElementById('wrapper').classList.contains('sidebar-collapsed'));
     }
@@ -1023,7 +1028,7 @@
         recordAttempt(false);
         showExplanation(true);
         awaitingAdvance = true;
-        ui.submit.textContent = t('action.next');
+        renderSubmitLabel();
         ui.hint.disabled = true;
         ui.skip.disabled = true;
         if (mode === 'daily') {
