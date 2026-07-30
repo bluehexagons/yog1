@@ -2058,7 +2058,15 @@
     renderAchievements();
     ui.achievement_notice.hidden = true;
     if ('serviceWorker' in navigator && window.location.protocol !== 'file:') {
-        navigator.serviceWorker.register('sw.js').catch(function () {});
+        navigator.serviceWorker.register('sw.js').then(function () {
+            return navigator.serviceWorker.ready;
+        }).then(function (registration) {
+            if (i18n.getLocale() === 'en' || !registration.active) return;
+            registration.active.postMessage({
+                type: 'cache-locale',
+                path: i18n.localeSource(i18n.getLocale())
+            });
+        }).catch(function () {});
     }
     bootFromUrl();
 }());

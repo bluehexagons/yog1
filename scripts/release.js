@@ -10,8 +10,10 @@ const versionPath = path.join(root, 'version.js');
 const htmlPath = path.join(root, 'yog1.htm');
 const manifestFiles = [
     'manifest.webmanifest', 'manifest.es.webmanifest', 'manifest.zh.webmanifest',
+    'manifest.de.webmanifest', 'manifest.fr.webmanifest', 'manifest.zh-Hant.webmanifest',
     'manifest.ar.webmanifest', 'manifest.bn.webmanifest', 'manifest.ja.webmanifest',
-    'manifest.hi.webmanifest', 'manifest.pt.webmanifest', 'manifest.ru.webmanifest',
+    'manifest.ko.webmanifest', 'manifest.hi.webmanifest', 'manifest.pt.webmanifest',
+    'manifest.pl.webmanifest', 'manifest.ru.webmanifest',
     'manifest.vi.webmanifest', 'manifest.tr.webmanifest', 'manifest.ur.webmanifest'
 ];
 const releaseFiles = ['version.js', 'yog1.htm', 'sw.js'].concat(manifestFiles);
