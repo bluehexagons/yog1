@@ -8,7 +8,10 @@ changing exactly one number into a `1`.
 The current version includes five difficulty settings, integer arithmetic from
 addition through roots, recurring warm-up and challenge rounds, and a custom game
 builder. Problem history and per-mode stats are stored locally in the
-browser and can be cleared from the page.
+browser and can be cleared from the page. The active puzzle, selected move,
+hint and session progress, result message, current screen, history page,
+sidebar state, and Custom builder choices are also remembered locally so
+refreshing can return to where you left off.
 
 Additional modes include Adaptive difficulty, a shared Daily puzzle, a 60-second
 Timed sprint, a three-life Endless run, ten handcrafted Challenges, and Guided

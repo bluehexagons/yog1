@@ -68,7 +68,8 @@
     let achievementState = load(KEYS.achievements, { unlocked: [], operations: [], solved: 0 });
     const defaultSettings = {
         sound: false, largeText: false, contrast: false, reducedClutter: false,
-        sidebarSide: 'auto', adaptiveStyle: 'flow', learningFocus: 'recommended'
+        sidebarSide: 'auto', adaptiveStyle: 'flow', learningFocus: 'recommended',
+        lastView: 'play', sidebarCollapsed: false, historyPage: 0
     };
     const loadedSettings = load(KEYS.settings, null);
     let settings = loadedSettings && typeof loadedSettings === 'object' &&
@@ -78,6 +79,7 @@
     let dailyResults = load(KEYS.daily, {});
     let adaptiveState = core.normalizeAdaptiveState(load(KEYS.adaptive, null));
     let learningState = core.normalizeLearningState(load(KEYS.learning, null));
+    let resumeState = load(KEYS.resume, null);
     if (!Array.isArray(history)) history = [];
     history = history.filter(function (item) {
         return item && typeof item === 'object' &&
@@ -113,6 +115,7 @@
     dailyResults = Object.fromEntries(Object.entries(dailyResults).filter(function (entry) {
         return validDailyResult(entry[0], entry[1]);
     }));
+    if (!storage.validResume(resumeState)) resumeState = null;
 
     let mode = 'tutorial';
     let profile = core.DIFFICULTIES.easy;
@@ -126,7 +129,8 @@
     let attemptsOnPuzzle = 0;
     let activeCustomSettings = null;
     let customRun = { attempts: 0, correct: 0, won: false };
-    let historyPage = 0;
+    let historyPage = Number.isSafeInteger(settings.historyPage) &&
+        settings.historyPage >= 0 ? settings.historyPage : 0;
     let forcedSeed = null;
     let forcedRound = null;
     let dailyDateOverride = null;
@@ -151,6 +155,73 @@
             hints: 0, lives: 3, phase: 'playing'
         };
         renderSession();
+    }
+
+    function persistResume(selectedOverride) {
+        if (!currentProblem || !session) return;
+        const resumedSelection = arguments.length ? selectedOverride : selectedId;
+        const messageValues = {};
+        if (currentMessage) {
+            for (const key of Object.keys(currentMessage.values)) {
+                const value = currentMessage.values[key];
+                const resolved = typeof value === 'function' ? value() : value;
+                if (typeof resolved === 'string' || typeof resolved === 'boolean' ||
+                    (typeof resolved === 'number' && Number.isFinite(resolved))) {
+                    messageValues[key] = resolved;
+                } else if (resolved && typeof resolved === 'object' &&
+                    typeof resolved.catalogKey === 'string') {
+                    messageValues[key] = { catalogKey: resolved.catalogKey };
+                }
+            }
+        }
+        resumeState = {
+            mode: mode,
+            round: round,
+            seed: currentSeed,
+            dailyDate: mode === 'daily' ? utcDate() : null,
+            custom: mode === 'custom' && activeCustomSettings
+                ? Object.assign({}, activeCustomSettings, {
+                    operations: activeCustomSettings.operations.slice()
+                }) : null,
+            adaptive: mode === 'adaptive' && adaptiveProblemState
+                ? core.normalizeAdaptiveState(adaptiveProblemState) : null,
+            learningConcept: mode === 'guided' ? currentLearningConcept : null,
+            selectedId: resumedSelection || null,
+            hintLevel: hintLevel,
+            attemptsOnPuzzle: attemptsOnPuzzle,
+            hintsOnPuzzle: hintsOnPuzzle,
+            session: {
+                id: session.id,
+                startedAt: session.startedAt,
+                puzzleStartedAt: session.puzzleStartedAt,
+                attempts: session.attempts,
+                correct: session.correct,
+                solved: session.solved,
+                streak: session.streak,
+                bestStreak: session.bestStreak,
+                hardest: session.hardest,
+                durations: session.durations.slice(),
+                hints: session.hints,
+                lives: session.lives
+            },
+            customRun: mode === 'custom' ? Object.assign({}, customRun) : null,
+            timerDeadline: mode === 'timed' ? timerDeadline : 0,
+            phase: session.phase,
+            message: currentMessage ? {
+                titleKey: currentMessage.titleKey,
+                messageKey: currentMessage.messageKey,
+                values: messageValues
+            } : null,
+            feedback: currentFeedback ? {
+                revealSolution: !!currentFeedback.revealSolution,
+                attemptedValues: Object.assign({},
+                    currentFeedback.attemptedValues === undefined
+                        ? currentValues : currentFeedback.attemptedValues),
+                alternate: !!currentFeedback.alternate,
+                moveId: currentFeedback.moveId || null
+            } : null
+        };
+        save(KEYS.resume, resumeState);
     }
 
     function customSettings() {
@@ -501,7 +572,9 @@
         const values = {};
         for (const key of Object.keys(currentMessage.values)) {
             const value = currentMessage.values[key];
-            values[key] = typeof value === 'function' ? value() : value;
+            values[key] = typeof value === 'function' ? value() :
+                (value && typeof value.catalogKey === 'string'
+                    ? t(value.catalogKey) : value);
         }
         ui.message_title.textContent = t(currentMessage.titleKey, values);
         ui.message_text.textContent = t(currentMessage.messageKey, values);
@@ -633,11 +706,10 @@
         } else {
             setCatalogMessage('round.kindTitle', currentProblem.roundKind === 'challenge' ?
                 'message.challengeBody' : 'message.standardBody', {
-                    kind: function () {
-                        return t('round.' + currentProblem.roundKind);
-                    }
+                    kind: { catalogKey: 'round.' + currentProblem.roundKind }
                 });
         }
+        persistResume();
     }
 
     function valuesWithFlip(id) {
@@ -801,6 +873,7 @@
         playSound('correct');
         showExplanation(true, undefined, alternate, selectedId);
         session.phase = 'review';
+        persistResume(null);
         renderSubmitLabel();
         ui.hint.disabled = true;
         ui.skip.disabled = true;
@@ -813,18 +886,21 @@
             setCatalogMessage('daily.complete', 'daily.completeBody', {
                 attempts: session.attempts, hints: session.hints
             });
+            persistResume(null);
             return;
         }
         if (mode === 'custom') {
             const accuracy = customRun.correct / customRun.attempts * 100;
             if (customRun.correct >= activeCustomSettings.correct && accuracy >= activeCustomSettings.rate) {
                 customRun.won = true;
+                persistResume(null);
                 ui.submit.disabled = true;
                 setCatalogMessage('custom.won', 'custom.wonBody', {
                     correct: customRun.correct,
                     attempts: customRun.attempts,
                     accuracy: Math.round(accuracy)
                 });
+                persistResume(null);
                 return;
             }
         }
@@ -837,6 +913,7 @@
             setCatalogMessage(alternate ? 'result.alternate' : 'result.balanced',
                 alternate ? 'result.alternateBody' : 'result.balancedBody');
         }
+        persistResume(null);
     }
 
     function incorrectAnswer() {
@@ -849,6 +926,7 @@
         selectedId = null;
         currentValues = {};
         drawProblem();
+        persistResume();
         if (mode === 'endless' && attemptsOnPuzzle === 1) {
             session.lives--;
             renderSession();
@@ -858,10 +936,13 @@
                     count: session.solved
                 });
                 showExplanation(true, attemptedValues, false, attemptedId);
+                persistResume(null);
                 return;
             }
+            persistResume();
         }
         setCatalogMessage('result.retry', 'result.retryBody');
+        persistResume();
     }
 
     function advanceRound() {
@@ -887,6 +968,7 @@
         renderStats();
         renderSession();
         setCatalogMessage(titleKey, messageKey, values);
+        persistResume(null);
     }
 
     function updateProgress() {
@@ -952,7 +1034,12 @@
 
     function renderHistory() {
         const pages = Math.max(1, Math.ceil(history.length / PAGE_SIZE));
-        historyPage = Math.max(0, Math.min(historyPage, pages - 1));
+        const nextPage = Math.max(0, Math.min(historyPage, pages - 1));
+        if (nextPage !== historyPage || settings.historyPage !== nextPage) {
+            historyPage = nextPage;
+            settings.historyPage = historyPage;
+            save(KEYS.settings, settings);
+        }
         ui.history.replaceChildren();
         const pageStart = historyPage * PAGE_SIZE;
         const pageItems = history.slice(pageStart, (historyPage + 1) * PAGE_SIZE);
@@ -1102,9 +1189,13 @@
         }
     }
 
-    function setSidebarCollapsed(collapsed) {
+    function setSidebarCollapsed(collapsed, remember) {
         const wrapper = document.getElementById('wrapper');
         wrapper.classList.toggle('sidebar-collapsed', collapsed);
+        if (remember !== false) {
+            settings.sidebarCollapsed = !!collapsed;
+            save(KEYS.settings, settings);
+        }
         for (const button of [ui.sidebar_toggle, ui.sidebar_toggle_play]) {
             button.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
         }
@@ -1115,6 +1206,8 @@
     function showView(view, focusHeading) {
         const screens = Array.from(document.querySelectorAll('[data-screen]'));
         const selected = screens.find(function (screen) { return screen.dataset.screen === view; }) || screens[0];
+        settings.lastView = selected.dataset.screen;
+        save(KEYS.settings, settings);
         for (const screen of screens) screen.hidden = screen !== selected;
         document.getElementById('app_footer').hidden = selected.dataset.screen === 'play';
         for (const button of ui.view_buttons.querySelectorAll('[data-view]')) {
@@ -1123,7 +1216,8 @@
             if (active) button.setAttribute('aria-current', 'page');
             else button.removeAttribute('aria-current');
         }
-        if (selected.dataset.screen !== 'play') setSidebarCollapsed(false);
+        setSidebarCollapsed(selected.dataset.screen === 'play'
+            ? !!settings.sidebarCollapsed : false, false);
         if (focusHeading) {
             const heading = selected.querySelector('h2');
             if (heading) {
@@ -1140,10 +1234,10 @@
         ui.timer_label.hidden = true;
     }
 
-    function startTimer() {
+    function startTimer(deadline) {
         clearTimer();
-        timeRemaining = TIMED_SECONDS;
-        timerDeadline = Date.now() + TIMED_SECONDS * 1000;
+        timerDeadline = deadline || Date.now() + TIMED_SECONDS * 1000;
+        timeRemaining = Math.max(0, Math.ceil((timerDeadline - Date.now()) / 1000));
         ui.timer_label.hidden = false;
         ui.timer_label.textContent = t('timer.seconds', { seconds: timeRemaining });
         function updateTimer() {
@@ -1154,7 +1248,12 @@
                 playSound('finish');
             }
         }
+        if (timeRemaining <= 0) {
+            updateTimer();
+            return;
+        }
         timerId = window.setInterval(updateTimer, 250);
+        persistResume();
     }
 
     function activateMode(nextMode, button, options) {
@@ -1363,6 +1462,7 @@
             setCatalogMessage(isSolved() ? 'tutorial.good' : 'tutorial.restore',
                 isSolved() ? 'tutorial.goodBody' : 'tutorial.restoreBody');
         }
+        persistResume();
     });
     ui.feedback.addEventListener('click', function (event) {
         const button = event.target.closest('[data-copy-learning]');
@@ -1390,6 +1490,7 @@
                 const easyButton = ui.mode_buttons.querySelector('[data-mode="easy"]');
                 activateMode('easy', easyButton);
                 setCatalogMessage('tutorial.complete', 'tutorial.completeBody');
+                persistResume();
             } else {
                 correctAnswer();
             }
@@ -1398,6 +1499,7 @@
             currentValues = {};
             drawProblem();
             setCatalogMessage('tutorial.retry', 'tutorial.retryBody');
+            persistResume();
             playSound('incorrect');
         } else {
             incorrectAnswer();
@@ -1422,7 +1524,7 @@
         } else if (hintLevel === 2) {
             const effect = learning.intendedEffect;
             setCatalogMessage('hint.direction', 'hint.directionBody', {
-                side: t(effect.side === 0 ? 'side.left' : 'side.right'),
+                side: { catalogKey: effect.side === 0 ? 'side.left' : 'side.right' },
                 delta: (effect.delta >= 0 ? '+' : '') + effect.delta,
                 total: effect.after
             });
@@ -1430,6 +1532,7 @@
             setCatalogMessage(hintLevel === 3 ? 'hint.side' : 'hint.number',
                 hintLevel === 3 ? 'hint.sideBody' : 'hint.numberBody');
         }
+        persistResume();
     });
 
     ui.skip.addEventListener('click', function () {
@@ -1440,6 +1543,7 @@
         const intendedId = core.solutionDetails(currentProblem.sides, {}).solutionId;
         showExplanation(true, {}, false, intendedId);
         session.phase = 'review';
+        persistResume(null);
         renderSubmitLabel();
         ui.hint.disabled = true;
         ui.skip.disabled = true;
@@ -1449,6 +1553,7 @@
             updateModeInfo();
             ui.submit.disabled = true;
             setCatalogMessage('daily.revealed', 'daily.revealedBody');
+            persistResume(null);
             return;
         }
         if (mode === 'endless') {
@@ -1463,6 +1568,7 @@
         }
         setCatalogMessage(mode === 'adaptive' ? 'adaptive.skipped' : 'result.solution',
             mode === 'adaptive' ? 'adaptive.skippedBody' : 'result.solutionBody');
+        persistResume(null);
     });
 
     ui.share.addEventListener('click', sharePuzzle);
@@ -1522,6 +1628,11 @@
     ui.custom_length.addEventListener('input', function () {
         ui.custom_length_value.textContent = ui.custom_length.value;
     });
+    ui.custom_form.addEventListener('input', function () {
+        if (ui.custom_form.checkValidity()) {
+            save(KEYS.custom, customSettings());
+        }
+    });
     ui.history.addEventListener('click', function (event) {
         const button = event.target.closest('[data-replay-history]');
         if (!button) return;
@@ -1554,8 +1665,14 @@
         }
         setCatalogMessage('history.replaying', 'history.replayingBody');
     });
-    ui.history_prev.addEventListener('click', function () { historyPage--; renderHistory(); });
-    ui.history_next.addEventListener('click', function () { historyPage++; renderHistory(); });
+    ui.history_prev.addEventListener('click', function () {
+        historyPage--;
+        renderHistory();
+    });
+    ui.history_next.addEventListener('click', function () {
+        historyPage++;
+        renderHistory();
+    });
     ui.practice_missed.addEventListener('click', function () {
         const index = history.findIndex(function (item) {
             return item && !item.correct && item.seed;
@@ -1570,6 +1687,8 @@
         if (window.confirm(t('confirm.clearHistory'))) {
             history = [];
             historyPage = 0;
+            settings.historyPage = historyPage;
+            save(KEYS.settings, settings);
             save(KEYS.history, history);
             renderHistory();
         }
@@ -1593,7 +1712,7 @@
 
     for (const input of [ui.setting_sound, ui.setting_large_text, ui.setting_contrast, ui.setting_reduced_clutter]) {
         input.addEventListener('change', function () {
-            settings = {
+            settings = Object.assign({}, settings, {
                 sound: ui.setting_sound.checked,
                 largeText: ui.setting_large_text.checked,
                 contrast: ui.setting_contrast.checked,
@@ -1601,7 +1720,7 @@
                 sidebarSide: ui.setting_sidebar_side.value,
                 adaptiveStyle: ui.setting_adaptive_style.value,
                 learningFocus: ui.setting_learning_focus.value
-            };
+            });
             save(KEYS.settings, settings);
             applySettings();
             if (input === ui.setting_sound && input.checked) playSound('flip');
@@ -1707,6 +1826,117 @@
         });
     });
 
+    function restoreLastProblem() {
+        if (!resumeState || !storage.validResume(resumeState)) return false;
+        const saved = resumeState;
+        const preferredView = ['play', 'options', 'stats', 'about'].includes(settings.lastView)
+            ? settings.lastView : 'play';
+        const preferredCollapsed = !!settings.sidebarCollapsed;
+        const button = ui.mode_buttons.querySelector('[data-mode="' + saved.mode + '"]');
+        if (!button) return false;
+        const latestAdaptiveState = adaptiveState;
+
+        if (saved.mode === 'custom') {
+            activateMode('custom', button, {
+                seed: saved.seed,
+                round: saved.round
+            });
+            for (const input of ui.custom_operations.querySelectorAll('input')) {
+                input.checked = saved.custom.operations.includes(input.value);
+            }
+            for (const key of ['length', 'min', 'max', 'correct', 'rate', 'seed']) {
+                ui['custom_' + key].value = saved.custom[key];
+            }
+            ui.custom_length_value.textContent = ui.custom_length.value;
+            ui.custom_form.requestSubmit();
+            if (!currentProblem) return false;
+        } else {
+            activateMode(saved.mode, button, {
+                seed: saved.seed,
+                round: saved.round,
+                date: saved.dailyDate,
+                adaptiveState: saved.adaptive,
+                learningConcept: saved.learningConcept
+            });
+        }
+        if (saved.mode === 'adaptive') adaptiveState = latestAdaptiveState;
+
+        if (mode === 'timed') {
+            clearTimer();
+            timerDeadline = saved.timerDeadline;
+        }
+        session = Object.assign({}, saved.session, {
+            durations: saved.session.durations.slice(),
+            phase: saved.phase
+        });
+        attemptsOnPuzzle = saved.attemptsOnPuzzle;
+        hintsOnPuzzle = saved.hintsOnPuzzle;
+        if (mode === 'custom') customRun = Object.assign({}, saved.customRun);
+        hintLevel = saved.hintLevel;
+        selectedId = null;
+        if (saved.selectedId) {
+            currentProblem.sides.forEach(function (side) {
+                core.visitNumbers(side, function (node) {
+                    if (node.id === saved.selectedId) selectedId = node.id;
+                });
+            });
+        }
+        currentValues = valuesWithFlip(selectedId);
+        currentFeedback = saved.feedback ? {
+            revealSolution: saved.feedback.revealSolution,
+            attemptedValues: Object.assign({}, saved.feedback.attemptedValues || {}),
+            alternate: saved.feedback.alternate,
+            moveId: saved.feedback.moveId
+        } : null;
+        if (saved.message) {
+            currentMessage = {
+                titleKey: saved.message.titleKey,
+                messageKey: saved.message.messageKey,
+                values: Object.assign({}, saved.message.values)
+            };
+        }
+        if (mode === 'custom' && customRun.won) {
+            session.phase = 'review';
+            selectedId = null;
+            currentValues = {};
+            ui.submit.disabled = true;
+            setCatalogMessage('custom.won', 'custom.wonBody', {
+                correct: customRun.correct,
+                attempts: customRun.attempts,
+                accuracy: customRun.attempts
+                    ? Math.round(customRun.correct / customRun.attempts * 100) : 0
+            });
+        }
+        if (session.phase !== 'playing') {
+            selectedId = null;
+            currentValues = {};
+            ui.hint.disabled = true;
+            ui.skip.disabled = true;
+            if (session.phase === 'finished' || mode === 'daily' ||
+                (mode === 'custom' && customRun.won)) {
+                ui.submit.disabled = true;
+            }
+        } else {
+            ui.hint.disabled = mode === 'tutorial' || hintLevel >= 4;
+        }
+        drawProblem();
+        renderSession();
+        renderSubmitLabel();
+        renderExplanation();
+        renderCatalogMessage();
+        persistResume();
+        if (mode === 'timed' && session.phase === 'playing') {
+            startTimer(saved.timerDeadline);
+        }
+
+        if (preferredView !== 'play') {
+            showView(preferredView);
+        } else {
+            setSidebarCollapsed(preferredCollapsed);
+        }
+        return true;
+    }
+
     function bootFromUrl() {
         const params = new URLSearchParams(window.location.search);
         const requestedDaily = params.get('daily');
@@ -1802,6 +2032,7 @@
             setCatalogMessage('shared.seeded', 'shared.seededBody');
             return;
         }
+        if (restoreLastProblem()) return;
         const button = ui.mode_buttons.querySelector('[data-mode="tutorial"]');
         activateMode('tutorial', button);
     }

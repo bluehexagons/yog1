@@ -31,6 +31,49 @@ assert(Object.values(storage.KEYS).every(function (key) {
     return key.startsWith('yog1.v2.');
 }), 'current storage uses one versioned namespace');
 storage.save(storage.KEYS.stats, { attempts: 3 });
+const resumeSession = {
+    id: 'session-test',
+    startedAt: Date.now(),
+    puzzleStartedAt: Date.now(),
+    attempts: 2,
+    correct: 1,
+    solved: 1,
+    streak: 1,
+    bestStreak: 1,
+    hardest: 9.5,
+    durations: [1200],
+    hints: 1,
+    lives: 3
+};
+const resumeSnapshot = {
+    mode: 'normal',
+    round: 7,
+    seed: 'resume-seed',
+    dailyDate: null,
+    custom: null,
+    adaptive: null,
+    learningConcept: null,
+    selectedId: 'n2',
+    hintLevel: 1,
+    attemptsOnPuzzle: 1,
+    hintsOnPuzzle: 1,
+    session: resumeSession,
+    customRun: null,
+    timerDeadline: 0,
+    phase: 'playing',
+    message: {
+        titleKey: 'hint.compare',
+        messageKey: 'hint.compareBody',
+        values: {
+            left: 8,
+            right: 12,
+            gap: 4,
+            side: { catalogKey: 'side.left' }
+        }
+    },
+    feedback: null
+};
+storage.save(storage.KEYS.resume, resumeSnapshot);
 values.set(storage.KEYS.locale, 'ja');
 assert.strictEqual(storage.load(storage.KEYS.stats, {}).attempts, 3,
     'stored values round-trip');
@@ -40,6 +83,8 @@ assert.strictEqual(snapshot.schemaVersion, storage.SCHEMA_VERSION,
 assert.strictEqual(snapshot.data.stats.attempts, 3,
     'backups include known application data');
 assert.strictEqual(snapshot.data.locale, 'ja', 'backups preserve the selected locale');
+assert.strictEqual(snapshot.data.resume.seed, 'resume-seed',
+    'backups preserve the active puzzle resume record');
 
 values.clear();
 storage.importData(snapshot);
@@ -47,6 +92,15 @@ assert.strictEqual(storage.load(storage.KEYS.stats, {}).attempts, 3,
     'valid backups restore known data');
 assert.strictEqual(values.get(storage.KEYS.locale), 'ja',
     'locale restoration preserves its plain-string storage format');
+assert.strictEqual(storage.load(storage.KEYS.resume, {}).round, 7,
+    'valid resume records restore with the rest of the save');
+assert.strictEqual(storage.load(storage.KEYS.resume, {}).message.values.gap, 4,
+    'resume records retain bounded localized message context');
+assert.strictEqual(
+    storage.load(storage.KEYS.resume, {}).message.values.side.catalogKey,
+    'side.left',
+    'resume messages retain translation references instead of rendered labels'
+);
 storage.save(storage.KEYS.settings, { sound: true });
 storage.importData({
     application: 'You Only Get 1s',
@@ -170,6 +224,22 @@ assert.throws(function () {
         }
     });
 }, /Unsupported/, 'daily backups reject malformed result records');
+assert.throws(function () {
+    storage.importData({
+        application: 'You Only Get 1s',
+        schemaVersion: storage.SCHEMA_VERSION,
+        data: {
+            resume: {
+                mode: 'custom',
+                round: 1,
+                seed: 'bad-resume',
+                custom: { operations: ['root'] },
+                selectedId: null,
+                hintLevel: 0
+            }
+        }
+    });
+}, /Unsupported/, 'resume records require complete, playable mode settings');
 storage.save(storage.KEYS.stats, { attempts: 7 });
 const beforeFailedImport = new Map(values);
 failNextWriteTo = storage.KEYS.custom;
@@ -193,5 +263,20 @@ values.set(storage.KEYS.stats, '[]');
 assert.throws(function () {
     storage.exportData();
 }, /Unsupported/, 'shape-invalid storage cannot produce a backup that restore would reject');
+
+const finishedTimedResume = {
+    ...resumeSnapshot,
+    mode: 'timed',
+    timerDeadline: 0,
+    phase: 'finished'
+};
+assert.strictEqual(storage.validResume(finishedTimedResume), true,
+    'finished Timed sessions do not need a live deadline');
+assert.strictEqual(storage.validResume({ ...finishedTimedResume, phase: 'playing' }), false,
+    'active Timed sessions must keep their deadline');
+assert.strictEqual(storage.validResume({
+    ...resumeSnapshot,
+    message: { titleKey: 'x', messageKey: 'y', values: { unsafe: {} } }
+}), false, 'resume message interpolation values must be simple data');
 
 console.log('Storage tests passed.');

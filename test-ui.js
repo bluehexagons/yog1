@@ -101,7 +101,7 @@ assert(game.includes("phase: 'playing'") &&
     game.includes("session.phase = 'review'") &&
     game.includes("session.phase = 'finished'"),
     'session transitions use explicit phases');
-assert(game.includes('timerDeadline = Date.now() + TIMED_SECONDS * 1000') &&
+assert(game.includes('deadline || Date.now() + TIMED_SECONDS * 1000') &&
     game.includes('(timerDeadline - Date.now()) / 1000'),
     'Timed mode follows an absolute deadline');
 assert(game.includes('data-replay-history') && game.includes('learningConcept:') &&
@@ -135,6 +135,34 @@ assert(game.includes('if (Object.prototype.hasOwnProperty.call(dailyResults, dat
     'replaying a Daily puzzle cannot overwrite its first recorded outcome');
 assert(game.includes('session.solved >= CURATED.length'),
     'the handcrafted-set achievement requires completing the whole set');
+assert(storage.includes("resume: STORAGE_PREFIX + 'resume'") &&
+    storage.includes('validResume: validResume') &&
+    game.includes('function persistResume(selectedOverride)') &&
+    game.includes('function restoreLastProblem()'),
+    'the active puzzle has a validated local resume boundary');
+assert(game.includes('seed: currentSeed') &&
+    game.includes('selectedId: resumedSelection || null') &&
+    game.includes('hintLevel: hintLevel') &&
+    game.includes('if (restoreLastProblem()) return;'),
+    'reload restores the exact generated puzzle and in-progress move state');
+assert(game.includes('attemptsOnPuzzle: attemptsOnPuzzle') &&
+    game.includes('durations: session.durations.slice()') &&
+    game.includes('lives: session.lives') &&
+    game.includes('timerDeadline: mode === \'timed\' ? timerDeadline : 0') &&
+    game.includes('customRun = Object.assign({}, saved.customRun)') &&
+    game.includes('persistResume();\n        }\n        setCatalogMessage(\'result.retry\'') &&
+    game.includes('if (saved.mode === \'adaptive\') adaptiveState = latestAdaptiveState') &&
+    game.includes('phase: session.phase') &&
+    game.includes('message: currentMessage ?') &&
+    game.includes('values: Object.assign({}, saved.message.values)') &&
+    game.includes('renderExplanation();'),
+    'resume records preserve session, messages, Custom, Endless, and Timed progress');
+assert(game.includes("lastView: 'play', sidebarCollapsed: false") &&
+    game.includes('settings.lastView = selected.dataset.screen') &&
+    game.includes('settings.sidebarCollapsed = !!collapsed') &&
+    game.includes('settings.historyPage = historyPage') &&
+    game.includes('? !!settings.sidebarCollapsed : false, false'),
+    'screen, history page, and sidebar convenience preferences persist');
 assert(game.includes('achievementIds.has(id)') &&
     game.includes('hasOwnProperty.call(core.OPERATIONS, operation)') &&
     game.includes('Math.min(stats[id].correct, stats[id].attempts)'),
