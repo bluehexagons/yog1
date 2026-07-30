@@ -49,6 +49,32 @@
     // or 40 rounds. Warm-ups and challenges recur without long difficulty ramps.
     const ROUND_WAVE = [0.7, 0.9, 1, 1.1, 1.3, 0.8, 1, 1.2];
     const ADAPTIVE_INITIAL_RATING = 0.35;
+    const LEARNING_CONCEPTS = {
+        balance: {
+            id: 'balance', operations: ['add', 'subtract'], profile: 'easy', length: 2,
+            example: '(a + b) − b = a'
+        },
+        multiplication: {
+            id: 'multiplication', operations: ['add', 'subtract', 'multiply'],
+            profile: 'normal', length: 3, example: 'a × 1 = a'
+        },
+        division: {
+            id: 'division', operations: ['add', 'subtract', 'multiply', 'divide'],
+            profile: 'hard', length: 3, example: 'a ÷ 1 = a'
+        },
+        remainder: {
+            id: 'remainder', operations: ['add', 'subtract', 'modulo'],
+            profile: 'expert', length: 4, example: 'a % b = remainder'
+        },
+        powers: {
+            id: 'powers', operations: ['add', 'subtract', 'multiply', 'power'],
+            profile: 'expert', length: 4, example: 'a ^ 1 = a'
+        },
+        roots: {
+            id: 'roots', operations: ['add', 'subtract', 'multiply', 'root'],
+            profile: 'extreme', length: 4, example: '√(a × a) = a'
+        }
+    };
 
     function randomInt(random, min, max) {
         return Math.floor(random() * (max - min + 1)) + min;
@@ -667,6 +693,148 @@
             describe(expression.right, values, operationLabels);
     }
 
+    function findNumberContext(expression, id, parentOperation, position) {
+        if (expression.type === 'number') {
+            return expression.id === id ? {
+                id: id,
+                value: expression.value,
+                operation: parentOperation || null,
+                position: position || null
+            } : null;
+        }
+        if (expression.type === 'root') {
+            return findNumberContext(expression.value, id, 'root', 'value');
+        }
+        return findNumberContext(expression.left, id, expression.operation, 'left') ||
+            findNumberContext(expression.right, id, expression.operation, 'right');
+    }
+
+    function learningConceptFor(sides) {
+        const operations = new Set();
+        sides.forEach(function (side) {
+            (function inspect(expression) {
+                if (expression.type === 'root') {
+                    operations.add('root');
+                    inspect(expression.value);
+                } else if (expression.type === 'binary') {
+                    operations.add(expression.operation);
+                    inspect(expression.left);
+                    inspect(expression.right);
+                }
+            }(side));
+        });
+        if (operations.has('root')) return 'roots';
+        if (operations.has('modulo')) return 'remainder';
+        if (operations.has('power')) return 'powers';
+        if (operations.has('divide')) return 'division';
+        if (operations.has('multiply')) return 'multiplication';
+        return 'balance';
+    }
+
+    function moveEffect(sides, id) {
+        if (!id) return null;
+        let context = null;
+        let sideIndex = -1;
+        for (let index = 0; index < sides.length; index++) {
+            context = findNumberContext(sides[index], id);
+            if (context) {
+                sideIndex = index;
+                break;
+            }
+        }
+        if (!context) return null;
+        const values = { [id]: 1 };
+        const beforeTotals = sides.map(function (side) { return evaluate(side); });
+        const afterTotals = sides.map(function (side) { return evaluate(side, values); });
+        return {
+            id: id,
+            number: context.value,
+            operation: context.operation,
+            position: context.position,
+            side: sideIndex,
+            beforeTotals: beforeTotals,
+            afterTotals: afterTotals,
+            before: beforeTotals[sideIndex],
+            after: afterTotals[sideIndex],
+            delta: afterTotals[sideIndex] - beforeTotals[sideIndex],
+            balanced: afterTotals[0] === afterTotals[1]
+        };
+    }
+
+    function learningAnalysis(sides, moveId) {
+        let intendedId = null;
+        sides.forEach(function (side) {
+            visitNumbers(side, function (node) {
+                if (node.solution) intendedId = node.id;
+            });
+        });
+        const beforeTotals = sides.map(function (side) { return evaluate(side); });
+        return {
+            concept: learningConceptFor(sides),
+            beforeTotals: beforeTotals,
+            gap: Math.abs(beforeTotals[0] - beforeTotals[1]),
+            intendedEffect: moveEffect(sides, intendedId),
+            moveEffect: moveEffect(sides, moveId)
+        };
+    }
+
+    function normalizeLearningState(state) {
+        state = state && typeof state === 'object' ? state : {};
+        const concepts = {};
+        for (const id of Object.keys(LEARNING_CONCEPTS)) {
+            const saved = state.concepts && state.concepts[id];
+            const seen = saved && Number.isFinite(saved.seen) ? Math.max(0, saved.seen) : 0;
+            const solved = saved && Number.isFinite(saved.solved)
+                ? Math.min(seen, Math.max(0, saved.solved)) : 0;
+            concepts[id] = {
+                seen: seen,
+                solved: solved,
+                unaided: saved && Number.isFinite(saved.unaided)
+                    ? Math.min(solved, Math.max(0, saved.unaided)) : 0,
+                hints: saved && Number.isFinite(saved.hints) ? Math.max(0, saved.hints) : 0,
+                totalMs: saved && Number.isFinite(saved.totalMs) ? Math.max(0, saved.totalMs) : 0
+            };
+        }
+        return { concepts: concepts };
+    }
+
+    function conceptMastery(entry) {
+        entry = entry || {};
+        const seen = Math.max(0, Number(entry.seen) || 0);
+        if (!seen) return 0;
+        const accuracy = Math.min(1, (Number(entry.solved) || 0) / seen);
+        const independence = Math.min(1, (Number(entry.unaided) || 0) / seen);
+        const confidence = Math.min(1, seen / 5);
+        return Math.round((accuracy * 0.65 + independence * 0.35) * confidence * 100);
+    }
+
+    function updateLearningState(state, concept, outcome) {
+        const normalized = normalizeLearningState(state);
+        if (!Object.prototype.hasOwnProperty.call(normalized.concepts, concept)) return normalized;
+        outcome = outcome || {};
+        const entry = normalized.concepts[concept];
+        entry.seen++;
+        entry.hints += Math.max(0, Number(outcome.hints) || 0);
+        entry.totalMs += Math.max(0, Number(outcome.durationMs) || 0);
+        if (outcome.solved) {
+            entry.solved++;
+            if (!(Number(outcome.hints) > 0) && !(Number(outcome.attempts) > 1)) {
+                entry.unaided++;
+            }
+        }
+        return normalized;
+    }
+
+    function recommendedConcept(state) {
+        const normalized = normalizeLearningState(state);
+        return Object.keys(LEARNING_CONCEPTS).sort(function (left, right) {
+            const leftEntry = normalized.concepts[left];
+            const rightEntry = normalized.concepts[right];
+            return conceptMastery(leftEntry) - conceptMastery(rightEntry) ||
+                leftEntry.seen - rightEntry.seen;
+        })[0];
+    }
+
     function solutionDetails(sides, currentValues) {
         let solution = null;
         const operations = new Set();
@@ -704,11 +872,33 @@
         };
     }
 
+    function learningExample(sides) {
+        const details = solutionDetails(sides, {});
+        const learning = learningAnalysis(sides, details.solutionId);
+        return {
+            schemaVersion: 1,
+            task: 'change exactly one number to 1 to balance the equation',
+            concept: learning.concept,
+            puzzle: sides.map(function (side) { return serialize(side); }).join(' = '),
+            initialTotals: learning.beforeTotals,
+            gap: learning.gap,
+            solution: {
+                numberId: details.solutionId,
+                number: details.solutionValue,
+                equation: details.solvedExpression,
+                total: details.solvedTotals[0],
+                effect: learning.intendedEffect,
+                steps: details.solvedSteps
+            }
+        };
+    }
+
     return {
         OPERATIONS: OPERATIONS,
         DIFFICULTIES: DIFFICULTIES,
         ROUND_WAVE: ROUND_WAVE,
         ADAPTIVE_INITIAL_RATING: ADAPTIVE_INITIAL_RATING,
+        LEARNING_CONCEPTS: LEARNING_CONCEPTS,
         hashSeed: hashSeed,
         createSeededRandom: createSeededRandom,
         clone: clone,
@@ -726,6 +916,14 @@
         serialize: serialize,
         evaluationSteps: evaluationSteps,
         describe: describe,
+        learningConceptFor: learningConceptFor,
+        moveEffect: moveEffect,
+        learningAnalysis: learningAnalysis,
+        normalizeLearningState: normalizeLearningState,
+        conceptMastery: conceptMastery,
+        updateLearningState: updateLearningState,
+        recommendedConcept: recommendedConcept,
+        learningExample: learningExample,
         solutionDetails: solutionDetails
     };
 }));

@@ -78,7 +78,7 @@ assert.strictEqual(document.documentElement.lang, 'zh-Hans',
     'the document exposes the full language tag to assistive technology');
 
 const modeIds = Object.keys(core.DIFFICULTIES)
-    .concat(['tutorial', 'adaptive', 'custom', 'daily', 'timed', 'endless', 'challenges']);
+    .concat(['tutorial', 'adaptive', 'workshop', 'custom', 'daily', 'timed', 'endless', 'challenges']);
 function assertCatalogIds(prefix, ids) {
     for (const id of ids) {
         assert(Object.prototype.hasOwnProperty.call(i18n.locales.en, prefix + '.' + id),
@@ -89,7 +89,7 @@ assertCatalogIds('operation', Object.keys(core.OPERATIONS));
 assertCatalogIds('mode', modeIds);
 assertCatalogIds('difficulty', Object.keys(core.DIFFICULTIES));
 assertCatalogIds('modeDescription',
-    ['tutorial', 'adaptive', 'custom', 'daily', 'timed', 'endless', 'challenges']);
+    ['tutorial', 'adaptive', 'workshop', 'custom', 'daily', 'timed', 'endless', 'challenges']);
 for (const id of ['first', 'streak5', 'twenty', 'explorer', 'daily', 'nohint', 'curated']) {
     assertCatalogIds('achievement.' + id, ['name', 'description']);
 }

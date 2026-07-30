@@ -112,5 +112,20 @@ assert(html.includes('class="mode-group"') &&
     html.includes('data-i18n="nav.learn"') &&
     html.includes('data-i18n="nav.challenge"'),
     'the mode list is grouped by player intent');
+assert(html.includes('data-mode="workshop"') &&
+    html.includes('id="learning_rows"') &&
+    html.includes('id="learning_goal"'),
+    'focused practice exposes a learning goal and mastery dashboard');
+assert(game.includes('hintLevel >= 4') &&
+    game.includes("'hint.compareBody'") &&
+    game.includes("'hint.directionBody'"),
+    'the hint ladder scaffolds comparison and planning before revealing the answer');
+assert(game.includes('core.updateLearningState') &&
+    game.includes('core.conceptMastery') &&
+    game.includes('core.recommendedConcept'),
+    'completed puzzles update concept-level mastery and recommendations');
+assert(game.includes('core.learningExample') &&
+    game.includes('data-copy-learning'),
+    'reviewed puzzles can expose structured reasoning examples');
 
 console.log('UI audit tests passed.');

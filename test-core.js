@@ -200,6 +200,50 @@ assert(details.solvedSteps.some(function (side) { return side.length > 0; }),
     'solution details include step-by-step arithmetic');
 assert(core.describe(seededA.sides[0], {}, { add: 'plus' }).length > 0,
     'expressions have a natural-language description');
+const learning = core.learningAnalysis(seededA.sides, details.solutionId);
+assert(Object.prototype.hasOwnProperty.call(core.LEARNING_CONCEPTS, learning.concept),
+    'puzzles resolve to a stable learning concept');
+assert.strictEqual(learning.intendedEffect.balanced, true,
+    'learning analysis explains the balancing move');
+assert.strictEqual(
+    learning.intendedEffect.after - learning.intendedEffect.before,
+    learning.intendedEffect.delta,
+    'move analysis reports its numerical effect'
+);
+const learningExample = core.learningExample(seededA.sides);
+assert.strictEqual(learningExample.solution.effect.balanced, true,
+    'structured learning examples contain a verified solution effect');
+assert.strictEqual(learningExample.solution.steps.length, 2,
+    'structured learning examples contain both sides of the reasoning trace');
+
+let learningState = core.normalizeLearningState(null);
+assert.strictEqual(core.recommendedConcept(learningState), 'balance',
+    'new learners begin with balancing addition and subtraction');
+learningState = core.updateLearningState(learningState, 'balance', {
+    solved: true, hints: 0, attempts: 1, durationMs: 2500
+});
+assert.strictEqual(learningState.concepts.balance.unaided, 1,
+    'an independent solution is tracked');
+assert(core.conceptMastery(learningState.concepts.balance) > 0,
+    'practice raises confidence-aware mastery');
+const hintedLearning = core.updateLearningState(learningState, 'multiplication', {
+    solved: true, hints: 1, attempts: 1, durationMs: 4000
+});
+assert.strictEqual(hintedLearning.concepts.multiplication.unaided, 0,
+    'hinted solutions do not count as independent mastery');
+for (const concept of Object.values(core.LEARNING_CONCEPTS)) {
+    const profile = core.DIFFICULTIES[concept.profile];
+    const problem = core.generateProblem({
+        profile: profile,
+        operations: concept.operations,
+        length: concept.length,
+        random: core.createSeededRandom('learn:' + concept.id)
+    });
+    assert.strictEqual(core.learningConceptFor(problem.sides), concept.id,
+        concept.id + ' practice generates the intended concept');
+    assert.strictEqual(problem.analysis.unique, true,
+        concept.id + ' practice has one safe answer');
+}
 
 const allOperations = new Set();
 for (let seed = 1; seed <= 100; seed++) {

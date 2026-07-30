@@ -25,7 +25,9 @@
         'stats_rows', 'stats_reset_all', 'session_summary', 'achievement_list',
         'achievement_notice', 'setting_sound', 'setting_large_text', 'setting_contrast',
         'setting_reduced_clutter', 'setting_language', 'quick_language', 'setting_sidebar_side',
-        'setting_adaptive_style', 'install_app', 'export_data', 'import_data', 'import_file'
+        'setting_adaptive_style', 'setting_learning_focus', 'learning_goal',
+        'learning_goal_name', 'learning_goal_example', 'learning_recommendation',
+        'learning_rows', 'learning_practice', 'install_app', 'export_data', 'import_data', 'import_file'
     ]) {
         ui[id] = document.getElementById(id);
     }
@@ -62,7 +64,7 @@
     let achievementState = load(KEYS.achievements, { unlocked: [], operations: [], solved: 0 });
     const defaultSettings = {
         sound: false, largeText: false, contrast: false, reducedClutter: false,
-        sidebarSide: 'auto', adaptiveStyle: 'flow'
+        sidebarSide: 'auto', adaptiveStyle: 'flow', learningFocus: 'recommended'
     };
     const loadedSettings = load(KEYS.settings, null);
     let settings = loadedSettings && typeof loadedSettings === 'object' &&
@@ -71,6 +73,7 @@
         : Object.assign({}, defaultSettings);
     let dailyResults = load(KEYS.daily, {});
     let adaptiveState = core.normalizeAdaptiveState(load(KEYS.adaptive, null));
+    let learningState = core.normalizeLearningState(load(KEYS.learning, null));
     if (!Array.isArray(history)) history = [];
     let historyMigrated = false;
     for (const item of history) {
@@ -102,6 +105,7 @@
     let selectedId = null;
     let currentValues = {};
     let hintLevel = 0;
+    let hintsOnPuzzle = 0;
     let attemptsOnPuzzle = 0;
     let activeCustomSettings = null;
     let customRun = { attempts: 0, correct: 0, won: false };
@@ -120,6 +124,8 @@
     let currentFeedback = null;
     let currentAchievementId = null;
     let adaptiveProblemState = null;
+    let currentLearningConcept = 'balance';
+    let forcedLearningConcept = null;
 
     function newSession() {
         session = {
@@ -185,6 +191,42 @@
         ui.custom_length_value.textContent = ui.custom_length.value;
     }
 
+    function conceptLabel(id) {
+        const labels = {
+            balance: ['add', 'subtract'],
+            multiplication: ['multiply'],
+            division: ['divide'],
+            remainder: ['modulo'],
+            powers: ['power'],
+            roots: ['root']
+        };
+        return (labels[id] || []).map(function (operation) {
+            return t('operation.' + operation);
+        }).join(' / ');
+    }
+
+    function populateLearningFocus() {
+        const selected = settings.learningFocus;
+        ui.setting_learning_focus.replaceChildren();
+        const recommended = document.createElement('option');
+        recommended.value = 'recommended';
+        recommended.textContent = t('learning.recommended');
+        ui.setting_learning_focus.appendChild(recommended);
+        for (const id of Object.keys(core.LEARNING_CONCEPTS)) {
+            const option = document.createElement('option');
+            option.value = id;
+            option.textContent = conceptLabel(id);
+            ui.setting_learning_focus.appendChild(option);
+        }
+        ui.setting_learning_focus.value =
+            selected === 'recommended' || core.LEARNING_CONCEPTS[selected] ? selected : 'recommended';
+    }
+
+    function selectedLearningConcept() {
+        return core.LEARNING_CONCEPTS[settings.learningFocus]
+            ? settings.learningFocus : core.recommendedConcept(learningState);
+    }
+
     function tutorialProblem() {
         return {
             sides: CURATED[0].sides, score: 4, target: 4,
@@ -248,6 +290,11 @@
 
     function modeProfile() {
         if (mode === 'adaptive') return core.adaptiveProfile(adaptiveState);
+        if (mode === 'workshop') {
+            const concept = core.LEARNING_CONCEPTS[currentLearningConcept] ||
+                core.LEARNING_CONCEPTS.balance;
+            return core.DIFFICULTIES[concept.profile];
+        }
         if (mode === 'timed') return core.DIFFICULTIES.hard;
         if (mode === 'endless') {
             const choices = Object.values(core.DIFFICULTIES);
@@ -276,6 +323,11 @@
     function generateCurrentProblem() {
         if (mode === 'tutorial') return tutorialProblem();
         if (mode === 'challenges') return curatedProblem(round - 1);
+        if (mode === 'workshop') {
+            currentLearningConcept = core.LEARNING_CONCEPTS[forcedLearningConcept]
+                ? forcedLearningConcept : selectedLearningConcept();
+            forcedLearningConcept = null;
+        }
         const adaptiveModel = adaptiveProblemState || adaptiveState;
         const selectedProfile = mode === 'adaptive'
             ? core.adaptiveProfile(adaptiveModel) : modeProfile();
@@ -290,6 +342,14 @@
             options.target = Math.round(6 + adaptiveModel.rating * 25);
             options.operationWeights =
                 core.adaptiveOperationWeights(adaptiveModel, selectedProfile, settings.adaptiveStyle);
+        }
+        if (mode === 'workshop') {
+            const concept = core.LEARNING_CONCEPTS[currentLearningConcept];
+            Object.assign(options, {
+                operations: concept.operations,
+                length: concept.length,
+                maxNumber: core.DIFFICULTIES[concept.profile].maxNumber
+            });
         }
         if (mode === 'custom') {
             Object.assign(options, {
@@ -314,7 +374,7 @@
                 ? t('aria.restoreNumber', { number: expression.value })
                 : t('aria.changeNumber', { number: expression.value }));
             if (selectedId === expression.id) button.classList.add('flipped');
-            if ((mode === 'tutorial' || hintLevel >= 2) && expression.solution) {
+            if ((mode === 'tutorial' || hintLevel >= 4) && expression.solution) {
                 button.classList.add('hint-target');
             }
             parent.appendChild(button);
@@ -350,7 +410,7 @@
         currentProblem.sides.forEach(function (side, index) {
             const wrapper = document.createElement('span');
             wrapper.className = 'equation-side';
-            if (hintLevel >= 1 && index === solutionSide()) wrapper.classList.add('hint-side');
+            if (hintLevel >= 3 && index === solutionSide()) wrapper.classList.add('hint-side');
             renderExpression(side, wrapper);
             ui.problem.appendChild(wrapper);
             if (index + 1 < currentProblem.sides.length) {
@@ -371,6 +431,15 @@
         ui.round_kind.textContent = t('round.' + currentProblem.roundKind);
         ui.round_kind.className = 'round-kind ' + currentProblem.roundKind;
         ui.score_label.textContent = t('round.score', { target: currentProblem.target, score: currentProblem.score });
+        renderLearningGoal();
+    }
+
+    function renderLearningGoal() {
+        ui.learning_goal.hidden = mode !== 'workshop' || !currentProblem;
+        if (ui.learning_goal.hidden) return;
+        const concept = core.LEARNING_CONCEPTS[currentLearningConcept];
+        ui.learning_goal_name.textContent = conceptLabel(currentLearningConcept);
+        ui.learning_goal_example.textContent = concept.example;
     }
 
     function renderSubmitLabel() {
@@ -429,6 +498,17 @@
             }
         }
         appendSteps(t('feedback.yourSteps'), details.currentSteps);
+        const learning = core.learningAnalysis(currentProblem.sides, currentFeedback.moveId);
+        if (learning.moveEffect) {
+            const effect = learning.moveEffect;
+            ui.feedback.appendChild(text('p', t('feedback.effect', {
+                number: effect.number,
+                side: t(effect.side === 0 ? 'side.left' : 'side.right'),
+                before: effect.before,
+                after: effect.after,
+                delta: (effect.delta >= 0 ? '+' : '') + effect.delta
+            }), 'move-effect'));
+        }
         if (currentFeedback.alternate) {
             ui.feedback.appendChild(text('p', t('feedback.alternate'), 'alternate-solution'));
         }
@@ -439,15 +519,28 @@
             const equation = text('code', details.solvedExpression);
             ui.feedback.append(solution, equation);
             appendSteps(t('feedback.solutionSteps'), details.solvedSteps);
+            const concept = core.LEARNING_CONCEPTS[learning.concept];
+            const reflection = document.createElement('p');
+            reflection.className = 'learning-reflection';
+            reflection.append(
+                text('strong', conceptLabel(learning.concept) + ': '),
+                text('code', concept.example)
+            );
+            ui.feedback.appendChild(reflection);
+            const copyExample = text('button', t('action.share') + ' JSON', 'small-button');
+            copyExample.type = 'button';
+            copyExample.dataset.copyLearning = 'true';
+            ui.feedback.appendChild(copyExample);
         }
         ui.feedback.hidden = false;
     }
 
-    function showExplanation(revealSolution, attemptedValues, alternate) {
+    function showExplanation(revealSolution, attemptedValues, alternate, moveId) {
         currentFeedback = {
             revealSolution: revealSolution,
             attemptedValues: attemptedValues,
-            alternate: !!alternate
+            alternate: !!alternate,
+            moveId: moveId || null
         };
         renderExplanation();
     }
@@ -456,6 +549,7 @@
         selectedId = null;
         currentValues = {};
         hintLevel = 0;
+        hintsOnPuzzle = 0;
         attemptsOnPuzzle = 0;
         session.phase = 'playing';
         currentSeed = problemSeed();
@@ -483,6 +577,8 @@
         } else if (mode === 'adaptive') {
             setCatalogMessage('mode.adaptive', settings.adaptiveStyle === 'coach'
                 ? 'modeDescription.adaptiveCoach' : 'modeDescription.adaptive');
+        } else if (mode === 'workshop') {
+            setCatalogMessage('mode.workshop', 'modeDescription.workshop');
         } else if (mode === 'challenges') {
             setCatalogMessage(currentProblem.titleKey, 'message.curated', {
                 round: round, count: CURATED.length
@@ -542,6 +638,7 @@
                 ? Object.assign({}, activeCustomSettings) : null,
             adaptive: mode === 'adaptive' && adaptiveProblemState
                 ? core.normalizeAdaptiveState(adaptiveProblemState) : null,
+            learningConcept: mode === 'workshop' ? currentLearningConcept : null,
             generatorVersion: generatorVersion
         };
         history.unshift({
@@ -578,6 +675,20 @@
         save(KEYS.adaptive, adaptiveState);
         updateModeInfo();
         renderSession();
+    }
+
+    function recordLearning(solved) {
+        const concept = mode === 'workshop'
+            ? currentLearningConcept : core.learningConceptFor(currentProblem.sides);
+        learningState = core.updateLearningState(learningState, concept, {
+            solved: solved,
+            hints: hintsOnPuzzle,
+            attempts: attemptsOnPuzzle,
+            durationMs: Date.now() - session.puzzleStartedAt
+        });
+        save(KEYS.learning, learningState);
+        renderLearning();
+        updateModeInfo();
     }
 
     function recordAttempt(correct) {
@@ -640,9 +751,10 @@
         const alternate = selectedId !== intendedId;
         adapt('correct');
         recordAttempt(true);
+        recordLearning(true);
         updateAchievements();
         playSound('correct');
-        showExplanation(true, undefined, alternate);
+        showExplanation(true, undefined, alternate, selectedId);
         session.phase = 'review';
         renderSubmitLabel();
         ui.hint.disabled = true;
@@ -686,10 +798,11 @@
 
     function incorrectAnswer() {
         const attemptedValues = currentValues;
+        const attemptedId = selectedId;
         adapt('wrong');
         recordAttempt(false);
         playSound('incorrect');
-        showExplanation(false, attemptedValues);
+        showExplanation(false, attemptedValues, false, attemptedId);
         selectedId = null;
         currentValues = {};
         drawProblem();
@@ -697,10 +810,11 @@
             session.lives--;
             renderSession();
             if (session.lives <= 0) {
+                recordLearning(false);
                 finishSession('endless.complete', 'endless.completeBody', {
                     count: session.solved
                 });
-                showExplanation(true, attemptedValues);
+                showExplanation(true, attemptedValues, false, attemptedId);
                 return;
             }
         }
@@ -733,7 +847,8 @@
     }
 
     function updateProgress() {
-        ui.custom_progress.hidden = !['custom', 'endless', 'adaptive', 'daily'].includes(mode);
+        ui.custom_progress.hidden =
+            !['custom', 'endless', 'adaptive', 'daily', 'workshop'].includes(mode);
         if (mode === 'custom') {
             if (!activeCustomSettings) {
                 ui.custom_progress.hidden = true;
@@ -758,6 +873,11 @@
             const progress = dailyProgress();
             ui.custom_progress.textContent = t('progress.daily', {
                 current: progress.current, best: progress.best, grid: progress.grid
+            });
+        } else if (mode === 'workshop') {
+            const entry = learningState.concepts[currentLearningConcept];
+            ui.custom_progress.textContent = t('learning.masteryValue', {
+                mastery: core.conceptMastery(entry)
             });
         }
     }
@@ -834,6 +954,7 @@
             return { id: item.id, name: t('mode.' + item.id) };
         }).concat([
             { id: 'adaptive', name: t('mode.adaptive') },
+            { id: 'workshop', name: t('mode.workshop') },
             { id: 'custom', name: t('mode.custom') }, { id: 'daily', name: t('mode.daily') },
             { id: 'timed', name: t('mode.timed') }, { id: 'endless', name: t('mode.endless') },
             { id: 'challenges', name: t('mode.challenges') }
@@ -860,6 +981,28 @@
         }
     }
 
+    function renderLearning() {
+        learningState = core.normalizeLearningState(learningState);
+        const recommended = core.recommendedConcept(learningState);
+        ui.learning_recommendation.textContent = t('learning.recommendation', {
+            concept: conceptLabel(recommended)
+        });
+        ui.learning_rows.replaceChildren();
+        for (const id of Object.keys(core.LEARNING_CONCEPTS)) {
+            const entry = learningState.concepts[id];
+            const row = document.createElement('tr');
+            const name = text('th', conceptLabel(id));
+            name.scope = 'row';
+            row.append(
+                name,
+                text('td', String(entry.seen)),
+                text('td', core.conceptMastery(entry) + '%'),
+                text('td', entry.unaided + '/' + entry.solved)
+            );
+            ui.learning_rows.appendChild(row);
+        }
+    }
+
     function renderAchievements() {
         ui.achievement_list.replaceChildren();
         for (const item of ACHIEVEMENTS) {
@@ -882,6 +1025,17 @@
                 text('span', t('progress.adaptive', {
                     level: t('mode.' + item.id),
                     skill: Math.round(adaptiveState.rating * 100)
+                }))
+            );
+        } else if (mode === 'workshop') {
+            const concept = core.LEARNING_CONCEPTS[currentLearningConcept];
+            const entry = learningState.concepts[currentLearningConcept];
+            ui.mode_info.replaceChildren(
+                text('strong', t('mode.workshop')),
+                text('span', conceptLabel(currentLearningConcept)),
+                text('code', concept.example),
+                text('span', t('learning.masteryValue', {
+                    mastery: core.conceptMastery(entry)
                 }))
             );
         } else if (mode === 'daily') {
@@ -975,6 +1129,11 @@
         forcedRound = options.round || null;
         generatorVersion = options.generatorVersion || 2;
         dailyDateOverride = options.date || null;
+        forcedLearningConcept = options.learningConcept || null;
+        if (mode === 'workshop') {
+            currentLearningConcept = core.LEARNING_CONCEPTS[forcedLearningConcept]
+                ? forcedLearningConcept : selectedLearningConcept();
+        }
         if (mode === 'adaptive' && options.adaptiveState) {
             adaptiveState = core.normalizeAdaptiveState(options.adaptiveState);
         }
@@ -1033,6 +1192,9 @@
                 url.searchParams.set('comfort', Object.keys(core.OPERATIONS).map(function (operation) {
                     return sharedModel.operations[operation];
                 }).join(','));
+            } else if (mode === 'workshop') {
+                url.searchParams.set('difficulty', 'workshop');
+                url.searchParams.set('focus', currentLearningConcept);
             } else if (mode === 'custom') {
                 url.searchParams.set('difficulty', 'custom');
                 url.searchParams.set('ops', activeCustomSettings.operations.join(','));
@@ -1107,6 +1269,7 @@
         ui.setting_sidebar_side.value = requestedSide;
         ui.setting_adaptive_style.value =
             ['flow', 'coach'].includes(settings.adaptiveStyle) ? settings.adaptiveStyle : 'flow';
+        populateLearningFocus();
     }
 
     function refreshLocalizedUi() {
@@ -1115,6 +1278,7 @@
         updateModeInfo();
         renderHistory();
         renderStats();
+        renderLearning();
         renderAchievements();
         renderSession();
         if (currentProblem) drawProblem();
@@ -1148,6 +1312,20 @@
                 isSolved() ? 'tutorial.goodBody' : 'tutorial.restoreBody');
         }
     });
+    ui.feedback.addEventListener('click', function (event) {
+        const button = event.target.closest('[data-copy-learning]');
+        if (!button || !currentProblem) return;
+        const value = JSON.stringify(core.learningExample(currentProblem.sides), null, 2);
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(value).then(function () {
+                setCatalogMessage('share.copied', 'share.ready');
+            }).catch(function () {
+                window.prompt(t('share.prompt'), value);
+            });
+        } else {
+            window.prompt(t('share.prompt'), value);
+        }
+    });
 
     ui.submit.addEventListener('click', function () {
         if (session.phase === 'review') {
@@ -1175,21 +1353,40 @@
     });
 
     ui.hint.addEventListener('click', function () {
-        if (!currentProblem || session.phase !== 'playing' || hintLevel >= 2) return;
-        hintLevel = Math.min(2, hintLevel + 1);
+        if (!currentProblem || session.phase !== 'playing' || hintLevel >= 4) return;
+        hintLevel = Math.min(4, hintLevel + 1);
         session.hints++;
-        adapt('hint');
-        ui.hint.disabled = hintLevel >= 2;
+        hintsOnPuzzle++;
+        if (hintLevel === 1) adapt('hint');
+        ui.hint.disabled = hintLevel >= 4;
         drawProblem();
-        setCatalogMessage(hintLevel === 1 ? 'hint.side' : 'hint.number',
-            hintLevel === 1 ? 'hint.sideBody' : 'hint.numberBody');
+        const learning = core.learningAnalysis(currentProblem.sides);
+        if (hintLevel === 1) {
+            setCatalogMessage('hint.compare', 'hint.compareBody', {
+                left: learning.beforeTotals[0],
+                right: learning.beforeTotals[1],
+                gap: learning.gap
+            });
+        } else if (hintLevel === 2) {
+            const effect = learning.intendedEffect;
+            setCatalogMessage('hint.direction', 'hint.directionBody', {
+                side: t(effect.side === 0 ? 'side.left' : 'side.right'),
+                delta: (effect.delta >= 0 ? '+' : '') + effect.delta,
+                total: effect.after
+            });
+        } else {
+            setCatalogMessage(hintLevel === 3 ? 'hint.side' : 'hint.number',
+                hintLevel === 3 ? 'hint.sideBody' : 'hint.numberBody');
+        }
     });
 
     ui.skip.addEventListener('click', function () {
         if (!currentProblem || session.phase !== 'playing') return;
         adapt('skip');
         recordAttempt(false);
-        showExplanation(true);
+        recordLearning(false);
+        const intendedId = core.solutionDetails(currentProblem.sides, {}).solutionId;
+        showExplanation(true, {}, false, intendedId);
         session.phase = 'review';
         renderSubmitLabel();
         ui.hint.disabled = true;
@@ -1309,6 +1506,7 @@
                 round: saved.round,
                 date: saved.dailyDate,
                 adaptiveState: saved.adaptive,
+                learningConcept: saved.learningConcept,
                 generatorVersion: saved.generatorVersion || 1
             });
         }
@@ -1359,7 +1557,8 @@
                 contrast: ui.setting_contrast.checked,
                 reducedClutter: ui.setting_reduced_clutter.checked,
                 sidebarSide: ui.setting_sidebar_side.value,
-                adaptiveStyle: ui.setting_adaptive_style.value
+                adaptiveStyle: ui.setting_adaptive_style.value,
+                learningFocus: ui.setting_learning_focus.value
             };
             save(KEYS.settings, settings);
             applySettings();
@@ -1381,6 +1580,16 @@
         settings.adaptiveStyle = ui.setting_adaptive_style.value;
         save(KEYS.settings, settings);
         updateModeInfo();
+    });
+    ui.setting_learning_focus.addEventListener('change', function () {
+        settings.learningFocus = ui.setting_learning_focus.value;
+        save(KEYS.settings, settings);
+    });
+    ui.learning_practice.addEventListener('click', function () {
+        settings.learningFocus = 'recommended';
+        save(KEYS.settings, settings);
+        const button = ui.mode_buttons.querySelector('[data-mode="workshop"]');
+        activateMode('workshop', button);
     });
 
     document.addEventListener('keydown', function (event) {
@@ -1526,6 +1735,19 @@
                 setCatalogMessage('shared.custom', 'shared.customBody');
                 return;
             }
+            if (requested === 'workshop') {
+                const focus = core.LEARNING_CONCEPTS[params.get('focus')]
+                    ? params.get('focus') : 'balance';
+                const button = ui.mode_buttons.querySelector('[data-mode="workshop"]');
+                activateMode('workshop', button, {
+                    seed: safeSeed,
+                    round: sharedRound(params.get('round')),
+                    learningConcept: focus,
+                    generatorVersion: sharedGeneratorVersion
+                });
+                setCatalogMessage('shared.seeded', 'shared.seededBody');
+                return;
+            }
             const difficulty = core.DIFFICULTIES[requested] ? requested : 'normal';
             const button = ui.mode_buttons.querySelector('[data-mode="' + difficulty + '"]');
             activateMode(difficulty, button, {
@@ -1546,6 +1768,7 @@
     applySettings();
     renderHistory();
     renderStats();
+    renderLearning();
     renderAchievements();
     ui.achievement_notice.hidden = true;
     if ('serviceWorker' in navigator && window.location.protocol !== 'file:') {

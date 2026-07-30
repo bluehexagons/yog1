@@ -9,6 +9,7 @@
         settings: 'yog1.accessibility.v1',
         daily: 'yog1.dailyResults.v1',
         adaptive: 'yog1.adaptiveModel.v1',
+        learning: 'yog1.learning.v1',
         locale: 'yog1.locale.v1'
     };
     const SCHEMA_VERSION = 1;

@@ -11,18 +11,25 @@ builder. Problem history and per-difficulty stats are stored locally in the
 browser and can be cleared from the page.
 
 Additional modes include Adaptive difficulty, a shared Daily puzzle, a 60-second
-Timed sprint, a three-life Endless run, and ten handcrafted Challenges. Adaptive
-mode responds to correct and incorrect answers and offers a Flow style that
-reinforces strengths or a Coach style that practices weaker operators. Daily
-results include a seven-day grid plus current and best streaks.
+Timed sprint, a three-life Endless run, ten handcrafted Challenges, and a Math
+Lab for focused learning. Math Lab tracks confidence-aware mastery across
+balancing, multiplication, division, remainders, powers, and roots. It recommends
+concepts that need more practice while allowing learners to choose a focus.
+Adaptive mode responds to correct and incorrect answers and offers a Flow style
+that reinforces strengths or a Coach style that practices weaker operators.
+Daily results include a seven-day grid plus current and best streaks.
 
 Generated puzzles are sampled for a unique, safe solution and selected near the
 round's displayed complexity target. Every generated puzzle has a reproducible
 share link, and saved history entries can be replayed. Incorrect answers can be
-retried, hints reveal the relevant side and then the intended number, and
-completed puzzles include collapsible step-by-step arithmetic. Valid alternate
-solutions are recognized explicitly if one appears in legacy or handcrafted
-content.
+retried, and completed puzzles include collapsible step-by-step arithmetic.
+Valid alternate solutions are recognized explicitly if one appears in legacy
+or handcrafted content. A four-step hint ladder first compares both sides, then
+describes the needed numerical change, and only afterward reveals the relevant
+side and number. Feedback explains how the chosen replacement changed the value
+of its side and connects the puzzle to a reusable symbolic relationship. Reviewed
+puzzles can also be copied as structured JSON with their concept, totals,
+solution effect, and evaluation trace for lesson authoring or LLM experiments.
 
 The game also tracks achievements and session summaries. Local progress can be
 exported to or restored from a versioned JSON backup. Accessibility options
