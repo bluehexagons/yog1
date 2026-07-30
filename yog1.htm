@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#191919">
     <meta name="description" content="Balance integer equations by changing exactly one number into a 1." data-i18n-content="meta.description">
     <link rel="manifest" href="manifest.webmanifest">
@@ -13,19 +13,20 @@
         :root {
             --ink: #171717; --bg: #191919; --menu: #c9c9c3; --game: #e5e4dc;
             --paper: #fffef8; --blue: #123d61; --green: #17672f; --red: #a52d39;
-            --muted: #62625d; --warm: #8b4b28; --line: #aaa9a2;
+            --muted: #62625d; --warm: #8b4b28; --line: #aaa9a2; --focus: #006dcc;
         }
         body {
             margin: 0; min-height: 100vh; background: var(--bg); color: var(--ink);
-            font: 16px/1.45 Verdana, Geneva, sans-serif;
+            font: 1rem/1.45 Verdana, Geneva, sans-serif;
         }
-        html[lang="zh"] body { font-family: "Microsoft YaHei", "Noto Sans CJK SC", PingFang SC, sans-serif; }
-        html[lang="ar"] body { font-family: Tahoma, Arial, "Noto Naskh Arabic", sans-serif; }
-        html[lang="bn"] body, html[lang="hi"] body { font-family: "Noto Sans Bengali", "Noto Sans Devanagari", Mangal, sans-serif; }
+        html[lang^="zh"] body { font-family: "Microsoft YaHei", "Noto Sans CJK SC", PingFang SC, sans-serif; }
+        html[lang^="ar"] body { font-family: Tahoma, Arial, "Noto Naskh Arabic", sans-serif; }
+        html[lang^="bn"] body, html[lang^="hi"] body { font-family: "Noto Sans Bengali", "Noto Sans Devanagari", Mangal, sans-serif; }
         button, input, select { font: inherit; color: inherit; }
         button { cursor: pointer; }
         button:disabled { cursor: not-allowed; opacity: .5; }
         a { color: var(--blue); }
+        :focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
         #wrapper {
             width: 1180px; max-width: calc(100vw - 32px); min-height: 650px;
             display: flex; margin: 24px auto; border: 2px solid var(--ink);
@@ -62,21 +63,22 @@
         #mode_info strong { font: bold .8rem "Courier New", monospace; text-transform: uppercase; }
         #game { flex: 1; min-width: 0; padding: 24px 28px; overflow: hidden; }
         #game_toolbar { display: flex; justify-content: flex-end; min-height: 28px; margin-bottom: 8px; }
-        .toolbar-controls { display: flex; align-items: center; gap: 7px; }
+        .toolbar-controls { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 7px; }
         #game_toolbar #sidebar_toggle_play { padding: 4px 8px; }
         #quick_language { width: auto; max-width: 11rem; padding: 4px 6px; font-size: .78rem; }
         .screen > h2 { margin: 0 0 16px; font: bold 1.1rem "Courier New", monospace; text-transform: uppercase; }
-        #message { padding: 11px 14px; border: 1px solid var(--ink); border-left-width: 5px; background: #d6d5ce; }
+        #message { padding: 11px 14px; border: 1px solid var(--ink); border-inline-start-width: 5px; background: #d6d5ce; }
         #message strong { display: block; font: bold .78rem "Courier New", monospace; letter-spacing: .08em; text-transform: uppercase; }
         #message_text { font-size: .85rem; }
+        #message_text, #mode_info, .field-note { overflow-wrap: anywhere; }
         #achievement_notice { margin-top: 7px; color: var(--green); font: bold .75rem "Courier New", monospace; }
-        #round_bar { display: flex; gap: 10px; align-items: center; margin: 16px 0 8px; font-size: .76rem; color: var(--muted); }
+        #round_bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 16px 0 8px; font-size: .76rem; color: var(--muted); }
         #round_label { margin-inline-end: auto; color: var(--ink); font: bold .82rem "Courier New", monospace; text-transform: uppercase; }
         .round-kind { padding: 2px 7px; border: 1px solid var(--line); background: var(--paper); }
         .round-kind.challenge { color: var(--red); border-color: var(--red); }
         .round-kind.warmup { color: var(--green); border-color: var(--green); }
         #workspace { padding: 17px 19px; border: 2px solid var(--ink); background: #f7f6ee; box-shadow: 4px 4px #b4b3ac; }
-        #flips { display: flex; gap: 6px; color: var(--muted); font-size: .78rem; }
+        #flips { display: flex; flex-wrap: wrap; gap: 6px; color: var(--muted); font-size: .78rem; }
         #flips strong { margin-inline-end: auto; color: var(--ink); font: bold .75rem "Courier New", monospace; letter-spacing: .08em; text-transform: uppercase; }
         #flip_count { color: var(--ink); font-weight: bold; }
         #problem { min-height: 90px; display: flex; align-items: center; overflow-x: auto; padding: 10px 2px 16px; white-space: nowrap; font: 1.45rem "Courier New", monospace; }
@@ -97,9 +99,11 @@
         #feedback code { display: block; overflow-x: auto; color: var(--blue); white-space: nowrap; }
         #timer_label { padding: 2px 8px; color: var(--red); border: 1px solid var(--red); background: var(--paper); font-weight: bold; }
         .primary { padding: 9px 14px; font: bold .85rem "Courier New", monospace; text-transform: uppercase; }
-        #session_summary { display: flex; align-items: baseline; gap: 5px; margin-inline-start: auto; color: var(--muted); }
-        #session_summary .summary-value { color: var(--ink); font-size: .78rem; }
-        #session_summary .summary-label { font-size: .62rem; margin-inline-end: 5px; }
+        #session_summary { display: flex; flex-wrap: wrap; align-items: baseline; gap: 5px 10px; margin: 0; margin-inline-start: auto; color: var(--muted); }
+        #session_summary .session-stat { display: flex; align-items: baseline; gap: 4px; }
+        #session_summary dt, #session_summary dd { margin: 0; }
+        #session_summary .summary-value { order: -1; color: var(--ink); font-size: .78rem; }
+        #session_summary .summary-label { font-size: .7rem; }
         .panel-body { padding: 8px 3px 18px; overflow-x: auto; }
         .difficulty-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 7px; }
         .difficulty-grid article { padding: 9px; border: 1px solid var(--line); background: #eeeDE6; font-size: .72rem; }
@@ -109,7 +113,8 @@
         #custom_form { display: grid; gap: 12px; }
         #custom_form fieldset { margin: 0; border: 1px solid var(--line); }
         #custom_form legend { font: bold .75rem "Courier New", monospace; text-transform: uppercase; }
-        #custom_operations { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; font-size: .78rem; }
+        #custom_operations { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; font-size: .78rem; }
+        .check-option { display: flex; align-items: center; gap: 5px; min-height: 28px; }
         .field-note { margin: 8px 0 0; color: var(--muted); font-size: .7rem; }
         .custom-fields { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
         .custom-fields label { display: grid; gap: 3px; font-size: .75rem; }
@@ -120,7 +125,7 @@
         #history code { display: block; overflow-x: auto; padding-top: 4px; color: inherit; white-space: nowrap; }
         .history-summary { font-size: .72rem; font-weight: bold; }
         .history-date { color: var(--muted); font-weight: normal; }
-        .history-controls { display: flex; gap: 8px; align-items: center; margin-top: 10px; }
+        .history-controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 10px; }
         #history_page { margin-inline-end: auto; font-size: .72rem; color: var(--muted); }
         .secondary, .small-button { padding: 5px 9px; font-size: .72rem; }
         table { width: 100%; min-width: 610px; border-collapse: collapse; font-size: .78rem; }
@@ -132,8 +137,9 @@
         #achievement_list li { display: grid; list-style: none; padding: 8px; border: 1px solid var(--line); font-size: .7rem; }
         #achievement_list li strong { font: bold .75rem "Courier New", monospace; }
         #achievement_list .locked { color: var(--muted); opacity: .72; }
-        .settings-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; font-size: .78rem; }
-        body.large-text { font-size: 19px; }
+        .settings-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; font-size: .78rem; }
+        .settings-grid label { min-width: 0; }
+        html.large-text { font-size: 118.75%; }
         body.high-contrast { --game: #fff; --menu: #fff; --paper: #fff; --line: #333; --muted: #333; --blue: #003b6f; }
         body.high-contrast #message, body.high-contrast #mode_info, body.high-contrast #custom_panel { background: #fff; }
         body.reduced-clutter .options-extras, body.reduced-clutter #achievement_list { display: none; }
@@ -152,7 +158,11 @@
         footer { margin-top: 22px; padding-top: 12px; border-top: 1px solid var(--line); color: var(--muted); font-size: .75rem; text-align: center; }
         [hidden] { display: none !important; }
         @media (max-width: 760px) {
-            #wrapper { flex-direction: column; margin: 10px; max-width: calc(100vw - 20px); }
+            body {
+                padding: env(safe-area-inset-top) env(safe-area-inset-right)
+                    env(safe-area-inset-bottom) env(safe-area-inset-left);
+            }
+            #wrapper { width: auto; max-width: none; flex-direction: column; margin: 10px; }
             body.sidebar-right #wrapper, body.sidebar-left #wrapper, html[dir="rtl"] #wrapper { flex-direction: column; }
             #menu { width: 100%; border-right: 0; border-bottom: 2px solid var(--ink); }
             body.sidebar-right #menu, html[dir="rtl"] #menu { border-left: 0; border-bottom: 2px solid var(--ink); }
@@ -162,14 +172,35 @@
             #score_label { display: none; }
             #problem { font-size: 1.05rem; }
             #problem .number { font-size: 1.2rem; }
-            #session_summary { width: 100%; order: 5; margin-inline-start: 0; }
+            #session_summary { width: 100%; order: 5; margin: 0; }
             #achievement_list, .settings-grid { grid-template-columns: 1fr; }
             .options-grid { grid-template-columns: 1fr; }
+            #actions > button { flex: 1 1 9rem; min-height: 44px; }
+            #custom_progress { flex-basis: 100%; }
+            #view_buttons button, #mode_buttons button, select, .primary, .secondary, .small-button {
+                min-height: 44px;
+            }
+            input[type="number"], input[type="text"], input[type="range"] { min-height: 44px; }
+            .check-option, .settings-grid label:has(input[type="checkbox"]) { min-height: 44px; }
+            input[type="checkbox"] { width: 24px; height: 24px; flex: none; }
             #wrapper.sidebar-collapsed #menu { width: 100%; padding: 8px; }
             #wrapper.sidebar-collapsed #menu .menu-heading > div { display: block; }
             #wrapper.sidebar-collapsed #menu > :not(.menu-heading) { display: none; }
         }
+        @media (max-width: 420px) {
+            #view_buttons, #mode_buttons, #custom_operations, .custom-fields { grid-template-columns: 1fr; }
+            #game_toolbar, .toolbar-controls { justify-content: flex-start; }
+            #quick_language { min-width: 0; max-width: none; flex: 1; }
+        }
         @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; } }
+        @media (forced-colors: active) {
+            :focus-visible, #problem .number.hint-target, .equation-side.hint-side {
+                outline: 3px solid CanvasText;
+            }
+            #view_buttons button.active, #mode_buttons button.active, #problem .number.flipped {
+                border: 3px solid CanvasText;
+            }
+        }
     </style>
 </head>
 <body>
@@ -206,20 +237,20 @@
         <div id="mode_info" aria-live="polite"></div>
     </aside>
     <main id="game">
-        <div id="game_toolbar"><div class="toolbar-controls"><button id="sidebar_toggle_play" class="secondary" type="button" aria-controls="menu" aria-expanded="true" data-i18n="action.menu">Menu</button><label class="sr-only" for="quick_language" data-i18n="language.label">Language</label><select id="quick_language" aria-label="Language" data-i18n-aria-label="language.label"><option value="en">English</option><option value="es">Español</option><option value="zh">简体中文</option><option value="ar">العربية</option><option value="bn">বাংলা</option><option value="ja">日本語</option><option value="hi">हिन्दी</option><option value="pt">Português (Brasil)</option><option value="ru">Русский</option><option value="vi">Tiếng Việt</option><option value="tr">Türkçe</option><option value="ur">اردو</option></select></div></div>
+        <div id="game_toolbar"><div class="toolbar-controls"><button id="sidebar_toggle_play" class="secondary" type="button" aria-controls="menu" aria-expanded="true" data-i18n="action.menu">Menu</button><label class="sr-only" for="quick_language" data-i18n="language.label">Language</label><select id="quick_language" aria-label="Language" data-i18n-aria-label="language.label"></select></div></div>
         <section id="play_screen" class="screen" data-screen="play" aria-label="Play" data-i18n-aria-label="aria.play">
         <div id="message" role="status" aria-live="polite">
             <strong id="message_title" data-i18n="message.howToPlay">How to play</strong>
             <span id="message_text"></span>
-            <div id="achievement_notice" role="status"></div>
         </div>
+        <div id="achievement_notice" role="status" aria-live="polite"></div>
 
         <section id="custom_panel" hidden>
             <form id="custom_form">
-                <fieldset>
+                <fieldset aria-describedby="custom_note">
                     <legend data-i18n="custom.operations">Operations</legend>
                     <div id="custom_operations"></div>
-                    <p class="field-note" data-i18n="custom.note">Choose +, −, ×, ÷, or powers.</p>
+                    <p id="custom_note" class="field-note" data-i18n="custom.note">Choose +, −, ×, ÷, or powers.</p>
                 </fieldset>
                 <div class="custom-fields">
                     <label><span data-i18n="custom.length">Length</span>: <strong><span id="custom_length_value">5</span> <span data-i18n="custom.operationCount">operations</span></strong>
@@ -240,11 +271,11 @@
             <span id="round_kind" class="round-kind">Guided</span>
             <span id="score_label"></span>
             <span id="timer_label" hidden>60s</span>
-            <div id="session_summary" aria-label="Current session statistics" data-i18n-aria-label="aria.session"></div>
+            <dl id="session_summary" aria-label="Current session statistics" data-i18n-aria-label="aria.session"></dl>
         </div>
         <section id="workspace" aria-label="Current puzzle" data-i18n-aria-label="aria.puzzle">
             <div id="flips"><strong data-i18n="action.yourMove">Your move</strong><span id="flip_count">1</span><span id="flip_text">flip remaining</span></div>
-            <div id="problem"></div>
+            <div id="problem" role="group" dir="ltr"></div>
             <div id="actions">
                 <span id="custom_progress" hidden></span>
                 <button id="hint" class="secondary" type="button" title="Hint (H)" data-i18n="action.hint" data-i18n-title="action.hintTitle">Hint</button>
@@ -252,7 +283,7 @@
                 <button id="share" class="secondary" type="button" data-i18n="action.share">Share</button>
                 <button id="submit" class="primary" type="button" data-i18n="action.check">Check equation</button>
             </div>
-            <div id="feedback" aria-live="polite" hidden></div>
+            <div id="feedback" role="status" aria-live="polite" hidden></div>
         </section>
 
         </section>
@@ -275,7 +306,7 @@
             <section class="screen-panel">
                 <h3 data-i18n="page.accessibility">Accessibility &amp; sound</h3>
                 <div class="settings-grid">
-                    <label><span data-i18n="language.label">Language</span><select id="setting_language" aria-label="Language" data-i18n-aria-label="language.label"><option value="en">English</option><option value="es">Español</option><option value="zh">简体中文</option><option value="ar">العربية</option><option value="bn">বাংলা</option><option value="ja">日本語</option><option value="hi">हिन्दी</option><option value="pt">Português (Brasil)</option><option value="ru">Русский</option><option value="vi">Tiếng Việt</option><option value="tr">Türkçe</option><option value="ur">اردو</option></select></label>
+                    <label><span data-i18n="language.label">Language</span><select id="setting_language" aria-label="Language" data-i18n-aria-label="language.label"></select></label>
                     <label><span data-i18n="sidebar.label">Sidebar side</span><select id="setting_sidebar_side"><option value="auto" data-i18n="sidebar.auto">Automatic (follow language)</option><option value="left" data-i18n="sidebar.left">Left</option><option value="right" data-i18n="sidebar.right">Right</option></select></label>
                     <label><input id="setting_sound" type="checkbox"><span data-i18n="setting.sound">Sound effects</span></label>
                     <label><input id="setting_large_text" type="checkbox"><span data-i18n="setting.largeText">Larger text</span></label>

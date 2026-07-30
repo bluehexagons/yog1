@@ -52,6 +52,8 @@ i18n.setLocale('hi');
 assert.strictEqual(i18n.t('action.check'), 'समीकरण जाँचें', 'Hindi controls are available');
 i18n.setLocale('pt');
 assert.strictEqual(i18n.t('action.check'), 'Verificar equação', 'Brazilian Portuguese controls are available');
+assert.strictEqual(i18n.getLanguageTag(), 'pt-BR',
+    'Brazilian Portuguese exposes its precise document language tag');
 i18n.setLocale('ru');
 assert.strictEqual(i18n.t('action.check'), 'Проверить равенство', 'Russian controls are available');
 i18n.setLocale('vi');
@@ -62,6 +64,17 @@ i18n.setLocale('ur');
 assert.strictEqual(i18n.getDirection(), 'rtl', 'Urdu reuses right-to-left layout support');
 assert.strictEqual(manifestLink.href, 'manifest.ur.webmanifest',
     'right-to-left locales select their localized install manifest');
+i18n.setLocale('zh-TW');
+assert.strictEqual(i18n.getLocale(), 'en',
+    'Traditional Chinese preferences do not silently select Simplified Chinese');
+i18n.setLocale('pt-PT');
+assert.strictEqual(i18n.getLocale(), 'en',
+    'Portugal preferences do not silently select Brazilian Portuguese');
+i18n.setLocale('zh-Hans');
+assert.strictEqual(i18n.getLocale(), 'zh',
+    'a supported full language tag resolves to its backwards-compatible locale ID');
+assert.strictEqual(document.documentElement.lang, 'zh-Hans',
+    'the document exposes the full language tag to assistive technology');
 
 const modeIds = Object.keys(core.DIFFICULTIES)
     .concat(['tutorial', 'adaptive', 'custom', 'daily', 'timed', 'endless', 'challenges']);
@@ -128,17 +141,23 @@ for (const locale of i18n.availableLocales) {
     assert.deepStrictEqual(missing, [], locale + ' provides every catalog key used in the document');
 }
 
-const optionLocales = Array.from(new Set(
-    Array.from(html.matchAll(/<option value="([a-z]{2})">/g)).map(function (match) { return match[1]; })
-));
-assert.deepStrictEqual(optionLocales, Array.from(i18n.availableLocales),
-    'language selectors expose every supported locale');
+const localeOptionIds = Array.from(i18n.localeOptions, function (item) { return item.id; });
+assert.strictEqual(new Set(localeOptionIds).size,
+    i18n.availableLocales.length, 'language selector metadata has one entry per locale');
+assert.deepStrictEqual(localeOptionIds,
+    Array.from(i18n.availableLocales), 'language selector metadata exposes every supported locale');
+assert(i18n.localeOptions.every(function (item) {
+    return item.tag && item.label && ['ltr', 'rtl'].includes(item.direction);
+}), 'each language selector entry has an autonym, language tag, and direction');
+assert.strictEqual((html.match(/<select id="(?:quick_language|setting_language)"/g) || []).length, 2,
+    'both language selectors remain available in the document');
 
 for (const locale of i18n.availableLocales) {
     const filename = locale === 'en' ? 'manifest.webmanifest' :
         'manifest.' + locale + '.webmanifest';
     const manifest = JSON.parse(fs.readFileSync(filename, 'utf8'));
-    assert.strictEqual(manifest.lang, locale, filename + ' declares its locale');
+    const localeOption = i18n.localeOptions.find(function (item) { return item.id === locale; });
+    assert.strictEqual(manifest.lang, localeOption.tag, filename + ' declares its full language tag');
     assert.strictEqual(manifest.description, i18n.locales[locale]['meta.description'],
         filename + ' uses the cataloged localized description');
     assert.strictEqual(new URL(manifest.start_url, 'https://example.test/').searchParams.get('lang'),
@@ -174,6 +193,10 @@ assert(game.includes("i18n.getMessageId('mode', item.modeId || item.mode)"),
     'localized mode labels in existing history are migrated to stable identifiers');
 assert(game.includes('renderExplanation();'),
     'language changes rerender generated explanation copy');
+assert(game.includes('i18n.getLanguageTag()'),
+    'locale-sensitive date formatting uses the full language tag');
+assert(game.includes('for (const locale of i18n.localeOptions)'),
+    'both language selectors are generated from centralized locale metadata');
 assert(game.includes('const replayingChallenges'),
     'the submit label preserves the final Challenge replay state');
 assert.strictEqual(game.includes("session.finished && mode === 'challenges'"), false,

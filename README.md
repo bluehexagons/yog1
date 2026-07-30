@@ -27,6 +27,7 @@ Keyboard controls:
 - Left/Right: move between numbers
 - Space: flip the focused number
 - Enter: check the equation
+- Ctrl/Command+Enter: check from elsewhere in the game
 - H: request a hint
 
 It remains a dependency-free static site. Open `yog1.htm` in a browser to play.
@@ -39,13 +40,15 @@ it installable and available offline.
 Arabic, Bengali, Japanese, Hindi, Brazilian Portuguese, Russian, Vietnamese,
 Turkish, and Urdu. The Options screen remembers the chosen language, preserves
 it in shared links and installed-app metadata, and lets players choose the
-sidebar side. Arabic and Urdu enable the RTL layout while equations remain
-left-to-right. Use `data-i18n` for static markup and
+sidebar side. Centralized locale metadata supplies each language autonym,
+direction, and full BCP 47 document tag. Arabic and Urdu enable the RTL layout
+while equations remain left-to-right. Use `data-i18n` for static markup and
 `Yog1I18n.t(key, values)` for generated text.
 
-Run the generator and localization tests with:
+Run the generator, localization, and dependency-free UI audit tests with:
 
 ```sh
 node test-core.js
 node test-i18n.js
+node test-ui.js
 ```

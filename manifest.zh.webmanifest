@@ -1,7 +1,7 @@
 {
   "name": "You Only Get 1s",
   "short_name": "YOG1",
-  "lang": "zh",
+  "lang": "zh-Hans",
   "description": "只需把一个数字改为 1，即可使整数等式平衡。",
   "start_url": "./yog1.htm?lang=zh",
   "scope": "./",

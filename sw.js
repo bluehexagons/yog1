@@ -1,6 +1,6 @@
 'use strict';
 
-const CACHE = 'yog1-v9';
+const CACHE = 'yog1-v10';
 const FILES = [
     './yog1.htm',
     './game-core.js',

@@ -110,7 +110,11 @@
     const defaultSettings = {
         sound: false, largeText: false, contrast: false, reducedClutter: false, sidebarSide: 'auto'
     };
-    let settings = load(KEYS.settings, defaultSettings);
+    const loadedSettings = load(KEYS.settings, null);
+    let settings = loadedSettings && typeof loadedSettings === 'object' &&
+        !Array.isArray(loadedSettings)
+        ? Object.assign({}, defaultSettings, loadedSettings)
+        : Object.assign({}, defaultSettings);
     let dailyResults = load(KEYS.daily, {});
     let adaptiveState = core.normalizeAdaptiveState(load(KEYS.adaptive, null));
     if (!Array.isArray(history)) history = [];
@@ -132,9 +136,6 @@
     }
     if (!Array.isArray(achievementState.operations)) achievementState.operations = [];
     if (!Number.isFinite(achievementState.solved)) achievementState.solved = 0;
-    if (!settings || typeof settings !== 'object' || Array.isArray(settings)) {
-        settings = defaultSettings;
-    }
     if (!dailyResults || typeof dailyResults !== 'object' || Array.isArray(dailyResults)) {
         dailyResults = {};
     }
@@ -186,6 +187,20 @@
             rate: Number(ui.custom_rate.value),
             seed: ui.custom_seed.value.trim()
         };
+    }
+
+    function populateLanguageSelectors() {
+        for (const select of [ui.setting_language, ui.quick_language]) {
+            select.replaceChildren();
+            for (const locale of i18n.localeOptions) {
+                const option = document.createElement('option');
+                option.value = locale.id;
+                option.lang = locale.tag;
+                option.dir = locale.direction;
+                option.textContent = locale.label;
+                select.appendChild(option);
+            }
+        }
     }
 
     function populateCustomForm() {
@@ -347,6 +362,9 @@
                 ui.problem.appendChild(text('span', ' = ', 'equals'));
             }
         });
+        ui.problem.setAttribute('aria-label', currentProblem.sides.map(function (side) {
+            return core.serialize(side, currentValues);
+        }).join(' = '));
         ui.flip_count.textContent = selectedId ? '0' : '1';
         ui.flip_text.textContent = t(selectedId ? 'flip.many' : 'flip.one');
         ui.round_label.textContent = mode === 'tutorial' ? t('round.tutorial') :
@@ -476,13 +494,9 @@
         return stats[id];
     }
 
-    function statId() {
-        return core.DIFFICULTIES[mode] ? mode : mode;
-    }
-
     function recordStat(correct) {
         if (mode === 'tutorial') return;
-        const stat = getStat(statId());
+        const stat = getStat(mode);
         stat.attempts++;
         if (correct) {
             stat.correct++;
@@ -671,7 +685,7 @@
         ui.submit.disabled = true;
         ui.hint.disabled = true;
         ui.skip.disabled = true;
-        const stat = getStat(statId());
+        const stat = getStat(mode);
         stat.bestScore = Math.max(stat.bestScore || 0, session.solved);
         save(KEYS.stats, stats);
         renderStats();
@@ -710,15 +724,21 @@
         const average = session.durations.length
             ? (session.durations.reduce(function (sum, value) { return sum + value; }, 0) /
                 session.durations.length / 1000).toFixed(1) : null;
+        function sessionStat(label, value) {
+            const group = document.createElement('div');
+            group.className = 'session-stat';
+            group.append(
+                text('dt', label, 'summary-label'),
+                text('dd', value, 'summary-value')
+            );
+            return group;
+        }
         ui.session_summary.replaceChildren(
-            text('div', String(session.solved), 'summary-value'),
-            text('div', t('session.solved'), 'summary-label'),
-            text('div', accuracy + '%', 'summary-value'),
-            text('div', t('session.accuracy'), 'summary-label'),
-            text('div', average === null ? '—' : t('timer.seconds', { seconds: average }), 'summary-value'),
-            text('div', t('session.average'), 'summary-label'),
-            text('div', String(Math.round(session.hardest)), 'summary-value'),
-            text('div', t('session.hardest'), 'summary-label')
+            sessionStat(t('session.solved'), String(session.solved)),
+            sessionStat(t('session.accuracy'), accuracy + '%'),
+            sessionStat(t('session.average'),
+                average === null ? '—' : t('timer.seconds', { seconds: average })),
+            sessionStat(t('session.hardest'), String(Math.round(session.hardest)))
         );
         updateProgress();
     }
@@ -738,7 +758,8 @@
             const summary = text('div', (item.correct ? t('history.correct') : t('history.incorrect')) +
                 ' · ' + historyModeLabel(item.modeId || item.mode) + ' · ' +
                 t('history.round', { round: item.round }), 'history-summary');
-            summary.appendChild(text('time', ' ' + new Date(item.at).toLocaleString(i18n.getLocale()), 'history-date'));
+            summary.appendChild(text('time',
+                ' ' + new Date(item.at).toLocaleString(i18n.getLanguageTag()), 'history-date'));
             li.append(summary, text('code', item.expression));
             ui.history.appendChild(li);
         }
@@ -996,7 +1017,7 @@
     }
 
     function applySettings() {
-        document.body.classList.toggle('large-text', !!settings.largeText);
+        document.documentElement.classList.toggle('large-text', !!settings.largeText);
         document.body.classList.toggle('high-contrast', !!settings.contrast);
         document.body.classList.toggle('reduced-clutter', !!settings.reducedClutter);
         const requestedSide = ['auto', 'left', 'right'].includes(settings.sidebarSide) ? settings.sidebarSide : 'auto';
@@ -1035,13 +1056,18 @@
     ui.problem.addEventListener('click', function (event) {
         const button = event.target.closest('[data-number-id]');
         if (!button || awaitingAdvance || session.finished || !currentProblem) return;
+        const keyboardActivation = event.detail === 0;
         const id = button.dataset.numberId;
         selectedId = selectedId === id ? null : id;
         currentValues = valuesWithFlip(selectedId);
         playSound('flip');
         drawProblem();
         const replacement = ui.problem.querySelector('[data-number-id="' + id + '"]');
-        if (replacement) replacement.focus();
+        if (keyboardActivation && selectedId) {
+            ui.submit.focus();
+        } else if (replacement) {
+            replacement.focus();
+        }
         if (mode === 'tutorial') {
             setCatalogMessage(isSolved() ? 'tutorial.good' : 'tutorial.restore',
                 isSolved() ? 'tutorial.goodBody' : 'tutorial.restoreBody');
@@ -1135,18 +1161,30 @@
     ui.custom_form.addEventListener('submit', function (event) {
         event.preventDefault();
         const chosen = customSettings();
+        for (const input of ui.custom_form.querySelectorAll('[aria-invalid="true"]')) {
+            input.removeAttribute('aria-invalid');
+        }
         if (!chosen.operations.length) {
             setCatalogMessage('custom.chooseOperation', 'custom.chooseOperationBody');
+            const firstOperation = ui.custom_operations.querySelector('input');
+            if (firstOperation) firstOperation.focus();
             return;
         }
         if (!chosen.operations.some(function (operation) {
             return ['add', 'subtract', 'multiply', 'divide', 'power'].includes(operation);
         })) {
             setCatalogMessage('custom.chooseIdentity', 'custom.chooseIdentityBody');
+            const firstIdentity = Array.from(ui.custom_operations.querySelectorAll('input')).find(function (input) {
+                return ['add', 'subtract', 'multiply', 'divide', 'power'].includes(input.value);
+            });
+            if (firstIdentity) firstIdentity.focus();
             return;
         }
         if (chosen.min > chosen.max) {
             setCatalogMessage('custom.checkTargets', 'custom.checkTargetsBody');
+            ui.custom_min.setAttribute('aria-invalid', 'true');
+            ui.custom_max.setAttribute('aria-invalid', 'true');
+            ui.custom_min.focus();
             return;
         }
         save(KEYS.custom, chosen);
@@ -1227,8 +1265,10 @@
         } else if (event.key.toLowerCase() === 'h' && !ui.hint.disabled) {
             event.preventDefault();
             ui.hint.click();
-        } else if (event.key === 'Enter' &&
-            (document.activeElement === document.body || ui.problem.contains(document.activeElement))) {
+        } else if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) {
+            event.preventDefault();
+            ui.submit.click();
+        } else if (event.key === 'Enter' && document.activeElement === document.body) {
             event.preventDefault();
             ui.submit.click();
         }
@@ -1249,9 +1289,21 @@
 
     function bootFromUrl() {
         const params = new URLSearchParams(window.location.search);
-        const daily = params.get('daily');
+        const requestedDaily = params.get('daily');
+        function sharedDailyDate(value) {
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(value || '')) return null;
+            const parsed = new Date(value + 'T00:00:00Z');
+            return Number.isFinite(parsed.getTime()) &&
+                parsed.toISOString().slice(0, 10) === value ? value : null;
+        }
+        const daily = sharedDailyDate(requestedDaily);
         const challenge = params.get('challenge');
         const seed = params.get('seed');
+        function sharedRound(value) {
+            const parsed = Number(value);
+            return Number.isSafeInteger(parsed)
+                ? Math.max(1, Math.min(100000, parsed)) : 1;
+        }
         if (daily) {
             const button = ui.mode_buttons.querySelector('[data-mode="daily"]');
             activateMode('daily', button, { date: daily });
@@ -1260,7 +1312,7 @@
         if (challenge) {
             const button = ui.mode_buttons.querySelector('[data-mode="challenges"]');
             activateMode('challenges', button, {
-                round: Math.max(1, Math.min(CURATED.length, Number(challenge) || 1))
+                round: Math.min(CURATED.length, sharedRound(challenge))
             });
             setCatalogMessage('shared.challenge', currentProblem.titleKey);
             return;
@@ -1277,7 +1329,7 @@
                 const button = ui.mode_buttons.querySelector('[data-mode="adaptive"]');
                 activateMode('adaptive', button, {
                     seed: safeSeed,
-                    round: Math.max(1, Number(params.get('round')) || 1),
+                    round: sharedRound(params.get('round')),
                     adaptiveState: {
                         rating: Number(params.get('rating')),
                         operations: operations
@@ -1290,11 +1342,13 @@
                 const button = ui.mode_buttons.querySelector('[data-mode="custom"]');
                 activateMode('custom', button, {
                     seed: safeSeed,
-                    round: Math.max(1, Number(params.get('round')) || 1)
+                    round: sharedRound(params.get('round'))
                 });
-                const requestedOperations = (params.get('ops') || '').split(',').filter(function (key) {
-                    return Object.prototype.hasOwnProperty.call(core.OPERATIONS, key);
-                });
+                const requestedOperations = Array.from(new Set(
+                    (params.get('ops') || '').split(',').filter(function (key) {
+                        return Object.prototype.hasOwnProperty.call(core.OPERATIONS, key);
+                    })
+                ));
                 for (const input of ui.custom_operations.querySelectorAll('input')) {
                     input.checked = requestedOperations.includes(input.value);
                 }
@@ -1312,7 +1366,7 @@
             const button = ui.mode_buttons.querySelector('[data-mode="' + difficulty + '"]');
             activateMode(difficulty, button, {
                 seed: safeSeed,
-                round: Math.max(1, Number(params.get('round')) || 1)
+                round: sharedRound(params.get('round'))
             });
             setCatalogMessage('shared.seeded', 'shared.seededBody');
             return;
@@ -1321,6 +1375,7 @@
         activateMode('tutorial', button);
     }
 
+    populateLanguageSelectors();
     populateCustomForm();
     i18n.apply();
     applySettings();

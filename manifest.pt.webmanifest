@@ -1,7 +1,7 @@
 {
   "name": "You Only Get 1s",
   "short_name": "YOG1",
-  "lang": "pt",
+  "lang": "pt-BR",
   "description": "Equilibre equações de inteiros mudando exatamente um número para 1.",
   "start_url": "./yog1.htm?lang=pt",
   "scope": "./",

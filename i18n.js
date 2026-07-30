@@ -2,10 +2,27 @@
     'use strict';
 
     const STORAGE_KEY = 'yog1.locale.v1';
-    // Locales shown in Options. English safely fills any copy that has not yet
-    // been added to a locale's catalog.
-    const AVAILABLE_LOCALES = ['en', 'es', 'zh', 'ar', 'bn', 'ja', 'hi', 'pt', 'ru', 'vi', 'tr', 'ur'];
-    const RTL_LOCALES = ['ar', 'ur'];
+    // Internal IDs stay short for backwards-compatible links and storage.
+    // Language tags and autonyms live here so selectors, document metadata,
+    // formatting, and install manifests cannot drift apart.
+    const LOCALE_OPTIONS = [
+        { id: 'en', tag: 'en', label: 'English', direction: 'ltr' },
+        { id: 'es', tag: 'es', label: 'Español', direction: 'ltr' },
+        { id: 'zh', tag: 'zh-Hans', label: '简体中文', direction: 'ltr' },
+        { id: 'ar', tag: 'ar', label: 'العربية', direction: 'rtl' },
+        { id: 'bn', tag: 'bn', label: 'বাংলা', direction: 'ltr' },
+        { id: 'ja', tag: 'ja', label: '日本語', direction: 'ltr' },
+        { id: 'hi', tag: 'hi', label: 'हिन्दी', direction: 'ltr' },
+        { id: 'pt', tag: 'pt-BR', label: 'Português (Brasil)', direction: 'ltr' },
+        { id: 'ru', tag: 'ru', label: 'Русский', direction: 'ltr' },
+        { id: 'vi', tag: 'vi', label: 'Tiếng Việt', direction: 'ltr' },
+        { id: 'tr', tag: 'tr', label: 'Türkçe', direction: 'ltr' },
+        { id: 'ur', tag: 'ur', label: 'اردو', direction: 'rtl' }
+    ];
+    const AVAILABLE_LOCALES = LOCALE_OPTIONS.map(function (item) { return item.id; });
+    const RTL_LOCALES = LOCALE_OPTIONS.filter(function (item) {
+        return item.direction === 'rtl';
+    }).map(function (item) { return item.id; });
     const messages = {
         en: {
             'language.label': 'Language',
@@ -161,18 +178,40 @@
         }
     };
 
-    function supported(locale) {
-        return AVAILABLE_LOCALES.includes(locale) ? locale : 'en';
+    function localeOption(locale) {
+        return LOCALE_OPTIONS.find(function (item) { return item.id === locale; }) ||
+            LOCALE_OPTIONS[0];
+    }
+
+    function supported(value) {
+        const requested = String(value || '').trim().replace(/_/g, '-').toLowerCase();
+        const exact = LOCALE_OPTIONS.find(function (item) {
+            return item.id.toLowerCase() === requested || item.tag.toLowerCase() === requested;
+        });
+        if (exact) return exact.id;
+
+        const parts = requested.split('-');
+        const primary = parts[0];
+        // Do not silently show Simplified Chinese to Traditional Chinese users,
+        // or Brazilian Portuguese to users who explicitly requested Portugal.
+        if (primary === 'zh') {
+            return parts.length === 1 || parts.includes('hans') ||
+                ['cn', 'sg'].includes(parts[1]) ? 'zh' : 'en';
+        }
+        if (primary === 'pt') {
+            return parts.length === 1 || parts[1] === 'br' ? 'pt' : 'en';
+        }
+        return AVAILABLE_LOCALES.includes(primary) ? primary : 'en';
     }
 
     function initialLocale() {
         const requested = new URLSearchParams(window.location.search).get('lang');
-        if (requested) return supported(requested.toLowerCase().split('-')[0]);
+        if (requested) return supported(requested);
         try {
             const saved = localStorage.getItem(STORAGE_KEY);
             if (saved) return supported(saved);
         } catch (error) {}
-        return supported((navigator.language || 'en').toLowerCase().split('-')[0]);
+        return supported(navigator.language || 'en');
     }
 
     let locale = initialLocale();
@@ -1325,8 +1364,9 @@
             element.href = locale === 'en' ? 'manifest.webmanifest' :
                 'manifest.' + locale + '.webmanifest';
         }
-        document.documentElement.lang = locale;
-        document.documentElement.dir = RTL_LOCALES.includes(locale) ? 'rtl' : 'ltr';
+        const option = localeOption(locale);
+        document.documentElement.lang = option.tag;
+        document.documentElement.dir = option.direction;
     }
 
     function setLocale(nextLocale) {
@@ -1348,6 +1388,10 @@
         translate: translate,
         locales: messages,
         availableLocales: AVAILABLE_LOCALES,
+        localeOptions: LOCALE_OPTIONS.map(function (item) {
+            return Object.assign({}, item);
+        }),
+        getLanguageTag: function () { return localeOption(locale).tag; },
         getDirection: function () { return RTL_LOCALES.includes(locale) ? 'rtl' : 'ltr'; }
     };
 }(window));
