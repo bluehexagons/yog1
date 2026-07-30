@@ -2,7 +2,7 @@
   "name": "You Only Get 1s",
   "short_name": "YOG1",
   "lang": "ru",
-  "description": "Уравняйте целочисленные выражения, изменив ровно одно число на 1.",
+  "description": "Уравновесьте уравнения с целыми числами, заменив ровно одно число на 1.",
   "start_url": "./yog1.htm?lang=ru",
   "scope": "./",
   "display": "standalone",

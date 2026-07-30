@@ -142,6 +142,26 @@ for (const locale of i18n.availableLocales) {
     assert.strictEqual(laboratoryTerms.test(i18n.locales[locale]['mode.guided']), false,
         locale + ' uses a neutral Guided Practice label');
 }
+assert.strictEqual(Object.values(i18n.locales.ar).some(function (value) {
+    return value.includes('رقم');
+}), false, 'Arabic describes changeable values as numbers rather than digits');
+assert.strictEqual(i18n.locales.ar['achievement.first.name'], 'الواحد الأول',
+    'the Arabic first-achievement name has natural word order');
+assert.strictEqual(i18n.locales.bn['mode.timed'], i18n.locales.bn['message.timed'],
+    'the Bengali Timed label consistently describes a timed activity');
+assert.strictEqual(i18n.locales.ur['mode.timed'], i18n.locales.ur['message.timed'],
+    'the Urdu Timed label consistently describes a race against time');
+assert(i18n.locales.ru['meta.description'].includes('уравнения'),
+    'Russian metadata identifies the game objects as equations');
+for (const key of ['message.curated', 'challenges.completeBody', 'shared.challenge',
+    'share.challenge', 'achievement.curated.description']) {
+    assert.strictEqual(i18n.locales.ru[key].includes('ручн'), false,
+        'Russian uses idiomatic author-created wording for ' + key);
+    assert.strictEqual(i18n.locales.vi[key].includes('làm tay'), false,
+        'Vietnamese uses idiomatic author-designed wording for ' + key);
+}
+assert(i18n.locales.ur['achievement.curated.description'].includes('بنائی گئی'),
+    'Urdu handcrafted-puzzle wording includes the required auxiliary verb');
 for (const key of ['action.copyJson', 'share.jsonCopied', 'share.jsonReady', 'share.jsonPrompt']) {
     assert(Object.prototype.hasOwnProperty.call(i18n.locales.en, key),
         key + ' has dedicated structured-example copy');

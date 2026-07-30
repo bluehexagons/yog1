@@ -3,7 +3,7 @@
   "short_name": "YOG1",
   "lang": "ar",
   "dir": "rtl",
-  "description": "وازن معادلات الأعداد الصحيحة بتغيير رقم واحد فقط إلى 1.",
+  "description": "وازن معادلات الأعداد الصحيحة بتغيير عدد واحد فقط إلى 1.",
   "start_url": "./yog1.htm?lang=ar",
   "scope": "./",
   "display": "standalone",
