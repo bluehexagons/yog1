@@ -24,8 +24,8 @@
         'practice_missed',
         'stats_rows', 'stats_reset_all', 'session_summary', 'achievement_list',
         'achievement_notice', 'setting_sound', 'setting_large_text', 'setting_contrast',
-        'setting_reduced_clutter', 'setting_language', 'quick_language', 'setting_color_scheme',
-        'setting_sidebar_side',
+        'setting_reduced_clutter', 'setting_language', 'quick_language',
+        'setting_color_scheme', 'quick_color_scheme', 'setting_sidebar_side',
         'setting_adaptive_style', 'setting_learning_focus', 'learning_goal',
         'learning_goal_name', 'learning_goal_example', 'learning_recommendation',
         'learning_rows', 'learning_practice', 'install_app', 'export_data', 'import_data',
@@ -254,18 +254,103 @@
         }
     }
 
+    function populateThemeSelectors() {
+        for (const select of [ui.setting_color_scheme, ui.quick_color_scheme]) {
+            select.replaceChildren();
+            for (const scheme of window.Yog1Theme.schemes) {
+                const option = document.createElement('option');
+                option.value = scheme;
+                option.dataset.i18n = 'theme.' + scheme;
+                option.textContent = t(option.dataset.i18n);
+                select.appendChild(option);
+            }
+        }
+    }
+
+    function refreshCompactInputLabels() {
+        for (const input of document.querySelectorAll('[data-compact-input]')) {
+            const button = input.querySelector('.compact-input-toggle');
+            const label = input.querySelector('label');
+            const select = input.querySelector('select');
+            const option = select.options[select.selectedIndex];
+            if (!option) continue;
+            const description = label.textContent.trim() + ': ' + option.textContent.trim();
+            button.setAttribute('aria-label', description);
+            button.title = description;
+        }
+    }
+
+    function setupCompactInputs() {
+        const inputs = Array.from(document.querySelectorAll('[data-compact-input]'));
+
+        function setExpanded(input, expanded, moveFocus) {
+            const button = input.querySelector('.compact-input-toggle');
+            const panel = input.querySelector('.compact-input-panel');
+            button.setAttribute('aria-expanded', String(expanded));
+            panel.hidden = !expanded;
+            if (moveFocus) {
+                (expanded ? panel.querySelector('select') : button).focus();
+            }
+        }
+
+        for (const input of inputs) {
+            const button = input.querySelector('.compact-input-toggle');
+            button.addEventListener('click', function () {
+                if (button.getAttribute('aria-busy') === 'true') return;
+                const expanded = button.getAttribute('aria-expanded') !== 'true';
+                for (const other of inputs) setExpanded(other, false, false);
+                setExpanded(input, expanded, expanded);
+            });
+            input.addEventListener('change', function () {
+                refreshCompactInputLabels();
+                setExpanded(input, false, true);
+            });
+            input.addEventListener('keydown', function (event) {
+                if (event.key !== 'Escape') return;
+                event.preventDefault();
+                event.stopPropagation();
+                setExpanded(input, false, true);
+            });
+            input.addEventListener('focusout', function (event) {
+                if (event.relatedTarget && input.contains(event.relatedTarget)) return;
+                window.setTimeout(function () {
+                    if (!input.contains(document.activeElement)) {
+                        setExpanded(input, false, false);
+                    }
+                }, 0);
+            });
+        }
+
+        document.addEventListener('click', function (event) {
+            for (const input of inputs) {
+                if (!input.contains(event.target)) setExpanded(input, false, false);
+            }
+        });
+    }
+
     function chooseLanguage(nextLocale) {
         const selects = [ui.setting_language, ui.quick_language];
         for (const select of selects) {
             select.disabled = true;
             select.setAttribute('aria-busy', 'true');
+            const compactInput = select.closest('[data-compact-input]');
+            if (compactInput) {
+                compactInput.querySelector('.compact-input-toggle')
+                    .setAttribute('aria-busy', 'true');
+            }
         }
         return i18n.setLocale(nextLocale).then(function (activeLocale) {
             for (const select of selects) {
                 select.value = activeLocale;
                 select.disabled = false;
                 select.removeAttribute('aria-busy');
+                const compactInput = select.closest('[data-compact-input]');
+                if (compactInput) {
+                    compactInput.querySelector('.compact-input-toggle')
+                        .removeAttribute('aria-busy');
+                }
             }
+            refreshCompactInputLabels();
             return activeLocale;
         });
     }
@@ -1440,6 +1525,8 @@
         ui.setting_language.value = i18n.getLocale();
         ui.quick_language.value = i18n.getLocale();
         ui.setting_color_scheme.value = colorScheme;
+        ui.quick_color_scheme.value = colorScheme;
+        refreshCompactInputLabels();
         ui.setting_sidebar_side.value = requestedSide;
         ui.setting_adaptive_style.value =
             ['flow', 'coach'].includes(settings.adaptiveStyle) ? settings.adaptiveStyle : 'flow';
@@ -1764,17 +1851,18 @@
             if (input === ui.setting_sound && input.checked) playSound('flip');
         });
     }
-    ui.setting_language.addEventListener('change', function () {
-        chooseLanguage(ui.setting_language.value);
-    });
-    ui.quick_language.addEventListener('change', function () {
-        chooseLanguage(ui.quick_language.value);
-    });
-    ui.setting_color_scheme.addEventListener('change', function () {
-        settings.colorScheme = ui.setting_color_scheme.value;
-        save(KEYS.settings, settings);
-        applySettings();
-    });
+    for (const select of [ui.setting_language, ui.quick_language]) {
+        select.addEventListener('change', function () {
+            chooseLanguage(select.value);
+        });
+    }
+    for (const select of [ui.setting_color_scheme, ui.quick_color_scheme]) {
+        select.addEventListener('change', function () {
+            settings.colorScheme = select.value;
+            save(KEYS.settings, settings);
+            applySettings();
+        });
+    }
     ui.setting_sidebar_side.addEventListener('change', function () {
         settings.sidebarSide = ui.setting_sidebar_side.value;
         save(KEYS.settings, settings);
@@ -2084,6 +2172,8 @@
     }
 
     populateLanguageSelectors();
+    populateThemeSelectors();
+    setupCompactInputs();
     populateCustomForm();
     i18n.apply();
     renderVersion();

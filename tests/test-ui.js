@@ -71,15 +71,32 @@ assert(html.includes('@media (prefers-color-scheme: dark)') &&
     html.includes(':root[data-color-scheme="dark"]') &&
     html.includes('id="setting_color_scheme"'),
     'automatic, light, and dark color-scheme controls are available');
-for (const scheme of ['auto', 'light', 'dark', 'midnight', 'sunset', 'pastel']) {
-    assert(html.includes('<option value="' + scheme + '" data-i18n="theme.' + scheme + '">'),
-        scheme + ' is available from the color-scheme selector');
-}
 assert(theme.includes("STORAGE_KEY = 'yog1.v2.settings'") &&
     theme.includes("media.addEventListener('change'") &&
     game.includes('window.Yog1Theme.apply(settings.colorScheme)') &&
-    game.includes('settings.colorScheme = ui.setting_color_scheme.value'),
+    game.includes('for (const scheme of window.Yog1Theme.schemes)') &&
+    game.includes("option.dataset.i18n = 'theme.' + scheme") &&
+    game.includes('settings.colorScheme = select.value'),
     'the color scheme is restored early, follows browser changes, and persists');
+for (const id of ['quick_color_scheme', 'setting_color_scheme']) {
+    assert(new RegExp('<select id="' + id + '"[^>]*>\\s*</select>').test(html),
+        id + ' gets its options from the validated runtime theme list');
+}
+assert.strictEqual((html.match(/data-compact-input/g) || []).length, 2,
+    'language and theme use the reusable compact input');
+assert(html.includes('aria-controls="quick_language_panel"') &&
+    html.includes('aria-controls="quick_color_scheme_panel"') &&
+    html.includes('aria-expanded="false"') &&
+    game.includes('function setupCompactInputs()') &&
+    game.includes('function refreshCompactInputLabels()') &&
+    game.includes("button.setAttribute('aria-label', description)") &&
+    game.includes("event.key !== 'Escape'") &&
+    game.includes("panel.querySelector('select')"),
+    'compact inputs expose accessible expansion state and keyboard focus behavior');
+assert(html.includes('.compact-input-toggle[aria-expanded="true"]') &&
+    html.includes('.compact-input-label') &&
+    html.includes('.compact-input-toggle { min-width: 44px; }'),
+    'compact inputs show their label and open state and retain mobile touch targets');
 assert(html.includes('input[type="number"], input[type="text"], select') &&
     html.includes('accent-color: var(--blue)'),
     'text fields and native choice controls participate in every theme');
