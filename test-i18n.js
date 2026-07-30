@@ -3,6 +3,7 @@
 const assert = require('assert');
 const fs = require('fs');
 const vm = require('vm');
+const core = require('./game-core.js');
 
 const document = {
     documentElement: {},
@@ -54,6 +55,46 @@ i18n.setLocale('tr');
 assert.strictEqual(i18n.t('action.check'), 'Denklemi kontrol et', 'Turkish controls are available');
 i18n.setLocale('ur');
 assert.strictEqual(i18n.getDirection(), 'rtl', 'Urdu reuses right-to-left layout support');
+
+const modeIds = Object.keys(core.DIFFICULTIES)
+    .concat(['tutorial', 'custom', 'daily', 'timed', 'endless', 'challenges']);
+function assertCatalogIds(prefix, ids) {
+    for (const id of ids) {
+        assert(Object.prototype.hasOwnProperty.call(i18n.locales.en, prefix + '.' + id),
+            prefix + '.' + id + ' is cataloged for generated UI');
+    }
+}
+assertCatalogIds('operation', Object.keys(core.OPERATIONS));
+assertCatalogIds('mode', modeIds);
+assertCatalogIds('difficulty', Object.keys(core.DIFFICULTIES));
+assertCatalogIds('modeDescription',
+    ['tutorial', 'custom', 'daily', 'timed', 'endless', 'challenges']);
+for (const id of ['first', 'streak5', 'twenty', 'explorer', 'daily', 'nohint', 'curated']) {
+    assertCatalogIds('achievement.' + id, ['name', 'description']);
+}
+for (const id of modeIds) {
+    for (const locale of i18n.availableLocales) {
+        assert.strictEqual(
+            i18n.getMessageId('mode', i18n.locales[locale]['mode.' + id]),
+            id,
+            locale + ' mode labels resolve back to stable identifier ' + id
+        );
+    }
+}
+assert.strictEqual(i18n.getMessageId('mode', 'not-a-mode'), null,
+    'unknown saved labels are not mistaken for stable mode identifiers');
+
+const generatedRoundKinds = new Set();
+for (let round = 1; round <= core.ROUND_WAVE.length; round++) {
+    generatedRoundKinds.add(core.roundTarget(20, round).kind);
+}
+for (const kind of Array.from(generatedRoundKinds).concat(['guided', 'curated'])) {
+    for (const locale of i18n.availableLocales) {
+        assert(Object.prototype.hasOwnProperty.call(i18n.locales[locale], 'round.' + kind),
+            locale + ' catalogs generated round kind ' + kind);
+    }
+}
+
 for (const locale of i18n.availableLocales) {
     const missing = Object.keys(i18n.locales.en).filter(function (key) {
         return !Object.prototype.hasOwnProperty.call(i18n.locales[locale], key);
@@ -102,6 +143,14 @@ assert.strictEqual(localizedMeta.content,
 const game = fs.readFileSync('game.js', 'utf8');
 assert.strictEqual(game.includes('i18n.translate('), false,
     'generated UI uses catalog keys instead of partial source-text translation');
+assert.strictEqual(game.includes('roundKind.toLowerCase()'), false,
+    'round kinds remain stable catalog identifiers when UI content changes');
+assert(game.includes('modeId: mode'),
+    'new history records persist the stable mode identifier');
+assert(game.includes("i18n.getMessageId('mode', item.modeId || item.mode)"),
+    'localized mode labels in existing history are migrated to stable identifiers');
+assert(game.includes('renderExplanation();'),
+    'language changes rerender generated explanation copy');
 const catalogPrefixes = new Set(Object.keys(i18n.locales.en).map(function (key) {
     return key.split('.')[0];
 }));

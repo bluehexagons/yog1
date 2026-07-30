@@ -112,6 +112,18 @@
     let settings = load(KEYS.settings, defaultSettings);
     let dailyResults = load(KEYS.daily, {});
     if (!Array.isArray(history)) history = [];
+    let historyMigrated = false;
+    for (const item of history) {
+        if (!item || typeof item !== 'object') continue;
+        const modeId = i18n.getMessageId('mode', item.modeId || item.mode);
+        if (modeId && (item.modeId !== modeId ||
+            Object.prototype.hasOwnProperty.call(item, 'mode'))) {
+            item.modeId = modeId;
+            delete item.mode;
+            historyMigrated = true;
+        }
+    }
+    if (historyMigrated) save(KEYS.history, history);
     if (!stats || typeof stats !== 'object' || Array.isArray(stats)) stats = {};
     if (!achievementState || !Array.isArray(achievementState.unlocked)) {
         achievementState = { unlocked: [], operations: [], solved: 0 };
@@ -147,6 +159,8 @@
     let audioContext = null;
     let session = null;
     let currentMessage = null;
+    let currentFeedback = null;
+    let currentAchievementId = null;
 
     function newSession() {
         session = {
@@ -201,7 +215,7 @@
     function tutorialProblem() {
         return {
             sides: CURATED[0].sides, score: 4, target: 4,
-            roundKind: 'Guided', operationCount: 2
+            roundKind: 'guided', operationCount: 2
         };
     }
 
@@ -211,7 +225,7 @@
             sides: core.clone(item.sides),
             score: core.difficultyScore(item.sides),
             target: 10 + index * 8,
-            roundKind: index + 1 === CURATED.length ? 'Challenge' : 'Curated',
+            roundKind: index + 1 === CURATED.length ? 'challenge' : 'curated',
             operationCount: core.countOperations(item.sides[0]) + core.countOperations(item.sides[1]),
             titleKey: item.titleKey
         };
@@ -326,8 +340,8 @@
         ui.flip_text.textContent = t(selectedId ? 'flip.many' : 'flip.one');
         ui.round_label.textContent = mode === 'tutorial' ? t('round.tutorial') :
             (mode === 'daily' ? utcDate() : t('round.number', { round: round }));
-        ui.round_kind.textContent = t('round.' + currentProblem.roundKind.toLowerCase());
-        ui.round_kind.className = 'round-kind ' + currentProblem.roundKind.toLowerCase().replace('-', '');
+        ui.round_kind.textContent = t('round.' + currentProblem.roundKind);
+        ui.round_kind.className = 'round-kind ' + currentProblem.roundKind;
         ui.score_label.textContent = t('round.score', { target: currentProblem.target, score: currentProblem.score });
     }
 
@@ -348,20 +362,22 @@
     }
 
     function hideFeedback() {
+        currentFeedback = null;
         ui.feedback.hidden = true;
         ui.feedback.replaceChildren();
     }
 
-    function showExplanation(revealSolution, attemptedValues) {
+    function renderExplanation() {
+        if (!currentFeedback || !currentProblem) return;
         const details = core.solutionDetails(
             currentProblem.sides,
-            attemptedValues === undefined ? currentValues : attemptedValues
+            currentFeedback.attemptedValues === undefined ? currentValues : currentFeedback.attemptedValues
         );
         const current = text('p', t('feedback.totals', {
             left: details.currentTotals[0], right: details.currentTotals[1]
         }));
         ui.feedback.replaceChildren(current);
-        if (revealSolution) {
+        if (currentFeedback.revealSolution) {
             const solution = text('p', t('feedback.solution', {
                 number: details.solutionValue, total: details.solvedTotals[0]
             }));
@@ -369,6 +385,14 @@
             ui.feedback.append(solution, equation);
         }
         ui.feedback.hidden = false;
+    }
+
+    function showExplanation(revealSolution, attemptedValues) {
+        currentFeedback = {
+            revealSolution: revealSolution,
+            attemptedValues: attemptedValues
+        };
+        renderExplanation();
     }
 
     function startRound() {
@@ -401,10 +425,10 @@
                 round: round, count: CURATED.length
             });
         } else {
-            setCatalogMessage('round.kindTitle', currentProblem.roundKind === 'Challenge' ?
+            setCatalogMessage('round.kindTitle', currentProblem.roundKind === 'challenge' ?
                 'message.challengeBody' : 'message.standardBody', {
                     kind: function () {
-                        return t('round.' + currentProblem.roundKind.toLowerCase());
+                        return t('round.' + currentProblem.roundKind);
                     }
                 });
         }
@@ -455,7 +479,7 @@
             expression: currentProblem.sides.map(function (side) {
                 return core.serialize(side, currentValues);
             }).join(' = '),
-            mode: mode,
+            modeId: mode,
             round: round,
             seed: currentSeed,
             at: new Date().toISOString()
@@ -496,11 +520,17 @@
         if (achievementState.unlocked.includes(id)) return;
         achievementState.unlocked.push(id);
         save(KEYS.achievements, achievementState);
-        const item = ACHIEVEMENTS.find(function (achievement) { return achievement.id === id; });
-        ui.achievement_notice.textContent = t('page.achievements') + ': ' + t('achievement.' + item.id + '.name');
+        currentAchievementId = id;
+        renderAchievementNotice();
         ui.achievement_notice.hidden = false;
         playSound('achievement');
         renderAchievements();
+    }
+
+    function renderAchievementNotice() {
+        if (!currentAchievementId) return;
+        ui.achievement_notice.textContent = t('page.achievements') + ': ' +
+            t('achievement.' + currentAchievementId + '.name');
     }
 
     function updateAchievements() {
@@ -515,7 +545,7 @@
         if (achievementState.solved >= 20) unlock('twenty');
         if (achievementState.operations.length === Object.keys(core.OPERATIONS).length) unlock('explorer');
         if (mode === 'daily') unlock('daily');
-        if (currentProblem.roundKind === 'Challenge' && hintLevel === 0) unlock('nohint');
+        if (currentProblem.roundKind === 'challenge' && hintLevel === 0) unlock('nohint');
         if (mode === 'challenges' && round === CURATED.length) unlock('curated');
     }
 
@@ -650,18 +680,8 @@
     }
 
     function historyModeLabel(value) {
-        if (Object.prototype.hasOwnProperty.call(i18n.locales.en, 'mode.' + value)) {
-            return t('mode.' + value);
-        }
-        const modeIds = Object.values(core.DIFFICULTIES).map(function (item) {
-            return item.id;
-        }).concat(['custom', 'daily', 'timed', 'endless', 'challenges']);
-        const modeId = modeIds.find(function (id) {
-            return i18n.availableLocales.some(function (localeCode) {
-                return i18n.locales[localeCode]['mode.' + id] === value;
-            });
-        });
-        return modeId ? t('mode.' + modeId) : value;
+        const modeId = i18n.getMessageId('mode', value);
+        return modeId ? t('mode.' + modeId) : String(value || '');
     }
 
     function renderHistory() {
@@ -672,7 +692,7 @@
             const li = document.createElement('li');
             li.className = item.correct ? 'correct' : 'incorrect';
             const summary = text('div', (item.correct ? t('history.correct') : t('history.incorrect')) +
-                ' · ' + historyModeLabel(item.mode) + ' · ' +
+                ' · ' + historyModeLabel(item.modeId || item.mode) + ' · ' +
                 t('history.round', { round: item.round }), 'history-summary');
             summary.appendChild(text('time', ' ' + new Date(item.at).toLocaleString(i18n.getLocale()), 'history-date'));
             li.append(summary, text('code', item.expression));
@@ -822,6 +842,7 @@
         newSession();
         updateModeInfo();
         if (mode === 'custom') {
+            currentProblem = null;
             ui.submit.disabled = true;
             ui.problem.replaceChildren();
             hideFeedback();
@@ -935,7 +956,9 @@
         renderStats();
         renderAchievements();
         renderSession();
-        if (currentProblem && mode !== 'custom') drawProblem();
+        if (currentProblem) drawProblem();
+        renderExplanation();
+        renderAchievementNotice();
         if (timerId) ui.timer_label.textContent = t('timer.seconds', { seconds: timeRemaining });
         if (awaitingAdvance) ui.submit.textContent = t('action.next');
         else if (session && session.finished && mode === 'challenges') ui.submit.textContent = t('action.again');

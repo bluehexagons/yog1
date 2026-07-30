@@ -377,7 +377,9 @@
         return {
             target: Math.max(3, Math.round(baseTarget * factor)),
             factor: factor,
-            kind: factor <= 0.8 ? 'Warm-up' : (factor >= 1.2 ? 'Challenge' : 'Standard')
+            // Round kinds cross the core/UI boundary, so keep them as stable
+            // identifiers. Presentation belongs to the localization catalog.
+            kind: factor <= 0.8 ? 'warmup' : (factor >= 1.2 ? 'challenge' : 'standard')
         };
     }
 

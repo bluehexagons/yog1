@@ -102,8 +102,8 @@ for (let sessionLength = 20; sessionLength <= 40; sessionLength++) {
         sessionLength + '-round sessions stay close to the selected average difficulty'
     );
 }
-assert.strictEqual(core.roundTarget(20, 1).kind, 'Warm-up');
-assert.strictEqual(core.roundTarget(20, 5).kind, 'Challenge');
+assert.strictEqual(core.roundTarget(20, 1).kind, 'warmup');
+assert.strictEqual(core.roundTarget(20, 5).kind, 'challenge');
 
 for (const operation of Object.keys(core.OPERATIONS)) {
     const customOperations = operation === 'root'

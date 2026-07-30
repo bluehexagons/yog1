@@ -1191,6 +1191,19 @@
         });
     }
 
+    function getMessageId(prefix, value) {
+        if (typeof prefix !== 'string' || typeof value !== 'string') return null;
+        const keyPrefix = prefix + '.';
+        const directKey = keyPrefix + value;
+        if (Object.prototype.hasOwnProperty.call(messages.en, directKey)) return value;
+        const key = Object.keys(messages.en).find(function (candidate) {
+            return candidate.startsWith(keyPrefix) && AVAILABLE_LOCALES.some(function (code) {
+                return messages[code][candidate] === value;
+            });
+        });
+        return key ? key.slice(keyPrefix.length) : null;
+    }
+
     function apply(rootElement) {
         const scope = rootElement || document;
         for (const element of scope.querySelectorAll('[data-i18n]')) element.textContent = t(element.dataset.i18n);
@@ -1227,6 +1240,7 @@
         getLocale: function () { return locale; },
         setLocale: setLocale,
         t: t,
+        getMessageId: getMessageId,
         translate: translate,
         locales: messages,
         availableLocales: AVAILABLE_LOCALES,
