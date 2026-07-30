@@ -34,12 +34,21 @@ jobs:
         run: |
           npm run package
           node scripts/check-site.js dist
-      - name: Configure Pages
-        uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5
+      - name: Archive Pages artifact
+        run: |
+          tar \
+            --dereference \
+            --hard-dereference \
+            --directory dist \
+            -cvf "${RUNNER_TEMP}/artifact.tar" \
+            .
       - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          path: dist
+          name: github-pages
+          path: ${{ runner.temp }}/artifact.tar
+          retention-days: 1
+          if-no-files-found: error
 
   deploy:
     needs: build
