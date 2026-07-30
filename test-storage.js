@@ -5,11 +5,19 @@ const fs = require('fs');
 const vm = require('vm');
 
 const values = new Map();
+let failNextWriteTo = null;
 const context = {
     Date: Date,
     localStorage: {
         getItem: function (key) { return values.has(key) ? values.get(key) : null; },
-        setItem: function (key, value) { values.set(key, value); }
+        setItem: function (key, value) {
+            if (key === failNextWriteTo) {
+                failNextWriteTo = null;
+                throw new Error('Storage unavailable');
+            }
+            values.set(key, value);
+        },
+        removeItem: function (key) { values.delete(key); }
     },
     window: {}
 };
@@ -39,6 +47,15 @@ assert.strictEqual(storage.load(storage.KEYS.stats, {}).attempts, 3,
     'valid backups restore known data');
 assert.strictEqual(values.get(storage.KEYS.locale), 'ja',
     'locale restoration preserves its plain-string storage format');
+storage.save(storage.KEYS.settings, { sound: true });
+storage.importData({
+    application: 'You Only Get 1s',
+    schemaVersion: storage.SCHEMA_VERSION,
+    exportedAt: new Date().toISOString(),
+    data: { history: [] }
+});
+assert.strictEqual(values.has(storage.KEYS.settings), false,
+    'restoring a backup removes save entries that are absent from it');
 assert.throws(function () {
     storage.importData({
         application: 'You Only Get 1s',
@@ -46,6 +63,33 @@ assert.throws(function () {
         data: {}
     });
 }, /Unsupported/, 'older backup schemas are rejected');
+assert.throws(function () {
+    storage.importData({
+        application: 'You Only Get 1s',
+        schemaVersion: storage.SCHEMA_VERSION,
+        data: { unknown: {} }
+    });
+}, /Unsupported/, 'unknown save entries are rejected');
+assert.throws(function () {
+    storage.importData({
+        application: 'You Only Get 1s',
+        schemaVersion: storage.SCHEMA_VERSION,
+        data: { history: {} }
+    });
+}, /Unsupported/, 'save entries with invalid shapes are rejected');
+storage.save(storage.KEYS.stats, { attempts: 7 });
+const beforeFailedImport = new Map(values);
+failNextWriteTo = storage.KEYS.custom;
+assert.throws(function () {
+    storage.importData({
+        application: 'You Only Get 1s',
+        schemaVersion: storage.SCHEMA_VERSION,
+        exportedAt: new Date().toISOString(),
+        data: { history: [], stats: { attempts: 99 }, custom: { seed: 'test' } }
+    });
+}, /Could not restore/, 'failed storage writes reject the import');
+assert.deepStrictEqual(Array.from(values.entries()), Array.from(beforeFailedImport.entries()),
+    'a failed import rolls back the previous save');
 values.set(storage.KEYS.stats, '{bad json');
 assert.deepStrictEqual(storage.load(storage.KEYS.stats, { safe: true }), { safe: true },
     'corrupt storage falls back safely');

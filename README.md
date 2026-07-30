@@ -32,11 +32,12 @@ of its side and connects the puzzle to a reusable symbolic relationship. Reviewe
 puzzles can also be copied as structured JSON with their concept, totals,
 solution effect, and evaluation trace for lesson authoring or LLM experiments.
 
-The game also tracks achievements and session summaries. Local progress can be
-exported to or restored from a versioned JSON backup. Accessibility options
-provide larger text, higher contrast, reduced clutter, natural-language equation
-labels, and logical left-to-right math inside right-to-left layouts. Simple
-synthesized waveform sound effects are available but disabled by default.
+The game also tracks achievements and session summaries. The **Options → Save
+data** section can download or restore local progress as a versioned JSON backup.
+Accessibility options provide larger text, higher contrast, reduced clutter,
+natural-language equation labels, and logical left-to-right math inside
+right-to-left layouts. Simple synthesized waveform sound effects are available
+but disabled by default.
 
 Keyboard controls:
 

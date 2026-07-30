@@ -110,6 +110,17 @@ assert(game.includes('candidateCount: 12') && game.includes('requireUnique: true
 assert(storage.includes('SCHEMA_VERSION') && storage.includes('exportData') &&
     storage.includes('importData'),
     'persistent data has a versioned backup boundary');
+assert(html.includes('data-i18n="data.title"') &&
+    html.includes('id="export_data"') && html.includes('id="import_data"') &&
+    html.includes('accept=".json,application/json"') &&
+    !html.includes('class="screen-panel options-extras save-data-panel"'),
+    'Options always offers a dedicated save-data backup section');
+assert(game.includes("'yog1-save-'") &&
+    game.includes("setCatalogMessage('data.exportFailed', 'data.exportFailedBody')"),
+    'save export downloads a dated JSON file and reports failures');
+assert(storage.includes('localStorage.removeItem(key)') &&
+    storage.includes('Could not restore YOG1 backup'),
+    'imports replace the complete save and roll back failed writes');
 assert(html.includes('class="mode-group"') &&
     html.includes('data-i18n="nav.learn"') &&
     html.includes('data-i18n="nav.challenge"'),

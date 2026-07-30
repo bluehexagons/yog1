@@ -7,13 +7,14 @@ const path = require('path');
 
 const root = path.resolve(__dirname, '..');
 const versionPath = path.join(root, 'version.js');
+const htmlPath = path.join(root, 'yog1.htm');
 const manifestFiles = [
     'manifest.webmanifest', 'manifest.es.webmanifest', 'manifest.zh.webmanifest',
     'manifest.ar.webmanifest', 'manifest.bn.webmanifest', 'manifest.ja.webmanifest',
     'manifest.hi.webmanifest', 'manifest.pt.webmanifest', 'manifest.ru.webmanifest',
     'manifest.vi.webmanifest', 'manifest.tr.webmanifest', 'manifest.ur.webmanifest'
 ];
-const releaseFiles = ['version.js', 'sw.js'].concat(manifestFiles);
+const releaseFiles = ['version.js', 'yog1.htm', 'sw.js'].concat(manifestFiles);
 const semverPattern = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/;
 
 function localDate() {
@@ -50,6 +51,23 @@ function renderVersionFile(version, commitDate) {
         "        commitDate: '" + commitDate + "'\n" +
         '    });\n' +
         '}());\n';
+}
+
+function renderHtmlVersion(source, version, commitDate) {
+    const months = [
+        'January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+    const parts = commitDate.split('-').map(Number);
+    const displayDate = months[parts[1] - 1] + ' ' + parts[2] + ', ' + parts[0];
+    const withVersion = source.replace(
+        /(<strong id="app_version">)[^<]*(<\/strong>)/,
+        '$1' + version + '$2'
+    );
+    return withVersion.replace(
+        /(<time id="app_version_date" datetime=")[^"]*("[^>]*>)[^<]*(<\/time>)/,
+        '$1' + commitDate + '$2' + displayDate + '$3'
+    );
 }
 
 function run(command, args, capture) {
@@ -127,6 +145,10 @@ function main(argv) {
     }
 
     fs.writeFileSync(versionPath, renderVersionFile(nextVersion, commitDate));
+    fs.writeFileSync(
+        htmlPath,
+        renderHtmlVersion(fs.readFileSync(htmlPath, 'utf8'), nextVersion, commitDate)
+    );
     run(process.execPath, [path.join('scripts', 'update-assets.js')], false);
     console.log('Set version to ' + tagName + ' with commit date ' + commitDate + '.');
 
@@ -161,5 +183,6 @@ module.exports = {
     bumpVersion: bumpVersion,
     parseArguments: parseArguments,
     readVersion: readVersion,
-    renderVersionFile: renderVersionFile
+    renderVersionFile: renderVersionFile,
+    renderHtmlVersion: renderHtmlVersion
 };

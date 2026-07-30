@@ -168,6 +168,7 @@
         #wrapper.sidebar-collapsed #sidebar_toggle { font-size: 0; }
         #wrapper.sidebar-collapsed #sidebar_toggle::after { content: '☰'; font-size: 1rem; }
         .options-grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(260px, .75fr); gap: 20px; }
+        .save-data-panel { grid-column: 1 / -1; }
         .screen-panel { padding: 15px; border: 1px solid var(--ink); background: #f7f6ee; }
         .screen-panel h3 { margin: 0 0 10px; font: bold .82rem "Courier New", monospace; text-transform: uppercase; }
         .about-copy { max-width: 68ch; }
@@ -350,10 +351,15 @@
                 </div>
                 <p class="wave-note" data-i18n="options.keyboard">Keys: ←/→ select · Space changes or restores · Enter checks · H opens a hint.</p>
                 <button id="install_app" class="secondary" type="button" data-i18n="action.install" hidden>Install offline app</button>
-                <div class="history-controls options-extras">
-                    <button id="export_data" class="secondary" type="button" data-i18n="data.export">Export data</button>
-                    <button id="import_data" class="secondary" type="button" data-i18n="data.import">Import data</button>
-                    <input id="import_file" class="sr-only" type="file" accept="application/json">
+            </section>
+
+            <section class="screen-panel save-data-panel">
+                <h3 data-i18n="data.title">Save data</h3>
+                <p class="wave-note" data-i18n="data.description">Download a backup of your progress and settings, or restore them from a backup.</p>
+                <div class="history-controls">
+                    <button id="export_data" class="secondary" type="button" data-i18n="data.export">Download backup</button>
+                    <button id="import_data" class="secondary" type="button" data-i18n="data.import">Restore backup</button>
+                    <input id="import_file" class="sr-only" type="file" accept=".json,application/json" aria-labelledby="import_data">
                 </div>
             </section>
             </div>
@@ -400,7 +406,7 @@
                 <p data-i18n="about.summary">Change one number to 1 to balance an equation.</p>
                 <p data-i18n="about.origin">A refreshed version of bluehexagons’ Ludum Dare 28 game, with generated puzzles, settings, offline play, and local stats.</p>
                 <p class="app-version">
-                    <span data-i18n="about.version">Version</span> <strong id="app_version">0.2.0</strong><span aria-hidden="true"> · </span>
+                    <span data-i18n="about.version">Version</span> <strong id="app_version">0.2.1</strong><span aria-hidden="true"> · </span>
                     <span data-i18n="about.commitDate">Commit date</span> <time id="app_version_date" datetime="2026-07-30">July 30, 2026</time>
                 </p>
             </section>

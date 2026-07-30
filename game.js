@@ -1606,14 +1606,25 @@
         }
     });
     ui.export_data.addEventListener('click', function () {
-        const snapshot = storage.exportData();
-        const blob = new Blob([JSON.stringify(snapshot, null, 2)], { type: 'application/json' });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = 'yog1-backup-' + new Date().toISOString().slice(0, 10) + '.json';
-        link.click();
-        window.setTimeout(function () { URL.revokeObjectURL(link.href); }, 0);
-        setCatalogMessage('data.exported', 'data.exportedBody');
+        try {
+            const snapshot = storage.exportData();
+            const blob = new Blob([JSON.stringify(snapshot, null, 2)], {
+                type: 'application/json'
+            });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'yog1-save-' + new Date().toISOString().slice(0, 10) + '.json';
+            link.hidden = true;
+            document.body.appendChild(link);
+            link.click();
+            window.setTimeout(function () {
+                URL.revokeObjectURL(link.href);
+                link.remove();
+            }, 0);
+            setCatalogMessage('data.exported', 'data.exportedBody');
+        } catch (error) {
+            setCatalogMessage('data.exportFailed', 'data.exportFailedBody');
+        }
     });
     ui.import_data.addEventListener('click', function () {
         ui.import_file.click();

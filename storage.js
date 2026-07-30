@@ -36,13 +36,9 @@
     function exportData() {
         const data = {};
         for (const [name, key] of Object.entries(KEYS)) {
-            try {
-                const raw = localStorage.getItem(key);
-                if (raw !== null) {
-                    data[name] = name === 'locale' ? raw : JSON.parse(raw);
-                }
-            } catch (error) {
-                // Ignore a corrupt or unavailable entry without losing the rest.
+            const raw = localStorage.getItem(key);
+            if (raw !== null) {
+                data[name] = name === 'locale' ? raw : JSON.parse(raw);
             }
         }
         return {
@@ -53,7 +49,7 @@
         };
     }
 
-    function importData(snapshot) {
+    function validateSnapshot(snapshot) {
         if (!snapshot || snapshot.application !== 'You Only Get 1s' ||
             snapshot.schemaVersion !== SCHEMA_VERSION ||
             !snapshot.data || typeof snapshot.data !== 'object' ||
@@ -61,13 +57,48 @@
             throw new Error('Unsupported YOG1 backup');
         }
         for (const [name, value] of Object.entries(snapshot.data)) {
-            if (Object.prototype.hasOwnProperty.call(KEYS, name)) {
-                if (name === 'locale') {
-                    try { localStorage.setItem(KEYS[name], String(value)); } catch (error) {}
+            if (!Object.prototype.hasOwnProperty.call(KEYS, name)) {
+                throw new Error('Unsupported YOG1 backup');
+            }
+            if (name === 'locale') {
+                if (typeof value !== 'string') throw new Error('Unsupported YOG1 backup');
+            } else if (name === 'history') {
+                if (!Array.isArray(value)) throw new Error('Unsupported YOG1 backup');
+            } else if (!value || typeof value !== 'object' || Array.isArray(value)) {
+                throw new Error('Unsupported YOG1 backup');
+            }
+        }
+    }
+
+    function importData(snapshot) {
+        validateSnapshot(snapshot);
+        const previous = {};
+        const serialized = {};
+        for (const [name, key] of Object.entries(KEYS)) {
+            previous[name] = localStorage.getItem(key);
+            if (Object.prototype.hasOwnProperty.call(snapshot.data, name)) {
+                serialized[name] = name === 'locale'
+                    ? snapshot.data[name] : JSON.stringify(snapshot.data[name]);
+            }
+        }
+        try {
+            for (const [name, key] of Object.entries(KEYS)) {
+                if (Object.prototype.hasOwnProperty.call(serialized, name)) {
+                    localStorage.setItem(key, serialized[name]);
                 } else {
-                    save(KEYS[name], value);
+                    localStorage.removeItem(key);
                 }
             }
+        } catch (error) {
+            for (const [name, key] of Object.entries(KEYS)) {
+                try {
+                    if (previous[name] === null) localStorage.removeItem(key);
+                    else localStorage.setItem(key, previous[name]);
+                } catch (rollbackError) {
+                    // Continue restoring the remaining entries.
+                }
+            }
+            throw new Error('Could not restore YOG1 backup');
         }
     }
 

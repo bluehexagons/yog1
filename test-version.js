@@ -45,6 +45,14 @@ const game = fs.readFileSync('game.js', 'utf8');
 const updater = fs.readFileSync('scripts/update-assets.js', 'utf8');
 assert(html.includes('id="app_version"') && html.includes('id="app_version_date"'),
     'the About screen exposes version and date elements');
+assert(html.includes('<strong id="app_version">' + current.version + '</strong>') &&
+    html.includes('<time id="app_version_date" datetime="' + current.commitDate + '">'),
+    'the About fallback matches the generated release metadata');
+assert.strictEqual(
+    release.renderHtmlVersion(html, current.version, current.commitDate),
+    html,
+    'the checked-in About fallback uses the release generator format'
+);
 assert(html.indexOf('<script src="version.js">') < html.indexOf('<script src="game.js">'),
     'version metadata loads before the UI renders it');
 assert(game.includes("date.toLocaleDateString(i18n.getLanguageTag()"),

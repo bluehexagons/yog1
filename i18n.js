@@ -1938,6 +1938,106 @@
     };
     for (const code of AVAILABLE_LOCALES) Object.assign(messages[code], copyReviewMessages[code]);
 
+    const saveDataMessages = {
+        en: {
+            'data.title': 'Save data',
+            'data.description': 'Download a backup of your progress and settings, or restore them from a backup.',
+            'data.export': 'Download backup', 'data.import': 'Restore backup',
+            'data.exportFailed': 'Export failed',
+            'data.exportFailedBody': 'Your backup couldn’t be downloaded. Please try again.',
+            'confirm.importData': 'Import this backup? It will replace the save data on this device.'
+        },
+        es: {
+            'data.title': 'Datos guardados',
+            'data.description': 'Descarga una copia de tu progreso y ajustes, o restáuralos desde una copia.',
+            'data.export': 'Descargar copia', 'data.import': 'Restaurar copia',
+            'data.exportFailed': 'Error de exportación',
+            'data.exportFailedBody': 'No se pudo descargar la copia. Inténtalo de nuevo.',
+            'confirm.importData': '¿Importar esta copia? Reemplazará los datos guardados en este dispositivo.'
+        },
+        zh: {
+            'data.title': '存档数据',
+            'data.description': '下载进度和设置的备份，或从备份中恢复。',
+            'data.export': '下载备份', 'data.import': '恢复备份',
+            'data.exportFailed': '导出失败',
+            'data.exportFailedBody': '无法下载备份。请重试。',
+            'confirm.importData': '要导入此备份吗？它会替换这台设备上的存档数据。'
+        },
+        ar: {
+            'data.title': 'بيانات الحفظ',
+            'data.description': 'نزّل نسخة احتياطية من تقدمك وإعداداتك، أو استعدهما منها.',
+            'data.export': 'تنزيل نسخة احتياطية', 'data.import': 'استعادة نسخة احتياطية',
+            'data.exportFailed': 'تعذّر التصدير',
+            'data.exportFailedBody': 'تعذّر تنزيل النسخة الاحتياطية. حاول مرة أخرى.',
+            'confirm.importData': 'هل تريد استيراد هذه النسخة؟ ستحل محل بيانات الحفظ على هذا الجهاز.'
+        },
+        bn: {
+            'data.title': 'সংরক্ষিত ডেটা',
+            'data.description': 'আপনার অগ্রগতি ও সেটিংসের ব্যাকআপ ডাউনলোড করুন, অথবা ব্যাকআপ থেকে সেগুলি ফিরিয়ে আনুন।',
+            'data.export': 'ব্যাকআপ ডাউনলোড', 'data.import': 'ব্যাকআপ ফিরিয়ে আনুন',
+            'data.exportFailed': 'রপ্তানি ব্যর্থ',
+            'data.exportFailedBody': 'ব্যাকআপ ডাউনলোড করা যায়নি। আবার চেষ্টা করুন।',
+            'confirm.importData': 'এই ব্যাকআপ আমদানি করবেন? এটি এই ডিভাইসের সংরক্ষিত ডেটা বদলে দেবে।'
+        },
+        ja: {
+            'data.title': 'セーブデータ',
+            'data.description': '進捗と設定のバックアップをダウンロードしたり、バックアップから復元したりできます。',
+            'data.export': 'バックアップをダウンロード', 'data.import': 'バックアップから復元',
+            'data.exportFailed': '書き出し失敗',
+            'data.exportFailedBody': 'バックアップをダウンロードできませんでした。もう一度お試しください。',
+            'confirm.importData': 'このバックアップを読み込みますか？この端末のセーブデータが置き換わります。'
+        },
+        hi: {
+            'data.title': 'सेव डेटा',
+            'data.description': 'अपनी प्रगति और सेटिंग का बैकअप डाउनलोड करें या बैकअप से उन्हें वापस लाएँ।',
+            'data.export': 'बैकअप डाउनलोड करें', 'data.import': 'बैकअप वापस लाएँ',
+            'data.exportFailed': 'निर्यात विफल',
+            'data.exportFailedBody': 'बैकअप डाउनलोड नहीं हो सका। फिर कोशिश करें।',
+            'confirm.importData': 'यह बैकअप आयात करें? इससे इस डिवाइस का सेव डेटा बदल जाएगा।'
+        },
+        pt: {
+            'data.title': 'Dados salvos',
+            'data.description': 'Baixe um backup do seu progresso e das configurações ou restaure-os a partir de um backup.',
+            'data.export': 'Baixar backup', 'data.import': 'Restaurar backup',
+            'data.exportFailed': 'Falha ao exportar',
+            'data.exportFailedBody': 'Não foi possível baixar o backup. Tente novamente.',
+            'confirm.importData': 'Importar este backup? Ele substituirá os dados salvos neste dispositivo.'
+        },
+        ru: {
+            'data.title': 'Сохранённые данные',
+            'data.description': 'Скачайте резервную копию прогресса и настроек или восстановите их из копии.',
+            'data.export': 'Скачать копию', 'data.import': 'Восстановить копию',
+            'data.exportFailed': 'Ошибка экспорта',
+            'data.exportFailedBody': 'Не удалось скачать резервную копию. Попробуйте ещё раз.',
+            'confirm.importData': 'Импортировать эту копию? Она заменит сохранённые данные на этом устройстве.'
+        },
+        vi: {
+            'data.title': 'Dữ liệu đã lưu',
+            'data.description': 'Tải bản sao lưu tiến trình và cài đặt, hoặc khôi phục từ bản sao lưu.',
+            'data.export': 'Tải bản sao lưu', 'data.import': 'Khôi phục bản sao lưu',
+            'data.exportFailed': 'Xuất thất bại',
+            'data.exportFailedBody': 'Không thể tải bản sao lưu. Hãy thử lại.',
+            'confirm.importData': 'Nhập bản sao lưu này? Dữ liệu đã lưu trên thiết bị sẽ bị thay thế.'
+        },
+        tr: {
+            'data.title': 'Kayıt verileri',
+            'data.description': 'İlerlemenizin ve ayarlarınızın yedeğini indirin veya bir yedekten geri yükleyin.',
+            'data.export': 'Yedeği indir', 'data.import': 'Yedekten geri yükle',
+            'data.exportFailed': 'Dışa aktarma başarısız',
+            'data.exportFailedBody': 'Yedek indirilemedi. Yeniden deneyin.',
+            'confirm.importData': 'Bu yedek içe aktarılsın mı? Bu cihazdaki kayıt verilerinin yerini alacak.'
+        },
+        ur: {
+            'data.title': 'محفوظ ڈیٹا',
+            'data.description': 'اپنی پیش رفت اور ترتیبات کا بیک اپ ڈاؤن لوڈ کریں، یا بیک اپ سے انہیں بحال کریں۔',
+            'data.export': 'بیک اپ ڈاؤن لوڈ کریں', 'data.import': 'بیک اپ بحال کریں',
+            'data.exportFailed': 'برآمد ناکام',
+            'data.exportFailedBody': 'بیک اپ ڈاؤن لوڈ نہیں ہو سکا۔ دوبارہ کوشش کریں۔',
+            'confirm.importData': 'یہ بیک اپ درآمد کریں؟ یہ اس ڈیوائس کے محفوظ ڈیٹا کو بدل دے گا۔'
+        }
+    };
+    for (const code of AVAILABLE_LOCALES) Object.assign(messages[code], saveDataMessages[code]);
+
     function t(key, values) {
         const template = (messages[locale] && messages[locale][key]) || messages.en[key] || key;
         return template.replace(/\{(\w+)\}/g, function (_, name) {
