@@ -1,10 +1,10 @@
 (function (root) {
     'use strict';
 
-    const STORAGE_KEY = 'yog1.locale.v1';
-    // Internal IDs stay short for backwards-compatible links and storage.
-    // Language tags and autonyms live here so selectors, document metadata,
-    // formatting, and install manifests cannot drift apart.
+    const STORAGE_KEY = 'yog1.v2.locale';
+    // Compact app IDs map to complete language metadata in one place.
+    // Selectors, document metadata, formatting, and install manifests all use
+    // this source so they cannot drift apart.
     const LOCALE_OPTIONS = root.Yog1Locales.map(function (item) {
         return Object.assign({}, item);
     });
@@ -204,154 +204,6 @@
     }
 
     let locale = initialLocale();
-
-    const sourceTexts = {
-        es: {
-            'One move. Make it count.': 'Un movimiento. Haz que cuente.',
-            'Round ': 'Ronda ', 'Warm-up': 'Calentamiento', 'Standard': 'Estándar', 'Challenge': 'Desafío', 'Guided': 'Guiado',
-            'Tutorial': 'Tutorial', 'Easy': 'Fácil', 'Normal': 'Normal', 'Hard': 'Difícil', 'Expert': 'Experto', 'Extreme': 'Extremo',
-            'Daily': 'Diario', 'Timed': 'Contrarreloj', 'Endless': 'Infinito', 'Challenges': 'Desafíos', 'Custom…': 'Personalizado…',
-            'Options': 'Opciones', 'Stats': 'Estadísticas', 'Play': 'Jugar', 'Mode': 'Modo', 'View': 'Vista',
-            'How to play': 'Cómo jugar', 'Your move': 'Tu movimiento', 'Hint': 'Pista', 'Reveal': 'Revelar', 'Share': 'Compartir',
-            'Difficulty guide': 'Guía de dificultad', 'Accessibility & sound': 'Accesibilidad y sonido',
-            'Stats & history': 'Estadísticas e historial', 'Stats by difficulty': 'Estadísticas por dificultad',
-            'Problem history': 'Historial de problemas', 'Achievements': 'Logros', 'Previous': 'Anterior', 'Next': 'Siguiente',
-            'Clear history': 'Borrar historial', 'Reset all stats': 'Restablecer todas las estadísticas',
-            'Waveform sound effects (off by default)': 'Efectos de sonido de onda (desactivados de forma predeterminada)',
-            'Larger text': 'Texto más grande', 'Higher contrast': 'Mayor contraste', 'Reduced clutter': 'Interfaz simplificada',
-            'Install offline app': 'Instalar aplicación sin conexión', 'Operations': 'Operaciones', 'Start custom game': 'Iniciar juego personalizado',
-            'Three values only; small + and − puzzles.': 'Solo tres valores; problemas pequeños de + y −.',
-            'Compact puzzles; adds × and frequent three-value rounds.': 'Problemas compactos; añade × y frecuentes rondas de tres valores.',
-            'Compact puzzles; adds integer ÷ and some three-value rounds.': 'Problemas compactos; añade ÷ entera y algunas rondas de tres valores.',
-            'Adds modulus % and powers ^, with occasional three-value rounds.': 'Añade módulo % y potencias ^, con rondas ocasionales de tres valores.',
-            'Largest values and every operation, including √, in the longest puzzles.': 'Valores mayores y todas las operaciones, incluida √, en los problemas más largos.',
-            'Current session statistics': 'Estadísticas de la sesión actual',
-            'Correct': 'Correcto', 'Incorrect': 'Incorrecto', 'Win rate': 'Porcentaje de aciertos', 'Streak': 'Racha', 'Record': 'Récord', 'Actions': 'Acciones',
-            'Three-number addition and subtraction with small positive integers.': 'Sumas y restas de tres números con enteros positivos pequeños.',
-            'Compact expressions that introduce multiplication, with frequent three-number warm-ups.': 'Expresiones compactas con multiplicación y frecuentes rondas de tres números.',
-            'Compact expressions with integer (whole-quotient) division and some three-number rounds.': 'Expresiones compactas con división entera y algunas rondas de tres números.',
-            'Adds remainders and powers, while retaining occasional three-number rounds.': 'Añade restos y potencias, conservando algunas rondas de tres números.',
-            'Every operation, including roots, in the longest expressions.': 'Todas las operaciones, incluidas las raíces, en las expresiones más largas.',
-            'Change exactly one number into a 1 so both sides have the same integer value.': 'Cambia exactamente un número por un 1 para que ambos lados tengan el mismo valor entero.',
-            'Everyone gets this same seeded puzzle today. Solve it and share your result.': 'Hoy todos reciben este mismo problema generado. Resuélvelo y comparte tu resultado.',
-            'Solve as many puzzles as you can before the 60-second clock reaches zero.': 'Resuelve tantos problemas como puedas antes de que el reloj de 60 segundos llegue a cero.',
-            'Keep solving as difficulty rises. An incorrect first guess costs one of three lives.': 'Sigue resolviendo mientras aumenta la dificultad. Un primer intento incorrecto cuesta una de tres vidas.',
-            'A difficulty spike—take your time.': 'Un aumento de dificultad; tómate tu tiempo.',
-            'Change one number, then check the equation.': 'Cambia un número y después comprueba la ecuación.',
-            'Both sides balance. Review the solution, then continue.': 'Ambos lados coinciden. Revisa la solución y continúa.',
-            'The totals differed. The same puzzle is still here, and your move has been restored.': 'Los totales son distintos. El mismo problema sigue aquí y se ha restaurado tu movimiento.',
-            'Copied': 'Copiado', 'The puzzle link and result are ready to paste.': 'El enlace y el resultado están listos para pegar.',
-            'Build a custom game': 'Crea un juego personalizado', 'Choose the rules, then start the run. A seed makes it reproducible.': 'Elige las reglas y comienza la partida. Una semilla la hace reproducible.',
-            'Choose an operation': 'Elige una operación', 'Custom games need at least one mathematical operation.': 'Los juegos personalizados necesitan al menos una operación matemática.',
-            'Check the targets': 'Comprueba los objetivos', 'The minimum target cannot exceed the maximum.': 'El objetivo mínimo no puede superar el máximo.',
-            'Solution revealed': 'Solución revelada', 'This puzzle counts as incorrect. Review it, then continue.': 'Este problema cuenta como incorrecto. Revísalo y continúa.',
-            'Daily complete': 'Diario completado', 'Challenge set complete': 'Serie de desafíos completada', 'Not balanced—retry': 'No está equilibrado; inténtalo de nuevo',
-            'Run over': 'Fin de la partida', 'Time!': '¡Tiempo!', 'Achievement unlocked: ': 'Logro desbloqueado: '
-            , 'Good move': 'Buen movimiento', 'Try the outlined number': 'Prueba el número resaltado',
-            'The equation balances. Check it to finish.': 'La ecuación está equilibrada. Compruébala para terminar.',
-            'Click the selected number again to restore it.': 'Haz clic de nuevo en el número seleccionado para restaurarlo.',
-            'Tutorial complete': 'Tutorial completado', 'Your first Easy round is ready.': 'Tu primera ronda Fácil está lista.',
-            'Not quite': 'Aún no', 'Try changing the outlined 3, then check again.': 'Cambia el 3 resaltado y vuelve a comprobar.',
-            'Hint: choose a side': 'Pista: elige un lado', 'Hint: the number': 'Pista: el número',
-            'The outlined side contains the intended flip.': 'El lado resaltado contiene el cambio previsto.',
-            'The outlined number is the one used by the generated solution.': 'El número resaltado es el que usa la solución generada.',
-            'Daily solution revealed': 'Solución diaria revelada', 'The shared result records this as a reveal.': 'El resultado compartido lo registra como revelado.',
-            'Choose an identity operation': 'Elige una operación de identidad',
-            'Include +, −, ×, ÷, or powers so the one-flip solution can use only your selected operations.': 'Incluye +, −, ×, ÷ o potencias para que la solución de un cambio use solo las operaciones elegidas.',
-            'Shared handcrafted puzzle': 'Problema artesanal compartido', 'Shared custom puzzle': 'Problema personalizado compartido',
-            'Shared seeded puzzle': 'Problema generado compartido'
-        },
-        zh: {
-            'One move. Make it count.': '一步到位。认真思考。',
-            'Round ': '第 ', 'Warm-up': '热身', 'Standard': '标准', 'Challenge': '挑战', 'Guided': '引导',
-            'Tutorial': '教程', 'Easy': '简单', 'Normal': '普通', 'Hard': '困难', 'Expert': '专家', 'Extreme': '极限',
-            'Daily': '每日', 'Timed': '限时', 'Endless': '无尽', 'Challenges': '挑战', 'Custom…': '自定义…',
-            'Options': '选项', 'Stats': '统计', 'Play': '游戏', 'Mode': '模式', 'View': '页面',
-            'How to play': '玩法说明', 'Your move': '你的操作', 'Hint': '提示', 'Reveal': '揭晓', 'Share': '分享',
-            'Difficulty guide': '难度说明', 'Accessibility & sound': '无障碍与声音', 'Stats & history': '统计与历史',
-            'Stats by difficulty': '按难度统计', 'Problem history': '题目历史', 'Achievements': '成就',
-            'Previous': '上一页', 'Next': '下一页', 'Clear history': '清除历史', 'Reset all stats': '重置所有统计数据',
-            'Waveform sound effects (off by default)': '波形音效（默认关闭）', 'Larger text': '更大文字', 'Higher contrast': '更高对比度',
-            'Reduced clutter': '减少干扰', 'Install offline app': '安装离线应用',
-            'Three values only; small + and − puzzles.': '只有三个数值；小型加减题。',
-            'Compact puzzles; adds × and frequent three-value rounds.': '紧凑题目；加入 ×，并经常出现三个数值的回合。',
-            'Compact puzzles; adds integer ÷ and some three-value rounds.': '紧凑题目；加入整数 ÷，并有一些三个数值的回合。',
-            'Adds modulus % and powers ^, with occasional three-value rounds.': '加入取模 % 和幂 ^，偶尔有三个数值的回合。',
-            'Largest values and every operation, including √, in the longest puzzles.': '数值最大、包含所有运算（包括 √）的最长题目。',
-            'Three-number addition and subtraction with small positive integers.': '用较小正整数进行三数加减。',
-            'Compact expressions that introduce multiplication, with frequent three-number warm-ups.': '加入乘法的紧凑表达式，并经常有三数热身题。',
-            'Compact expressions with integer (whole-quotient) division and some three-number rounds.': '使用整除的紧凑表达式，并有一些三数回合。',
-            'Adds remainders and powers, while retaining occasional three-number rounds.': '加入余数和幂，同时保留偶尔的三数回合。',
-            'Every operation, including roots, in the longest expressions.': '最长表达式中包含所有运算，包括平方根。',
-            'Change exactly one number into a 1 so both sides have the same integer value.': '将恰好一个数字改为 1，使等式两边得到相同的整数值。',
-            'Change one number, then check the equation.': '改变一个数字，然后检查等式。',
-            'A difficulty spike—take your time.': '难度会提高——慢慢来。',
-            'Both sides balance. Review the solution, then continue.': '等式两边相等。查看解法后继续。',
-            'Not balanced—retry': '尚未平衡——再试一次', 'Solution revealed': '已揭晓解法',
-            'This puzzle counts as incorrect. Review it, then continue.': '此题计为错误。查看后继续。',
-            'Correct': '正确', 'Incorrect': '错误', 'Copied': '已复制',
-            'Build a custom game': '创建自定义游戏', 'Choose the rules, then start the run. A seed makes it reproducible.': '选择规则，然后开始游戏。种子可使题目可复现。',
-            'Check the targets': '检查目标', 'The minimum target cannot exceed the maximum.': '最小目标不能超过最大目标。'
-        },
-        ar: {
-            'One move. Make it count.': 'حركة واحدة. اجعلها مؤثرة.', 'Round ': 'الجولة ', 'Warm-up': 'إحماء', 'Standard': 'عادي', 'Challenge': 'تحدٍ', 'Guided': 'إرشادي',
-            'Tutorial': 'البرنامج التعليمي', 'Easy': 'سهل', 'Normal': 'عادي', 'Hard': 'صعب', 'Expert': 'خبير', 'Extreme': 'أقصى',
-            'Daily': 'يومي', 'Timed': 'مؤقت', 'Endless': 'لا نهائي', 'Challenges': 'تحديات', 'Custom…': 'مخصص…',
-            'Options': 'الخيارات', 'Stats': 'الإحصاءات', 'Play': 'العب', 'Mode': 'النمط', 'View': 'الصفحة',
-            'How to play': 'طريقة اللعب', 'Your move': 'حركتك', 'Hint': 'تلميح', 'Reveal': 'إظهار', 'Share': 'مشاركة',
-            'Difficulty guide': 'دليل الصعوبة', 'Accessibility & sound': 'إتاحة وصوت', 'Stats & history': 'الإحصاءات والسجل',
-            'Stats by difficulty': 'إحصاءات حسب الصعوبة', 'Problem history': 'سجل المسائل', 'Achievements': 'الإنجازات',
-            'Previous': 'السابق', 'Next': 'التالي', 'Clear history': 'مسح السجل', 'Reset all stats': 'إعادة ضبط كل الإحصاءات',
-            'Waveform sound effects (off by default)': 'مؤثرات صوتية موجية (متوقفة افتراضيًا)', 'Larger text': 'نص أكبر',
-            'Higher contrast': 'تباين أعلى', 'Reduced clutter': 'تقليل التشتيت', 'Install offline app': 'تثبيت تطبيق دون اتصال',
-            'Three values only; small + and − puzzles.': 'ثلاث قيم فقط؛ مسائل جمع وطرح صغيرة.',
-            'Compact puzzles; adds × and frequent three-value rounds.': 'مسائل مدمجة؛ تضيف × وجولات متكررة من ثلاث قيم.',
-            'Compact puzzles; adds integer ÷ and some three-value rounds.': 'مسائل مدمجة؛ تضيف ÷ الصحيحة وبعض جولات ثلاث قيم.',
-            'Adds modulus % and powers ^, with occasional three-value rounds.': 'تضيف الباقي % والأسس ^ مع جولات عرضية من ثلاث قيم.',
-            'Largest values and every operation, including √, in the longest puzzles.': 'أكبر القيم وكل العمليات، بما فيها √، في أطول المسائل.',
-            'Three-number addition and subtraction with small positive integers.': 'جمع وطرح بثلاثة أعداد صحيحة موجبة صغيرة.',
-            'Compact expressions that introduce multiplication, with frequent three-number warm-ups.': 'تعبيرات مدمجة تقدم الضرب مع إحماءات متكررة بثلاثة أعداد.',
-            'Compact expressions with integer (whole-quotient) division and some three-number rounds.': 'تعبيرات مدمجة بقسمة صحيحة وبعض جولات ثلاثة أعداد.',
-            'Adds remainders and powers, while retaining occasional three-number rounds.': 'تضيف البواقي والأسس مع الاحتفاظ بجولات عرضية من ثلاثة أعداد.',
-            'Every operation, including roots, in the longest expressions.': 'كل العمليات، بما فيها الجذور، في أطول التعبيرات.',
-            'Change exactly one number into a 1 so both sides have the same integer value.': 'غيّر رقمًا واحدًا بالضبط إلى 1 ليصبح للطرفين نفس القيمة الصحيحة.',
-            'Change one number, then check the equation.': 'غيّر رقمًا واحدًا ثم تحقق من المعادلة.', 'A difficulty spike—take your time.': 'قفزة في الصعوبة—خذ وقتك.',
-            'Both sides balance. Review the solution, then continue.': 'الطرفان متساويان. راجع الحل ثم تابع.', 'Not balanced—retry': 'غير متوازن—حاول ثانيةً',
-            'Solution revealed': 'تم إظهار الحل', 'This puzzle counts as incorrect. Review it, then continue.': 'تُحسب هذه المسألة غير صحيحة. راجعها ثم تابع.',
-            'Correct': 'صحيح', 'Incorrect': 'غير صحيح', 'Copied': 'تم النسخ', 'Build a custom game': 'أنشئ لعبة مخصصة',
-            'Choose the rules, then start the run. A seed makes it reproducible.': 'اختر القواعد ثم ابدأ. تجعل البذرة اللعبة قابلة للتكرار.'
-        },
-        bn: {
-            'One move. Make it count.': 'একটি চাল। সেটি গুরুত্বপূর্ণ করুন।', 'Round ': 'রাউন্ড ', 'Warm-up': 'ওয়ার্ম-আপ', 'Standard': 'সাধারণ', 'Challenge': 'চ্যালেঞ্জ',
-            'Tutorial': 'টিউটোরিয়াল', 'Easy': 'সহজ', 'Normal': 'সাধারণ', 'Hard': 'কঠিন', 'Expert': 'বিশেষজ্ঞ', 'Extreme': 'চরম',
-            'Daily': 'দৈনিক', 'Timed': 'সময়সীমা', 'Endless': 'অন্তহীন', 'Challenges': 'চ্যালেঞ্জ', 'Custom…': 'কাস্টম…',
-            'Options': 'বিকল্প', 'Stats': 'পরিসংখ্যান', 'Play': 'খেলুন', 'Mode': 'মোড', 'View': 'পৃষ্ঠা',
-            'How to play': 'কীভাবে খেলবেন', 'Your move': 'আপনার চাল', 'Hint': 'ইঙ্গিত', 'Reveal': 'দেখান', 'Share': 'শেয়ার করুন',
-            'Difficulty guide': 'কঠিনতার নির্দেশিকা', 'Accessibility & sound': 'সহায়ক সুবিধা ও শব্দ', 'Stats & history': 'পরিসংখ্যান ও ইতিহাস',
-            'Stats by difficulty': 'কঠিনতা অনুযায়ী পরিসংখ্যান', 'Problem history': 'প্রশ্নের ইতিহাস', 'Achievements': 'অর্জন',
-            'Previous': 'আগের', 'Next': 'পরের', 'Clear history': 'ইতিহাস মুছুন', 'Reset all stats': 'সব পরিসংখ্যান রিসেট করুন'
-        },
-        ja: {
-            'One move. Make it count.': '一手に集中しよう。', 'Round ': 'ラウンド ', 'Warm-up': 'ウォームアップ', 'Standard': '標準', 'Challenge': 'チャレンジ',
-            'Tutorial': 'チュートリアル', 'Easy': 'かんたん', 'Normal': 'ふつう', 'Hard': 'むずかしい', 'Expert': 'エキスパート', 'Extreme': 'エクストリーム',
-            'Daily': 'デイリー', 'Timed': 'タイムアタック', 'Endless': 'エンドレス', 'Challenges': 'チャレンジ', 'Custom…': 'カスタム…',
-            'Options': 'オプション', 'Stats': '統計', 'Play': 'プレイ', 'Mode': 'モード', 'View': '画面',
-            'How to play': '遊び方', 'Your move': 'あなたの手番', 'Hint': 'ヒント', 'Reveal': '答えを見る', 'Share': '共有',
-            'Difficulty guide': '難易度ガイド', 'Accessibility & sound': 'アクセシビリティとサウンド', 'Stats & history': '統計と履歴',
-            'Stats by difficulty': '難易度別の統計', 'Problem history': '問題履歴', 'Achievements': '実績',
-            'Previous': '前へ', 'Next': '次へ', 'Clear history': '履歴を消去', 'Reset all stats': 'すべての統計をリセット'
-        },
-        hi: {
-            'One move. Make it count.': 'एक चाल। उसे सार्थक बनाएँ।', 'Round ': 'राउंड ', 'Warm-up': 'वार्म-अप', 'Standard': 'सामान्य', 'Challenge': 'चुनौती',
-            'Tutorial': 'ट्यूटोरियल', 'Easy': 'आसान', 'Normal': 'सामान्य', 'Hard': 'कठिन', 'Expert': 'विशेषज्ञ', 'Extreme': 'अत्यंत कठिन',
-            'Daily': 'दैनिक', 'Timed': 'समयबद्ध', 'Endless': 'अंतहीन', 'Challenges': 'चुनौतियाँ', 'Custom…': 'कस्टम…',
-            'Options': 'विकल्प', 'Stats': 'आँकड़े', 'Play': 'खेलें', 'Mode': 'मोड', 'View': 'स्क्रीन',
-            'How to play': 'कैसे खेलें', 'Your move': 'आपकी चाल', 'Hint': 'संकेत', 'Reveal': 'हल दिखाएँ', 'Share': 'साझा करें',
-            'Difficulty guide': 'कठिनाई गाइड', 'Accessibility & sound': 'सुगम्यता और ध्वनि', 'Stats & history': 'आँकड़े और इतिहास',
-            'Stats by difficulty': 'कठिनाई के अनुसार आँकड़े', 'Problem history': 'पहेली इतिहास', 'Achievements': 'उपलब्धियाँ',
-            'Previous': 'पिछला', 'Next': 'अगला', 'Clear history': 'इतिहास मिटाएँ', 'Reset all stats': 'सभी आँकड़े रीसेट करें'
-        }
-    };
 
     // Structural UI copy is keyed so every selectable locale must provide it.
     const uiMessages = {
@@ -1507,12 +1359,12 @@
 
     const learningMessages = {
         en: {
-            'mode.workshop': 'Guided Practice',
-            'modeDescription.workshop': 'Focused practice follows your concept mastery and revisits ideas that need more confidence.',
-            'learning.goal': 'Learning goal', 'learning.practice': 'Concept',
+            'mode.guided': 'Guided Practice',
+            'modeDescription.guided': 'Focused practice follows your progress and revisits concepts over time.',
+            'learning.goal': 'Learning goal', 'learning.concept': 'Concept',
             'learning.recommended': 'Recommended next', 'learning.seen': 'Practiced',
-            'learning.mastery': 'Mastery', 'learning.unaided': 'Independent',
-            'learning.masteryValue': 'Mastery: {mastery}%',
+            'learning.progress': 'Progress', 'learning.unaided': 'Independent',
+            'learning.progressValue': 'Progress: {progress}%',
             'learning.recommendation': 'Recommended next: {concept}',
             'hint.compare': 'Compare the sides',
             'hint.compareBody': 'Before the move: left {left}, right {right}. Their gap is {gap}.',
@@ -1522,12 +1374,12 @@
             'feedback.effect': 'Changing {number} to 1 changed the {side} side from {before} to {after} ({delta}).'
         },
         es: {
-            'mode.workshop': 'Práctica guiada',
-            'modeDescription.workshop': 'La práctica sigue tu dominio de conceptos y repasa las ideas que necesitan más confianza.',
-            'learning.goal': 'Objetivo de aprendizaje', 'learning.practice': 'Concepto',
+            'mode.guided': 'Práctica guiada',
+            'modeDescription.guided': 'La práctica sigue tu dominio de conceptos y repasa las ideas que necesitan más confianza.',
+            'learning.goal': 'Objetivo de aprendizaje', 'learning.concept': 'Concepto',
             'learning.recommended': 'Siguiente recomendado', 'learning.seen': 'Practicado',
-            'learning.mastery': 'Dominio', 'learning.unaided': 'Independiente',
-            'learning.masteryValue': 'Dominio: {mastery} %',
+            'learning.progress': 'Dominio', 'learning.unaided': 'Independiente',
+            'learning.progressValue': 'Dominio: {progress} %',
             'learning.recommendation': 'Siguiente recomendado: {concept}',
             'hint.compare': 'Compara los lados',
             'hint.compareBody': 'Antes del cambio: izquierda {left}, derecha {right}. La diferencia es {gap}.',
@@ -1537,12 +1389,12 @@
             'feedback.effect': 'Cambiar {number} por 1 cambió el lado {side} de {before} a {after} ({delta}).'
         },
         zh: {
-            'mode.workshop': '引导练习',
-            'modeDescription.workshop': '根据概念掌握情况进行专项练习，并复习仍需巩固的内容。',
-            'learning.goal': '学习目标', 'learning.practice': '概念',
+            'mode.guided': '引导练习',
+            'modeDescription.guided': '根据概念掌握情况进行专项练习，并复习仍需巩固的内容。',
+            'learning.goal': '学习目标', 'learning.concept': '概念',
             'learning.recommended': '推荐下一项', 'learning.seen': '练习次数',
-            'learning.mastery': '掌握度', 'learning.unaided': '独立完成',
-            'learning.masteryValue': '掌握度：{mastery}%',
+            'learning.progress': '掌握度', 'learning.unaided': '独立完成',
+            'learning.progressValue': '掌握度：{progress}%',
             'learning.recommendation': '推荐下一项：{concept}',
             'hint.compare': '比较两边',
             'hint.compareBody': '改变前：左边 {left}，右边 {right}，相差 {gap}。',
@@ -1552,12 +1404,12 @@
             'feedback.effect': '把 {number} 改为 1 后，{side}边从 {before} 变为 {after}（{delta}）。'
         },
         ar: {
-            'mode.workshop': 'تدريب موجّه',
-            'modeDescription.workshop': 'يتبع التدريب إتقانك للمفاهيم ويعيد الأفكار التي تحتاج إلى ثقة أكبر.',
-            'learning.goal': 'هدف التعلم', 'learning.practice': 'المفهوم',
+            'mode.guided': 'تدريب موجّه',
+            'modeDescription.guided': 'يتبع التدريب إتقانك للمفاهيم ويعيد الأفكار التي تحتاج إلى ثقة أكبر.',
+            'learning.goal': 'هدف التعلم', 'learning.concept': 'المفهوم',
             'learning.recommended': 'المقترح التالي', 'learning.seen': 'مرات التدريب',
-            'learning.mastery': 'الإتقان', 'learning.unaided': 'مستقل',
-            'learning.masteryValue': 'الإتقان: {mastery}٪',
+            'learning.progress': 'الإتقان', 'learning.unaided': 'مستقل',
+            'learning.progressValue': 'الإتقان: {progress}٪',
             'learning.recommendation': 'المقترح التالي: {concept}',
             'hint.compare': 'قارن الطرفين',
             'hint.compareBody': 'قبل التغيير: اليسار {left} واليمين {right}. الفرق {gap}.',
@@ -1567,12 +1419,12 @@
             'feedback.effect': 'تغيير {number} إلى 1 غيّر الطرف {side} من {before} إلى {after} ({delta}).'
         },
         bn: {
-            'mode.workshop': 'নির্দেশিত অনুশীলন',
-            'modeDescription.workshop': 'ধারণার দক্ষতা অনুযায়ী অনুশীলন হয় এবং যেগুলোতে আরও আত্মবিশ্বাস দরকার সেগুলো ফিরে আসে।',
-            'learning.goal': 'শেখার লক্ষ্য', 'learning.practice': 'ধারণা',
+            'mode.guided': 'নির্দেশিত অনুশীলন',
+            'modeDescription.guided': 'ধারণার দক্ষতা অনুযায়ী অনুশীলন হয় এবং যেগুলোতে আরও আত্মবিশ্বাস দরকার সেগুলো ফিরে আসে।',
+            'learning.goal': 'শেখার লক্ষ্য', 'learning.concept': 'ধারণা',
             'learning.recommended': 'পরের সুপারিশ', 'learning.seen': 'অনুশীলন',
-            'learning.mastery': 'দক্ষতা', 'learning.unaided': 'স্বাধীন',
-            'learning.masteryValue': 'দক্ষতা: {mastery}%',
+            'learning.progress': 'দক্ষতা', 'learning.unaided': 'স্বাধীন',
+            'learning.progressValue': 'দক্ষতা: {progress}%',
             'learning.recommendation': 'পরের সুপারিশ: {concept}',
             'hint.compare': 'দুই পাশ তুলনা করুন',
             'hint.compareBody': 'পরিবর্তনের আগে: বাম {left}, ডান {right}। ব্যবধান {gap}।',
@@ -1582,12 +1434,12 @@
             'feedback.effect': '{number} কে 1 করায় {side} পাশ {before} থেকে {after} হয়েছে ({delta})।'
         },
         ja: {
-            'mode.workshop': 'ガイド付き練習',
-            'modeDescription.workshop': '概念の習熟度に合わせ、まだ自信が必要な考え方を復習します。',
-            'learning.goal': '学習目標', 'learning.practice': '概念',
+            'mode.guided': 'ガイド付き練習',
+            'modeDescription.guided': '概念の習熟度に合わせ、まだ自信が必要な考え方を復習します。',
+            'learning.goal': '学習目標', 'learning.concept': '概念',
             'learning.recommended': '次のおすすめ', 'learning.seen': '練習回数',
-            'learning.mastery': '習熟度', 'learning.unaided': '自力',
-            'learning.masteryValue': '習熟度：{mastery}%',
+            'learning.progress': '習熟度', 'learning.unaided': '自力',
+            'learning.progressValue': '習熟度：{progress}%',
             'learning.recommendation': '次のおすすめ：{concept}',
             'hint.compare': '両辺を比べる',
             'hint.compareBody': '変更前は左辺 {left}、右辺 {right}。差は {gap} です。',
@@ -1597,12 +1449,12 @@
             'feedback.effect': '{number} を1にすると、{side}辺は {before} から {after} に変わりました（{delta}）。'
         },
         hi: {
-            'mode.workshop': 'मार्गदर्शित अभ्यास',
-            'modeDescription.workshop': 'अभ्यास अवधारणा-दक्षता के अनुसार चलता है और कम आत्मविश्वास वाले विचार दोहराता है।',
-            'learning.goal': 'सीखने का लक्ष्य', 'learning.practice': 'अवधारणा',
+            'mode.guided': 'मार्गदर्शित अभ्यास',
+            'modeDescription.guided': 'अभ्यास अवधारणा-दक्षता के अनुसार चलता है और कम आत्मविश्वास वाले विचार दोहराता है।',
+            'learning.goal': 'सीखने का लक्ष्य', 'learning.concept': 'अवधारणा',
             'learning.recommended': 'अगला सुझाव', 'learning.seen': 'अभ्यास',
-            'learning.mastery': 'दक्षता', 'learning.unaided': 'स्वतंत्र',
-            'learning.masteryValue': 'दक्षता: {mastery}%',
+            'learning.progress': 'दक्षता', 'learning.unaided': 'स्वतंत्र',
+            'learning.progressValue': 'दक्षता: {progress}%',
             'learning.recommendation': 'अगला सुझाव: {concept}',
             'hint.compare': 'दोनों पक्षों की तुलना करें',
             'hint.compareBody': 'बदलाव से पहले: बायाँ {left}, दायाँ {right}। अंतर {gap} है।',
@@ -1612,12 +1464,12 @@
             'feedback.effect': '{number} को 1 करने से {side} पक्ष {before} से {after} हो गया ({delta})।'
         },
         pt: {
-            'mode.workshop': 'Prática guiada',
-            'modeDescription.workshop': 'A prática acompanha seu domínio dos conceitos e retoma ideias que precisam de mais confiança.',
-            'learning.goal': 'Objetivo de aprendizagem', 'learning.practice': 'Conceito',
+            'mode.guided': 'Prática guiada',
+            'modeDescription.guided': 'A prática acompanha seu domínio dos conceitos e retoma ideias que precisam de mais confiança.',
+            'learning.goal': 'Objetivo de aprendizagem', 'learning.concept': 'Conceito',
             'learning.recommended': 'Próximo recomendado', 'learning.seen': 'Praticado',
-            'learning.mastery': 'Domínio', 'learning.unaided': 'Independente',
-            'learning.masteryValue': 'Domínio: {mastery}%',
+            'learning.progress': 'Domínio', 'learning.unaided': 'Independente',
+            'learning.progressValue': 'Domínio: {progress}%',
             'learning.recommendation': 'Próximo recomendado: {concept}',
             'hint.compare': 'Compare os lados',
             'hint.compareBody': 'Antes da mudança: esquerda {left}, direita {right}. A diferença é {gap}.',
@@ -1627,12 +1479,12 @@
             'feedback.effect': 'Mudar {number} para 1 alterou o lado {side} de {before} para {after} ({delta}).'
         },
         ru: {
-            'mode.workshop': 'Практика с поддержкой',
-            'modeDescription.workshop': 'Практика следует за освоением понятий и возвращает идеи, в которых нужно больше уверенности.',
-            'learning.goal': 'Цель обучения', 'learning.practice': 'Понятие',
+            'mode.guided': 'Практика с поддержкой',
+            'modeDescription.guided': 'Практика следует за освоением понятий и возвращает идеи, в которых нужно больше уверенности.',
+            'learning.goal': 'Цель обучения', 'learning.concept': 'Понятие',
             'learning.recommended': 'Далее рекомендуется', 'learning.seen': 'Практика',
-            'learning.mastery': 'Освоение', 'learning.unaided': 'Самостоятельно',
-            'learning.masteryValue': 'Освоение: {mastery}%',
+            'learning.progress': 'Освоение', 'learning.unaided': 'Самостоятельно',
+            'learning.progressValue': 'Освоение: {progress}%',
             'learning.recommendation': 'Далее рекомендуется: {concept}',
             'hint.compare': 'Сравните стороны',
             'hint.compareBody': 'До замены: слева {left}, справа {right}. Разница {gap}.',
@@ -1642,12 +1494,12 @@
             'feedback.effect': 'Замена {number} на 1 изменила сторону {side} с {before} до {after} ({delta}).'
         },
         vi: {
-            'mode.workshop': 'Luyện tập có hướng dẫn',
-            'modeDescription.workshop': 'Bài luyện theo mức độ nắm vững khái niệm và ôn lại ý tưởng cần thêm tự tin.',
-            'learning.goal': 'Mục tiêu học tập', 'learning.practice': 'Khái niệm',
+            'mode.guided': 'Luyện tập có hướng dẫn',
+            'modeDescription.guided': 'Bài luyện theo mức độ nắm vững khái niệm và ôn lại ý tưởng cần thêm tự tin.',
+            'learning.goal': 'Mục tiêu học tập', 'learning.concept': 'Khái niệm',
             'learning.recommended': 'Đề xuất tiếp theo', 'learning.seen': 'Đã luyện',
-            'learning.mastery': 'Mức thành thạo', 'learning.unaided': 'Tự làm',
-            'learning.masteryValue': 'Thành thạo: {mastery}%',
+            'learning.progress': 'Mức thành thạo', 'learning.unaided': 'Tự làm',
+            'learning.progressValue': 'Thành thạo: {progress}%',
             'learning.recommendation': 'Đề xuất tiếp theo: {concept}',
             'hint.compare': 'So sánh hai vế',
             'hint.compareBody': 'Trước khi đổi: trái {left}, phải {right}. Chênh lệch là {gap}.',
@@ -1657,12 +1509,12 @@
             'feedback.effect': 'Đổi {number} thành 1 làm vế {side} đổi từ {before} thành {after} ({delta}).'
         },
         tr: {
-            'mode.workshop': 'Rehberli alıştırma',
-            'modeDescription.workshop': 'Alıştırmalar kavram ustalığını izler ve daha çok güven gereken fikirleri tekrarlar.',
-            'learning.goal': 'Öğrenme hedefi', 'learning.practice': 'Kavram',
+            'mode.guided': 'Rehberli alıştırma',
+            'modeDescription.guided': 'Alıştırmalar kavram ustalığını izler ve daha çok güven gereken fikirleri tekrarlar.',
+            'learning.goal': 'Öğrenme hedefi', 'learning.concept': 'Kavram',
             'learning.recommended': 'Sıradaki öneri', 'learning.seen': 'Alıştırma',
-            'learning.mastery': 'Ustalık', 'learning.unaided': 'Bağımsız',
-            'learning.masteryValue': 'Ustalık: %{mastery}',
+            'learning.progress': 'Ustalık', 'learning.unaided': 'Bağımsız',
+            'learning.progressValue': 'Ustalık: %{progress}',
             'learning.recommendation': 'Sıradaki öneri: {concept}',
             'hint.compare': 'Tarafları karşılaştır',
             'hint.compareBody': 'Değişimden önce: sol {left}, sağ {right}. Fark {gap}.',
@@ -1672,12 +1524,12 @@
             'feedback.effect': "{number} sayısını 1 yapmak {side} tarafı {before}'den {after}'e değiştirdi ({delta})."
         },
         ur: {
-            'mode.workshop': 'رہنمائی کے ساتھ مشق',
-            'modeDescription.workshop': 'مشق تصور کی مہارت کے مطابق چلتی ہے اور کم اعتماد والے خیالات دوبارہ لاتی ہے۔',
-            'learning.goal': 'سیکھنے کا مقصد', 'learning.practice': 'تصور',
+            'mode.guided': 'رہنمائی کے ساتھ مشق',
+            'modeDescription.guided': 'مشق تصور کی مہارت کے مطابق چلتی ہے اور کم اعتماد والے خیالات دوبارہ لاتی ہے۔',
+            'learning.goal': 'سیکھنے کا مقصد', 'learning.concept': 'تصور',
             'learning.recommended': 'اگلی تجویز', 'learning.seen': 'مشق',
-            'learning.mastery': 'مہارت', 'learning.unaided': 'خود حل',
-            'learning.masteryValue': 'مہارت: {mastery}٪',
+            'learning.progress': 'مہارت', 'learning.unaided': 'خود حل',
+            'learning.progressValue': 'مہارت: {progress}٪',
             'learning.recommendation': 'اگلی تجویز: {concept}',
             'hint.compare': 'دونوں طرف موازنہ کریں',
             'hint.compareBody': 'تبدیلی سے پہلے: بائیں {left}، دائیں {right}۔ فرق {gap} ہے۔',
@@ -1699,9 +1551,9 @@
             'adaptive.skippedBody': 'Here’s the solution. Adaptive mode will choose a gentler next step.',
             'modeDescription.challenges': 'Ten handcrafted puzzles featuring different operations.',
             'modeDescription.daily': 'The same puzzle for everyone, refreshed each day.',
-            'modeDescription.workshop': 'Focused practice follows your progress and revisits concepts over time.',
+            'modeDescription.guided': 'Focused practice follows your progress and revisits concepts over time.',
             'learning.focus': 'Practice focus', 'learning.recommended': 'Suggested for me',
-            'learning.mastery': 'Progress', 'learning.masteryValue': 'Progress: {mastery}%',
+            'learning.progress': 'Progress', 'learning.progressValue': 'Progress: {progress}%',
             'learning.recommendation': 'Suggested next: {concept}',
             'hint.sideBody': 'One solution changes a number on the outlined side.',
             'hint.numberBody': 'One solution changes the outlined number.',
@@ -1732,9 +1584,9 @@
             'adaptive.skippedBody': 'Aquí tienes la solución. El modo Adaptativo elegirá un siguiente paso más accesible.',
             'modeDescription.challenges': 'Diez problemas artesanales con distintas operaciones.',
             'modeDescription.daily': 'El mismo problema para todo el mundo, renovado cada día.',
-            'modeDescription.workshop': 'La práctica enfocada sigue tu progreso y retoma conceptos con el tiempo.',
+            'modeDescription.guided': 'La práctica enfocada sigue tu progreso y retoma conceptos con el tiempo.',
             'learning.focus': 'Enfoque de práctica', 'learning.recommended': 'Sugerido para mí',
-            'learning.mastery': 'Progreso', 'learning.masteryValue': 'Progreso: {mastery} %',
+            'learning.progress': 'Progreso', 'learning.progressValue': 'Progreso: {progress} %',
             'learning.recommendation': 'Siguiente sugerencia: {concept}',
             'hint.sideBody': 'Una solución cambia un número del lado marcado.',
             'hint.numberBody': 'Una solución cambia el número marcado.',
@@ -1764,9 +1616,9 @@
             'adaptive.skippedBody': '这里是解法。自适应模式下一步会选择更平缓的题目。',
             'modeDescription.challenges': '十道使用不同运算的精选题目。',
             'modeDescription.daily': '每天更新一道所有人相同的题目。',
-            'modeDescription.workshop': '专项练习会跟随你的进度，并逐步回顾各个概念。',
+            'modeDescription.guided': '专项练习会跟随你的进度，并逐步回顾各个概念。',
             'learning.focus': '练习重点', 'learning.recommended': '为我推荐',
-            'learning.mastery': '进度', 'learning.masteryValue': '进度：{mastery}%',
+            'learning.progress': '进度', 'learning.progressValue': '进度：{progress}%',
             'learning.recommendation': '下一项建议：{concept}',
             'hint.sideBody': '一种解法会改变标出一侧的某个数字。',
             'hint.numberBody': '一种解法会改变标出的数字。',
@@ -1796,9 +1648,9 @@
             'adaptive.skippedBody': 'إليك الحل. سيختار النمط المتكيف خطوة تالية ألطف.',
             'modeDescription.challenges': 'عشر مسائل مصنوعة يدويًا بعمليات مختلفة.',
             'modeDescription.daily': 'المسألة نفسها للجميع، وتتجدد كل يوم.',
-            'modeDescription.workshop': 'يتبع التدريب المركّز تقدمك ويعيد المفاهيم مع مرور الوقت.',
+            'modeDescription.guided': 'يتبع التدريب المركّز تقدمك ويعيد المفاهيم مع مرور الوقت.',
             'learning.focus': 'تركيز التدريب', 'learning.recommended': 'اقترح لي',
-            'learning.mastery': 'التقدم', 'learning.masteryValue': 'التقدم: {mastery}٪',
+            'learning.progress': 'التقدم', 'learning.progressValue': 'التقدم: {progress}٪',
             'learning.recommendation': 'المقترح التالي: {concept}',
             'hint.sideBody': 'يغيّر أحد الحلول رقمًا في الطرف المحدد.',
             'hint.numberBody': 'يغيّر أحد الحلول الرقم المحدد.',
@@ -1828,9 +1680,9 @@
             'adaptive.skippedBody': 'এখানে সমাধানটি দেওয়া হলো। অভিযোজিত মোড পরের ধাপে আরও সহজ একটি প্রশ্ন বেছে নেবে।',
             'modeDescription.challenges': 'ভিন্ন ক্রিয়ার দশটি হাতে তৈরি ধাঁধা।',
             'modeDescription.daily': 'সবার জন্য একই প্রশ্ন, প্রতিদিন নতুন হয়।',
-            'modeDescription.workshop': 'নির্দিষ্ট অনুশীলন আপনার অগ্রগতি অনুসরণ করে এবং সময়ের সঙ্গে ধারণাগুলো আবার দেখায়।',
+            'modeDescription.guided': 'নির্দিষ্ট অনুশীলন আপনার অগ্রগতি অনুসরণ করে এবং সময়ের সঙ্গে ধারণাগুলো আবার দেখায়।',
             'learning.focus': 'অনুশীলনের বিষয়', 'learning.recommended': 'আমার জন্য পরামর্শ',
-            'learning.mastery': 'অগ্রগতি', 'learning.masteryValue': 'অগ্রগতি: {mastery}%',
+            'learning.progress': 'অগ্রগতি', 'learning.progressValue': 'অগ্রগতি: {progress}%',
             'learning.recommendation': 'পরের পরামর্শ: {concept}',
             'hint.sideBody': 'একটি সমাধানে চিহ্নিত পাশের একটি সংখ্যা বদলাতে হয়।',
             'hint.numberBody': 'একটি সমাধানে চিহ্নিত সংখ্যাটি বদলাতে হয়।',
@@ -1861,9 +1713,9 @@
             'adaptive.skippedBody': '解答を表示しました。適応モードでは次に少し取り組みやすい問題を選びます。',
             'modeDescription.challenges': '異なる演算を使う10問の手作り問題です。',
             'modeDescription.daily': '毎日更新される、全員共通の問題です。',
-            'modeDescription.workshop': '集中練習が進み具合に合わせ、時間をおいて概念を復習します。',
+            'modeDescription.guided': '集中練習が進み具合に合わせ、時間をおいて概念を復習します。',
             'learning.focus': '練習内容', 'learning.recommended': 'おすすめを選ぶ',
-            'learning.mastery': '進み具合', 'learning.masteryValue': '進み具合：{mastery}%',
+            'learning.progress': '進み具合', 'learning.progressValue': '進み具合：{progress}%',
             'learning.recommendation': '次のおすすめ：{concept}',
             'hint.sideBody': '解き方の一つでは、枠で囲まれた側の数字を変えます。',
             'hint.numberBody': '解き方の一つでは、枠で囲まれた数字を変えます。',
@@ -1894,9 +1746,9 @@
             'adaptive.skippedBody': 'यह रहा हल। अनुकूली मोड अगला कदम थोड़ा आसान चुनेगा।',
             'modeDescription.challenges': 'अलग-अलग संक्रियाओं वाली दस हाथ से बनाई पहेलियाँ।',
             'modeDescription.daily': 'हर दिन नई होने वाली, सभी के लिए एक ही पहेली।',
-            'modeDescription.workshop': 'केंद्रित अभ्यास आपकी प्रगति के अनुसार चलता है और समय के साथ अवधारणाएँ दोहराता है।',
+            'modeDescription.guided': 'केंद्रित अभ्यास आपकी प्रगति के अनुसार चलता है और समय के साथ अवधारणाएँ दोहराता है।',
             'learning.focus': 'अभ्यास का विषय', 'learning.recommended': 'मेरे लिए सुझाव',
-            'learning.mastery': 'प्रगति', 'learning.masteryValue': 'प्रगति: {mastery}%',
+            'learning.progress': 'प्रगति', 'learning.progressValue': 'प्रगति: {progress}%',
             'learning.recommendation': 'अगला सुझाव: {concept}',
             'hint.sideBody': 'एक हल में रेखांकित पक्ष की एक संख्या बदलती है।',
             'hint.numberBody': 'एक हल में रेखांकित संख्या बदलती है।',
@@ -1927,9 +1779,9 @@
             'adaptive.skippedBody': 'Aqui está a solução. O modo Adaptativo escolherá um próximo passo mais acessível.',
             'modeDescription.challenges': 'Dez problemas feitos à mão com operações diferentes.',
             'modeDescription.daily': 'O mesmo problema para todo mundo, renovado a cada dia.',
-            'modeDescription.workshop': 'A prática focada acompanha seu progresso e retoma conceitos ao longo do tempo.',
+            'modeDescription.guided': 'A prática focada acompanha seu progresso e retoma conceitos ao longo do tempo.',
             'learning.focus': 'Foco da prática', 'learning.recommended': 'Sugerido para mim',
-            'learning.mastery': 'Progresso', 'learning.masteryValue': 'Progresso: {mastery}%',
+            'learning.progress': 'Progresso', 'learning.progressValue': 'Progresso: {progress}%',
             'learning.recommendation': 'Próxima sugestão: {concept}',
             'hint.sideBody': 'Uma solução muda um número do lado destacado.',
             'hint.numberBody': 'Uma solução muda o número destacado.',
@@ -1960,9 +1812,9 @@
             'adaptive.skippedBody': 'Вот решение. Адаптивный режим выберет более доступный следующий шаг.',
             'modeDescription.challenges': 'Десять авторских задач с разными операциями.',
             'modeDescription.daily': 'Одна задача для всех, обновляется каждый день.',
-            'modeDescription.workshop': 'Целевая практика следует за вашим прогрессом и со временем возвращается к понятиям.',
+            'modeDescription.guided': 'Целевая практика следует за вашим прогрессом и со временем возвращается к понятиям.',
             'learning.focus': 'Тема практики', 'learning.recommended': 'Предложить мне',
-            'learning.mastery': 'Прогресс', 'learning.masteryValue': 'Прогресс: {mastery}%',
+            'learning.progress': 'Прогресс', 'learning.progressValue': 'Прогресс: {progress}%',
             'learning.recommendation': 'Далее предлагаем: {concept}',
             'hint.sideBody': 'В одном из решений меняется число на выделенной стороне.',
             'hint.numberBody': 'В одном из решений меняется выделенное число.',
@@ -1993,9 +1845,9 @@
             'adaptive.skippedBody': 'Đây là lời giải. Chế độ Thích ứng sẽ chọn bước tiếp theo nhẹ nhàng hơn.',
             'modeDescription.challenges': 'Mười câu đố được soạn thủ công với nhiều phép toán.',
             'modeDescription.daily': 'Cùng một câu đố cho mọi người, được làm mới mỗi ngày.',
-            'modeDescription.workshop': 'Bài luyện tập trung theo tiến trình của bạn và ôn lại khái niệm theo thời gian.',
+            'modeDescription.guided': 'Bài luyện tập trung theo tiến trình của bạn và ôn lại khái niệm theo thời gian.',
             'learning.focus': 'Trọng tâm luyện tập', 'learning.recommended': 'Gợi ý cho tôi',
-            'learning.mastery': 'Tiến trình', 'learning.masteryValue': 'Tiến trình: {mastery}%',
+            'learning.progress': 'Tiến trình', 'learning.progressValue': 'Tiến trình: {progress}%',
             'learning.recommendation': 'Gợi ý tiếp theo: {concept}',
             'hint.sideBody': 'Một lời giải đổi một số ở vế được đánh dấu.',
             'hint.numberBody': 'Một lời giải đổi số được đánh dấu.',
@@ -2026,9 +1878,9 @@
             'adaptive.skippedBody': 'Çözüm burada. Uyarlamalı mod sırada daha erişilebilir bir adım seçecek.',
             'modeDescription.challenges': 'Farklı işlemler kullanan on el yapımı bulmaca.',
             'modeDescription.daily': 'Herkes için aynı olan ve her gün yenilenen bir bulmaca.',
-            'modeDescription.workshop': 'Odaklı alıştırma ilerlemenizi izler ve kavramları zamanla yeniden ele alır.',
+            'modeDescription.guided': 'Odaklı alıştırma ilerlemenizi izler ve kavramları zamanla yeniden ele alır.',
             'learning.focus': 'Alıştırma odağı', 'learning.recommended': 'Bana öner',
-            'learning.mastery': 'İlerleme', 'learning.masteryValue': 'İlerleme: %{mastery}',
+            'learning.progress': 'İlerleme', 'learning.progressValue': 'İlerleme: %{progress}',
             'learning.recommendation': 'Sıradaki öneri: {concept}',
             'hint.sideBody': 'Çözümlerden biri, çerçeveli taraftaki bir sayıyı değiştirir.',
             'hint.numberBody': 'Çözümlerden biri çerçeveli sayıyı değiştirir.',
@@ -2059,9 +1911,9 @@
             'adaptive.skippedBody': 'یہ رہا حل۔ موافق موڈ اگلا قدم قدرے آسان چنے گا۔',
             'modeDescription.challenges': 'مختلف عملیات والی دس ہاتھ سے بنائی پہیلیاں۔',
             'modeDescription.daily': 'سب کے لیے ایک ہی پہیلی، جو ہر روز نئی ہوتی ہے۔',
-            'modeDescription.workshop': 'مرکوز مشق آپ کی پیش رفت کے مطابق چلتی ہے اور وقت کے ساتھ تصورات دوبارہ لاتی ہے۔',
+            'modeDescription.guided': 'مرکوز مشق آپ کی پیش رفت کے مطابق چلتی ہے اور وقت کے ساتھ تصورات دوبارہ لاتی ہے۔',
             'learning.focus': 'مشق کا موضوع', 'learning.recommended': 'میرے لیے تجویز',
-            'learning.mastery': 'پیش رفت', 'learning.masteryValue': 'پیش رفت: {mastery}٪',
+            'learning.progress': 'پیش رفت', 'learning.progressValue': 'پیش رفت: {progress}٪',
             'learning.recommendation': 'اگلی تجویز: {concept}',
             'hint.sideBody': 'ایک حل میں نشان زدہ طرف کا ایک عدد بدلا جاتا ہے۔',
             'hint.numberBody': 'ایک حل میں نشان زدہ عدد بدلا جاتا ہے۔',
@@ -2086,29 +1938,11 @@
     };
     for (const code of AVAILABLE_LOCALES) Object.assign(messages[code], copyReviewMessages[code]);
 
-    function translate(value) {
-        if (typeof value !== 'string') return value;
-        return (sourceTexts[locale] && sourceTexts[locale][value]) || value;
-    }
-
     function t(key, values) {
         const template = (messages[locale] && messages[locale][key]) || messages.en[key] || key;
         return template.replace(/\{(\w+)\}/g, function (_, name) {
             return values && values[name] !== undefined ? values[name] : '{' + name + '}';
         });
-    }
-
-    function getMessageId(prefix, value) {
-        if (typeof prefix !== 'string' || typeof value !== 'string') return null;
-        const keyPrefix = prefix + '.';
-        const directKey = keyPrefix + value;
-        if (Object.prototype.hasOwnProperty.call(messages.en, directKey)) return value;
-        const key = Object.keys(messages.en).find(function (candidate) {
-            return candidate.startsWith(keyPrefix) && AVAILABLE_LOCALES.some(function (code) {
-                return messages[code][candidate] === value;
-            });
-        });
-        return key ? key.slice(keyPrefix.length) : null;
     }
 
     function apply(rootElement) {
@@ -2123,10 +1957,6 @@
         }
         for (const element of scope.querySelectorAll('[data-i18n-content]')) {
             element.setAttribute('content', t(element.dataset.i18nContent));
-        }
-        for (const element of scope.querySelectorAll('[data-localize]')) {
-            if (!element.dataset.sourceText) element.dataset.sourceText = element.textContent;
-            element.textContent = translate(element.dataset.sourceText);
         }
         for (const element of document.querySelectorAll('link[rel="manifest"]')) {
             element.href = locale === 'en' ? 'manifest.webmanifest' :
@@ -2152,8 +1982,6 @@
         getLocale: function () { return locale; },
         setLocale: setLocale,
         t: t,
-        getMessageId: getMessageId,
-        translate: translate,
         locales: messages,
         availableLocales: AVAILABLE_LOCALES,
         localeOptions: LOCALE_OPTIONS.map(function (item) {

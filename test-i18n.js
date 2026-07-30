@@ -34,7 +34,6 @@ const i18n = context.window.Yog1I18n;
 
 assert.strictEqual(i18n.getLocale(), 'es', 'a supported shared locale is selected');
 assert.strictEqual(i18n.t('round.score', { target: 12, score: 8 }), 'Objetivo 12 · puntuación 8');
-assert.strictEqual(i18n.translate('Easy'), 'Fácil', 'source text is translated for existing UI content');
 assert.strictEqual(i18n.t('missing.key'), 'missing.key', 'missing translations are visible during development');
 i18n.setLocale('en');
 assert.strictEqual(i18n.getLocale(), 'en', 'the selected locale can be changed and persisted');
@@ -73,12 +72,12 @@ assert.strictEqual(i18n.getLocale(), 'en',
     'Portugal preferences do not silently select Brazilian Portuguese');
 i18n.setLocale('zh-Hans');
 assert.strictEqual(i18n.getLocale(), 'zh',
-    'a supported full language tag resolves to its backwards-compatible locale ID');
+    'a supported full language tag resolves to its compact locale ID');
 assert.strictEqual(document.documentElement.lang, 'zh-Hans',
     'the document exposes the full language tag to assistive technology');
 
 const modeIds = Object.keys(core.DIFFICULTIES)
-    .concat(['tutorial', 'adaptive', 'workshop', 'custom', 'daily', 'timed', 'endless', 'challenges']);
+    .concat(['tutorial', 'adaptive', 'guided', 'custom', 'daily', 'timed', 'endless', 'challenges']);
 function assertCatalogIds(prefix, ids) {
     for (const id of ids) {
         assert(Object.prototype.hasOwnProperty.call(i18n.locales.en, prefix + '.' + id),
@@ -89,22 +88,10 @@ assertCatalogIds('operation', Object.keys(core.OPERATIONS));
 assertCatalogIds('mode', modeIds);
 assertCatalogIds('difficulty', Object.keys(core.DIFFICULTIES));
 assertCatalogIds('modeDescription',
-    ['tutorial', 'adaptive', 'workshop', 'custom', 'daily', 'timed', 'endless', 'challenges']);
+    ['tutorial', 'adaptive', 'guided', 'custom', 'daily', 'timed', 'endless', 'challenges']);
 for (const id of ['first', 'streak5', 'twenty', 'explorer', 'daily', 'nohint', 'curated']) {
     assertCatalogIds('achievement.' + id, ['name', 'description']);
 }
-for (const id of modeIds) {
-    for (const locale of i18n.availableLocales) {
-        assert.strictEqual(
-            i18n.getMessageId('mode', i18n.locales[locale]['mode.' + id]),
-            id,
-            locale + ' mode labels resolve back to stable identifier ' + id
-        );
-    }
-}
-assert.strictEqual(i18n.getMessageId('mode', 'not-a-mode'), null,
-    'unknown saved labels are not mistaken for stable mode identifiers');
-
 const generatedRoundKinds = new Set();
 for (let round = 1; round <= core.ROUND_WAVE.length; round++) {
     generatedRoundKinds.add(core.roundTarget(20, round).kind);
@@ -140,7 +127,7 @@ assert(i18n.locales.en['modeDescription.challenges'].startsWith('Ten '),
     'the Challenge description matches the ten handcrafted puzzles');
 const laboratoryTerms = /lab|laborat|лаборатор|实验室|مختبر|ল্যাব|ラボ|प्रयोगशाला|لیب/i;
 for (const locale of i18n.availableLocales) {
-    assert.strictEqual(laboratoryTerms.test(i18n.locales[locale]['mode.workshop']), false,
+    assert.strictEqual(laboratoryTerms.test(i18n.locales[locale]['mode.guided']), false,
         locale + ' uses a neutral Guided Practice label');
 }
 for (const key of ['action.copyJson', 'share.jsonCopied', 'share.jsonReady', 'share.jsonPrompt']) {
@@ -207,14 +194,12 @@ assert.strictEqual(localizedMeta.content,
     'localized metadata is applied');
 
 const game = fs.readFileSync('game.js', 'utf8');
-assert.strictEqual(game.includes('i18n.translate('), false,
-    'generated UI uses catalog keys instead of partial source-text translation');
+assert.strictEqual(fs.readFileSync('i18n.js', 'utf8').includes('function translate('), false,
+    'localization uses one keyed catalog path');
 assert.strictEqual(game.includes('roundKind.toLowerCase()'), false,
     'round kinds remain stable catalog identifiers when UI content changes');
-assert(game.includes('modeId: mode'),
-    'new history records persist the stable mode identifier');
-assert(game.includes("i18n.getMessageId('mode', item.modeId || item.mode)"),
-    'localized mode labels in existing history are migrated to stable identifiers');
+assert(game.includes('mode: mode') && game.includes("t('mode.' + item.mode)"),
+    'history records use the current mode identifier directly');
 assert(game.includes('renderExplanation();'),
     'language changes rerender generated explanation copy');
 assert(game.includes('i18n.getLanguageTag()'),

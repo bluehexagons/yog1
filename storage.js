@@ -1,18 +1,19 @@
 (function (root) {
     'use strict';
 
+    const STORAGE_PREFIX = 'yog1.v2.';
     const KEYS = {
-        history: 'yog1.problemHistory.v2',
-        stats: 'yog1.difficultyStats.v2',
-        custom: 'yog1.customSettings.v2',
-        achievements: 'yog1.achievements.v1',
-        settings: 'yog1.accessibility.v1',
-        daily: 'yog1.dailyResults.v1',
-        adaptive: 'yog1.adaptiveModel.v1',
-        learning: 'yog1.learning.v1',
-        locale: 'yog1.locale.v1'
+        history: STORAGE_PREFIX + 'history',
+        stats: STORAGE_PREFIX + 'stats',
+        custom: STORAGE_PREFIX + 'custom',
+        achievements: STORAGE_PREFIX + 'achievements',
+        settings: STORAGE_PREFIX + 'settings',
+        daily: STORAGE_PREFIX + 'daily',
+        adaptive: STORAGE_PREFIX + 'adaptive',
+        learning: STORAGE_PREFIX + 'learning',
+        locale: STORAGE_PREFIX + 'locale'
     };
-    const SCHEMA_VERSION = 1;
+    const SCHEMA_VERSION = 2;
 
     function load(key, fallback) {
         try {

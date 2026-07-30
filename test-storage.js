@@ -19,6 +19,9 @@ vm.runInNewContext(fs.readFileSync('storage.js', 'utf8'), context, {
 });
 const storage = context.window.Yog1Storage;
 
+assert(Object.values(storage.KEYS).every(function (key) {
+    return key.startsWith('yog1.v2.');
+}), 'current storage uses one versioned namespace');
 storage.save(storage.KEYS.stats, { attempts: 3 });
 values.set(storage.KEYS.locale, 'ja');
 assert.strictEqual(storage.load(storage.KEYS.stats, {}).attempts, 3,
@@ -37,8 +40,12 @@ assert.strictEqual(storage.load(storage.KEYS.stats, {}).attempts, 3,
 assert.strictEqual(values.get(storage.KEYS.locale), 'ja',
     'locale restoration preserves its plain-string storage format');
 assert.throws(function () {
-    storage.importData({ application: 'Something else', schemaVersion: 1, data: {} });
-}, /Unsupported/, 'foreign backups are rejected');
+    storage.importData({
+        application: 'You Only Get 1s',
+        schemaVersion: storage.SCHEMA_VERSION - 1,
+        data: {}
+    });
+}, /Unsupported/, 'older backup schemas are rejected');
 values.set(storage.KEYS.stats, '{bad json');
 assert.deepStrictEqual(storage.load(storage.KEYS.stats, { safe: true }), { safe: true },
     'corrupt storage falls back safely');

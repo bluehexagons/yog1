@@ -244,7 +244,7 @@
                 <span class="mode-group-label" data-i18n="nav.learn">Learn</span>
                 <button type="button" data-mode="tutorial" class="active" aria-pressed="true" data-i18n="mode.tutorial">Tutorial</button>
                 <button type="button" data-mode="adaptive" aria-pressed="false" data-i18n="mode.adaptive">Adaptive</button>
-                <button type="button" data-mode="workshop" aria-pressed="false" data-i18n="mode.workshop">Guided Practice</button>
+                <button type="button" data-mode="guided" aria-pressed="false" data-i18n="mode.guided">Guided Practice</button>
             </div>
             <div class="mode-group">
                 <span class="mode-group-label" data-i18n="nav.classic">Classic</span>
@@ -383,10 +383,10 @@
                 <h3 data-i18n="nav.learn">Learn</h3>
                 <p id="learning_recommendation" class="wave-note"></p>
                 <div class="panel-body"><table>
-                    <thead><tr><th scope="col" data-i18n="learning.practice">Concept</th><th scope="col" data-i18n="learning.seen">Practiced</th><th scope="col" data-i18n="learning.mastery">Progress</th><th scope="col" data-i18n="learning.unaided">Independent</th></tr></thead>
+                    <thead><tr><th scope="col" data-i18n="learning.concept">Concept</th><th scope="col" data-i18n="learning.seen">Practiced</th><th scope="col" data-i18n="learning.progress">Progress</th><th scope="col" data-i18n="learning.unaided">Independent</th></tr></thead>
                     <tbody id="learning_rows"></tbody>
                 </table></div>
-                <button id="learning_practice" class="secondary" type="button" data-i18n="mode.workshop">Guided Practice</button>
+                <button id="learning_practice" class="secondary" type="button" data-i18n="mode.guided">Guided Practice</button>
             </section>
             <section class="screen-panel options-extras">
                 <h3 data-i18n="page.achievements">Achievements</h3><ul id="achievement_list"></ul>
@@ -400,7 +400,7 @@
                 <p data-i18n="about.summary">Change one number to 1 to balance an equation.</p>
                 <p data-i18n="about.origin">A refreshed version of bluehexagons’ Ludum Dare 28 game, with generated puzzles, settings, offline play, and local stats.</p>
                 <p class="app-version">
-                    <span data-i18n="about.version">Version</span> <strong id="app_version">0.1.2</strong><span aria-hidden="true"> · </span>
+                    <span data-i18n="about.version">Version</span> <strong id="app_version">0.2.0</strong><span aria-hidden="true"> · </span>
                     <span data-i18n="about.commitDate">Commit date</span> <time id="app_version_date" datetime="2026-07-30">July 30, 2026</time>
                 </p>
             </section>

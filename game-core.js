@@ -798,7 +798,7 @@
         return { concepts: concepts };
     }
 
-    function conceptMastery(entry) {
+    function conceptProgress(entry) {
         entry = entry || {};
         const seen = Math.max(0, Number(entry.seen) || 0);
         if (!seen) return 0;
@@ -830,7 +830,7 @@
         return Object.keys(LEARNING_CONCEPTS).sort(function (left, right) {
             const leftEntry = normalized.concepts[left];
             const rightEntry = normalized.concepts[right];
-            return conceptMastery(leftEntry) - conceptMastery(rightEntry) ||
+            return conceptProgress(leftEntry) - conceptProgress(rightEntry) ||
                 leftEntry.seen - rightEntry.seen;
         })[0];
     }
@@ -920,7 +920,7 @@
         moveEffect: moveEffect,
         learningAnalysis: learningAnalysis,
         normalizeLearningState: normalizeLearningState,
-        conceptMastery: conceptMastery,
+        conceptProgress: conceptProgress,
         updateLearningState: updateLearningState,
         recommendedConcept: recommendedConcept,
         learningExample: learningExample,

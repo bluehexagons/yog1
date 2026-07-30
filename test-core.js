@@ -224,13 +224,13 @@ learningState = core.updateLearningState(learningState, 'balance', {
 });
 assert.strictEqual(learningState.concepts.balance.unaided, 1,
     'an independent solution is tracked');
-assert(core.conceptMastery(learningState.concepts.balance) > 0,
-    'practice raises confidence-aware mastery');
+assert(core.conceptProgress(learningState.concepts.balance) > 0,
+    'practice raises confidence-aware progress');
 const hintedLearning = core.updateLearningState(learningState, 'multiplication', {
     solved: true, hints: 1, attempts: 1, durationMs: 4000
 });
 assert.strictEqual(hintedLearning.concepts.multiplication.unaided, 0,
-    'hinted solutions do not count as independent mastery');
+    'hinted solutions do not count as independent progress');
 for (const concept of Object.values(core.LEARNING_CONCEPTS)) {
     const profile = core.DIFFICULTIES[concept.profile];
     const problem = core.generateProblem({

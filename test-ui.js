@@ -100,11 +100,13 @@ assert(game.includes("phase: 'playing'") &&
 assert(game.includes('timerDeadline = Date.now() + TIMED_SECONDS * 1000') &&
     game.includes('(timerDeadline - Date.now()) / 1000'),
     'Timed mode follows an absolute deadline');
-assert(game.includes('data-replay-history') && game.includes('replay: replay'),
-    'history records carry replay metadata and controls');
-assert(game.includes("url.searchParams.set('gen', String(generatorVersion))") &&
-    game.includes("params.get('gen') === '2'"),
-    'new share links version the generator while legacy links remain reproducible');
+assert(game.includes('data-replay-history') && game.includes('learningConcept:') &&
+    game.includes('adaptive:'),
+    'flat history records carry current replay metadata and controls');
+assert.strictEqual(game.includes('generatorVersion'), false,
+    'puzzle generation has one current implementation');
+assert(game.includes('candidateCount: 12') && game.includes('requireUnique: true'),
+    'the current generator samples for unique solutions');
 assert(storage.includes('SCHEMA_VERSION') && storage.includes('exportData') &&
     storage.includes('importData'),
     'persistent data has a versioned backup boundary');
@@ -112,18 +114,18 @@ assert(html.includes('class="mode-group"') &&
     html.includes('data-i18n="nav.learn"') &&
     html.includes('data-i18n="nav.challenge"'),
     'the mode list is grouped by player intent');
-assert(html.includes('data-mode="workshop"') &&
+assert(html.includes('data-mode="guided"') &&
     html.includes('id="learning_rows"') &&
     html.includes('id="learning_goal"'),
-    'focused practice exposes a learning goal and mastery dashboard');
+    'focused practice exposes a learning goal and progress dashboard');
 assert(game.includes('hintLevel >= 4') &&
     game.includes("'hint.compareBody'") &&
     game.includes("'hint.directionBody'"),
     'the hint ladder scaffolds comparison and planning before revealing the answer');
 assert(game.includes('core.updateLearningState') &&
-    game.includes('core.conceptMastery') &&
+    game.includes('core.conceptProgress') &&
     game.includes('core.recommendedConcept'),
-    'completed puzzles update concept-level mastery and recommendations');
+    'completed puzzles update concept-level progress and recommendations');
 assert(game.includes('core.learningExample') &&
     game.includes('data-copy-learning'),
     'reviewed puzzles can expose structured reasoning examples');

@@ -24,8 +24,8 @@ Generated puzzles are sampled for a unique, safe solution and selected near the
 round's displayed complexity target. Every generated puzzle has a reproducible
 share link, and saved history entries can be replayed. Incorrect answers can be
 retried, and completed puzzles include collapsible step-by-step arithmetic.
-Valid alternate solutions are recognized explicitly if one appears in legacy
-or handcrafted content. A four-step hint ladder first compares both sides, then
+Valid alternate solutions are recognized explicitly in handcrafted content. A
+four-step hint ladder first compares both sides, then
 describes the needed numerical change, and only afterward reveals the relevant
 side and number. Feedback explains how the chosen replacement changed the value
 of its side and connects the puzzle to a reusable symbolic relationship. Reviewed
@@ -78,6 +78,8 @@ The shipped game remains a dependency-free static site. `game-core.js` owns
 arithmetic generation and analysis, `game-content.js` owns handcrafted content,
 `storage.js` owns versioned persistence and backup data, `locales.js` owns locale
 metadata, and `game.js` coordinates session state and rendering.
+Pre-release builds intentionally support only the current saved-data, backup,
+and shared-link formats.
 
 After changing runtime files, locale metadata, descriptions, icons, or install
 metadata, regenerate localized manifests and the content-hashed offline cache:

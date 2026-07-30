@@ -76,18 +76,6 @@
     let adaptiveState = core.normalizeAdaptiveState(load(KEYS.adaptive, null));
     let learningState = core.normalizeLearningState(load(KEYS.learning, null));
     if (!Array.isArray(history)) history = [];
-    let historyMigrated = false;
-    for (const item of history) {
-        if (!item || typeof item !== 'object') continue;
-        const modeId = i18n.getMessageId('mode', item.modeId || item.mode);
-        if (modeId && (item.modeId !== modeId ||
-            Object.prototype.hasOwnProperty.call(item, 'mode'))) {
-            item.modeId = modeId;
-            delete item.mode;
-            historyMigrated = true;
-        }
-    }
-    if (historyMigrated) save(KEYS.history, history);
     if (!stats || typeof stats !== 'object' || Array.isArray(stats)) stats = {};
     if (!achievementState || !Array.isArray(achievementState.unlocked)) {
         achievementState = { unlocked: [], operations: [], solved: 0 };
@@ -113,7 +101,6 @@
     let historyPage = 0;
     let forcedSeed = null;
     let forcedRound = null;
-    let generatorVersion = 2;
     let dailyDateOverride = null;
     let timerId = null;
     let timerDeadline = 0;
@@ -291,7 +278,7 @@
 
     function modeProfile() {
         if (mode === 'adaptive') return core.adaptiveProfile(adaptiveState);
-        if (mode === 'workshop') {
+        if (mode === 'guided') {
             const concept = core.LEARNING_CONCEPTS[currentLearningConcept] ||
                 core.LEARNING_CONCEPTS.balance;
             return core.DIFFICULTIES[concept.profile];
@@ -309,7 +296,7 @@
     }
 
     function problemSeed() {
-        if (mode === 'daily') return 'daily:' + utcDate() + ':v' + generatorVersion;
+        if (mode === 'daily') return 'daily:' + utcDate();
         if (forcedSeed) {
             const value = forcedSeed;
             forcedSeed = null;
@@ -324,7 +311,7 @@
     function generateCurrentProblem() {
         if (mode === 'tutorial') return tutorialProblem();
         if (mode === 'challenges') return curatedProblem(round - 1);
-        if (mode === 'workshop') {
+        if (mode === 'guided') {
             currentLearningConcept = core.LEARNING_CONCEPTS[forcedLearningConcept]
                 ? forcedLearningConcept : selectedLearningConcept();
             forcedLearningConcept = null;
@@ -336,15 +323,15 @@
             profile: selectedProfile,
             round: mode === 'daily' ? (core.hashSeed(utcDate()) % 40) + 1 : round,
             random: core.createSeededRandom(currentSeed),
-            candidateCount: generatorVersion >= 2 ? 12 : 1,
-            requireUnique: generatorVersion >= 2
+            candidateCount: 12,
+            requireUnique: true
         };
         if (mode === 'adaptive') {
             options.target = Math.round(6 + adaptiveModel.rating * 25);
             options.operationWeights =
                 core.adaptiveOperationWeights(adaptiveModel, selectedProfile, settings.adaptiveStyle);
         }
-        if (mode === 'workshop') {
+        if (mode === 'guided') {
             const concept = core.LEARNING_CONCEPTS[currentLearningConcept];
             Object.assign(options, {
                 operations: concept.operations,
@@ -436,7 +423,7 @@
     }
 
     function renderLearningGoal() {
-        ui.learning_goal.hidden = mode !== 'workshop' || !currentProblem;
+        ui.learning_goal.hidden = mode !== 'guided' || !currentProblem;
         if (ui.learning_goal.hidden) return;
         const concept = core.LEARNING_CONCEPTS[currentLearningConcept];
         ui.learning_goal_name.textContent = conceptLabel(currentLearningConcept);
@@ -578,8 +565,8 @@
         } else if (mode === 'adaptive') {
             setCatalogMessage('mode.adaptive', settings.adaptiveStyle === 'coach'
                 ? 'modeDescription.adaptiveCoach' : 'modeDescription.adaptive');
-        } else if (mode === 'workshop') {
-            setCatalogMessage('mode.workshop', 'modeDescription.workshop');
+        } else if (mode === 'guided') {
+            setCatalogMessage('mode.guided', 'modeDescription.guided');
         } else if (mode === 'challenges') {
             setCatalogMessage(currentProblem.titleKey, 'message.curated', {
                 round: round, count: CURATED.length
@@ -630,7 +617,11 @@
 
     function recordHistory(correct) {
         if (mode === 'tutorial') return;
-        const replay = {
+        history.unshift({
+            correct: correct,
+            expression: currentProblem.sides.map(function (side) {
+                return core.serialize(side, currentValues);
+            }).join(' = '),
             mode: mode,
             round: round,
             seed: currentSeed,
@@ -639,18 +630,7 @@
                 ? Object.assign({}, activeCustomSettings) : null,
             adaptive: mode === 'adaptive' && adaptiveProblemState
                 ? core.normalizeAdaptiveState(adaptiveProblemState) : null,
-            learningConcept: mode === 'workshop' ? currentLearningConcept : null,
-            generatorVersion: generatorVersion
-        };
-        history.unshift({
-            correct: correct,
-            expression: currentProblem.sides.map(function (side) {
-                return core.serialize(side, currentValues);
-            }).join(' = '),
-            modeId: mode,
-            round: round,
-            seed: currentSeed,
-            replay: replay,
+            learningConcept: mode === 'guided' ? currentLearningConcept : null,
             at: new Date().toISOString()
         });
         history = history.slice(0, HISTORY_LIMIT);
@@ -679,7 +659,7 @@
     }
 
     function recordLearning(solved) {
-        const concept = mode === 'workshop'
+        const concept = mode === 'guided'
             ? currentLearningConcept : core.learningConceptFor(currentProblem.sides);
         learningState = core.updateLearningState(learningState, concept, {
             solved: solved,
@@ -849,7 +829,7 @@
 
     function updateProgress() {
         ui.custom_progress.hidden =
-            !['custom', 'endless', 'adaptive', 'daily', 'workshop'].includes(mode);
+            !['custom', 'endless', 'adaptive', 'daily', 'guided'].includes(mode);
         if (mode === 'custom') {
             if (!activeCustomSettings) {
                 ui.custom_progress.hidden = true;
@@ -875,10 +855,10 @@
             ui.custom_progress.textContent = t('progress.daily', {
                 current: progress.current, best: progress.best, grid: progress.grid
             });
-        } else if (mode === 'workshop') {
+        } else if (mode === 'guided') {
             const entry = learningState.concepts[currentLearningConcept];
-            ui.custom_progress.textContent = t('learning.masteryValue', {
-                mastery: core.conceptMastery(entry)
+            ui.custom_progress.textContent = t('learning.progressValue', {
+                progress: core.conceptProgress(entry)
             });
         }
     }
@@ -908,11 +888,6 @@
         updateProgress();
     }
 
-    function historyModeLabel(value) {
-        const modeId = i18n.getMessageId('mode', value);
-        return modeId ? t('mode.' + modeId) : String(value || '');
-    }
-
     function renderHistory() {
         const pages = Math.max(1, Math.ceil(history.length / PAGE_SIZE));
         historyPage = Math.max(0, Math.min(historyPage, pages - 1));
@@ -923,7 +898,7 @@
             const li = document.createElement('li');
             li.className = item.correct ? 'correct' : 'incorrect';
             const summary = text('div', (item.correct ? t('history.correct') : t('history.incorrect')) +
-                ' · ' + historyModeLabel(item.modeId || item.mode) + ' · ' +
+                ' · ' + t('mode.' + item.mode) + ' · ' +
                 t('history.round', { round: item.round }), 'history-summary');
             summary.appendChild(text('time',
                 ' ' + new Date(item.at).toLocaleString(i18n.getLanguageTag()), 'history-date'));
@@ -955,7 +930,7 @@
             return { id: item.id, name: t('mode.' + item.id) };
         }).concat([
             { id: 'adaptive', name: t('mode.adaptive') },
-            { id: 'workshop', name: t('mode.workshop') },
+            { id: 'guided', name: t('mode.guided') },
             { id: 'custom', name: t('mode.custom') }, { id: 'daily', name: t('mode.daily') },
             { id: 'timed', name: t('mode.timed') }, { id: 'endless', name: t('mode.endless') },
             { id: 'challenges', name: t('mode.challenges') }
@@ -997,7 +972,7 @@
             row.append(
                 name,
                 text('td', String(entry.seen)),
-                text('td', core.conceptMastery(entry) + '%'),
+                text('td', core.conceptProgress(entry) + '%'),
                 text('td', entry.unaided + '/' + entry.solved)
             );
             ui.learning_rows.appendChild(row);
@@ -1028,15 +1003,15 @@
                     skill: Math.round(adaptiveState.rating * 100)
                 }))
             );
-        } else if (mode === 'workshop') {
+        } else if (mode === 'guided') {
             const concept = core.LEARNING_CONCEPTS[currentLearningConcept];
             const entry = learningState.concepts[currentLearningConcept];
             ui.mode_info.replaceChildren(
-                text('strong', t('mode.workshop')),
+                text('strong', t('mode.guided')),
                 text('span', conceptLabel(currentLearningConcept)),
                 text('code', concept.example),
-                text('span', t('learning.masteryValue', {
-                    mastery: core.conceptMastery(entry)
+                text('span', t('learning.progressValue', {
+                    progress: core.conceptProgress(entry)
                 }))
             );
         } else if (mode === 'daily') {
@@ -1128,10 +1103,9 @@
         round = options.round || 1;
         forcedSeed = options.seed || null;
         forcedRound = options.round || null;
-        generatorVersion = options.generatorVersion || 2;
         dailyDateOverride = options.date || null;
         forcedLearningConcept = options.learningConcept || null;
-        if (mode === 'workshop') {
+        if (mode === 'guided') {
             currentLearningConcept = core.LEARNING_CONCEPTS[forcedLearningConcept]
                 ? forcedLearningConcept : selectedLearningConcept();
         }
@@ -1178,14 +1152,12 @@
         let shareText = 'You Only Get 1s';
         if (mode === 'daily') {
             url.searchParams.set('daily', utcDate());
-            url.searchParams.set('gen', String(generatorVersion));
             shareText = dailyShareText();
         } else if (mode === 'challenges') {
             url.searchParams.set('challenge', String(round));
             shareText += ' · ' + t('share.challenge', { round: round });
         } else {
             url.searchParams.set('seed', currentSeed);
-            url.searchParams.set('gen', String(generatorVersion));
             if (mode === 'adaptive') {
                 const sharedModel = adaptiveProblemState || adaptiveState;
                 url.searchParams.set('difficulty', 'adaptive');
@@ -1193,8 +1165,8 @@
                 url.searchParams.set('comfort', Object.keys(core.OPERATIONS).map(function (operation) {
                     return sharedModel.operations[operation];
                 }).join(','));
-            } else if (mode === 'workshop') {
-                url.searchParams.set('difficulty', 'workshop');
+            } else if (mode === 'guided') {
+                url.searchParams.set('difficulty', 'guided');
                 url.searchParams.set('focus', currentLearningConcept);
             } else if (mode === 'custom') {
                 url.searchParams.set('difficulty', 'custom');
@@ -1493,36 +1465,28 @@
         if (!button) return;
         const item = history[Number(button.dataset.replayHistory)];
         if (!item) return;
-        const saved = item.replay || {
-            mode: item.modeId || item.mode,
-            round: item.round,
-            seed: item.seed
-        };
-        const modeId = i18n.getMessageId('mode', saved.mode) || saved.mode;
-        const modeButton = ui.mode_buttons.querySelector('[data-mode="' + modeId + '"]');
+        const modeButton = ui.mode_buttons.querySelector('[data-mode="' + item.mode + '"]');
         if (!modeButton) return;
-        if (modeId === 'custom' && saved.custom) {
+        if (item.mode === 'custom' && item.custom) {
             activateMode('custom', modeButton, {
-                seed: saved.seed,
-                round: saved.round,
-                generatorVersion: saved.generatorVersion || 1
+                seed: item.seed,
+                round: item.round
             });
             for (const input of ui.custom_operations.querySelectorAll('input')) {
-                input.checked = saved.custom.operations.includes(input.value);
+                input.checked = item.custom.operations.includes(input.value);
             }
             for (const key of ['length', 'min', 'max', 'correct', 'rate', 'seed']) {
-                if (saved.custom[key] !== undefined) ui['custom_' + key].value = saved.custom[key];
+                if (item.custom[key] !== undefined) ui['custom_' + key].value = item.custom[key];
             }
             ui.custom_length_value.textContent = ui.custom_length.value;
             ui.custom_form.requestSubmit();
         } else {
-            activateMode(modeId, modeButton, {
-                seed: saved.seed,
-                round: saved.round,
-                date: saved.dailyDate,
-                adaptiveState: saved.adaptive,
-                learningConcept: saved.learningConcept,
-                generatorVersion: saved.generatorVersion || 1
+            activateMode(item.mode, modeButton, {
+                seed: item.seed,
+                round: item.round,
+                date: item.dailyDate,
+                adaptiveState: item.adaptive,
+                learningConcept: item.learningConcept
             });
         }
         setCatalogMessage('history.replaying', 'history.replayingBody');
@@ -1603,8 +1567,8 @@
     ui.learning_practice.addEventListener('click', function () {
         settings.learningFocus = 'recommended';
         save(KEYS.settings, settings);
-        const button = ui.mode_buttons.querySelector('[data-mode="workshop"]');
-        activateMode('workshop', button);
+        const button = ui.mode_buttons.querySelector('[data-mode="guided"]');
+        activateMode('guided', button);
     });
 
     document.addEventListener('keydown', function (event) {
@@ -1671,7 +1635,6 @@
 
     function bootFromUrl() {
         const params = new URLSearchParams(window.location.search);
-        const sharedGeneratorVersion = params.get('gen') === '2' ? 2 : 1;
         const requestedDaily = params.get('daily');
         function sharedDailyDate(value) {
             if (!/^\d{4}-\d{2}-\d{2}$/.test(value || '')) return null;
@@ -1690,8 +1653,7 @@
         if (daily) {
             const button = ui.mode_buttons.querySelector('[data-mode="daily"]');
             activateMode('daily', button, {
-                date: daily,
-                generatorVersion: sharedGeneratorVersion
+                date: daily
             });
             return;
         }
@@ -1719,8 +1681,7 @@
                     adaptiveState: {
                         rating: Number(params.get('rating')),
                         operations: operations
-                    },
-                    generatorVersion: sharedGeneratorVersion
+                    }
                 });
                 setCatalogMessage('shared.seeded', 'shared.seededBody');
                 return;
@@ -1729,8 +1690,7 @@
                 const button = ui.mode_buttons.querySelector('[data-mode="custom"]');
                 activateMode('custom', button, {
                     seed: safeSeed,
-                    round: sharedRound(params.get('round')),
-                    generatorVersion: sharedGeneratorVersion
+                    round: sharedRound(params.get('round'))
                 });
                 const requestedOperations = Array.from(new Set(
                     (params.get('ops') || '').split(',').filter(function (key) {
@@ -1750,15 +1710,14 @@
                 setCatalogMessage('shared.custom', 'shared.customBody');
                 return;
             }
-            if (requested === 'workshop') {
+            if (requested === 'guided') {
                 const focus = core.LEARNING_CONCEPTS[params.get('focus')]
                     ? params.get('focus') : 'balance';
-                const button = ui.mode_buttons.querySelector('[data-mode="workshop"]');
-                activateMode('workshop', button, {
+                const button = ui.mode_buttons.querySelector('[data-mode="guided"]');
+                activateMode('guided', button, {
                     seed: safeSeed,
                     round: sharedRound(params.get('round')),
-                    learningConcept: focus,
-                    generatorVersion: sharedGeneratorVersion
+                    learningConcept: focus
                 });
                 setCatalogMessage('shared.seeded', 'shared.seededBody');
                 return;
@@ -1767,8 +1726,7 @@
             const button = ui.mode_buttons.querySelector('[data-mode="' + difficulty + '"]');
             activateMode(difficulty, button, {
                 seed: safeSeed,
-                round: sharedRound(params.get('round')),
-                generatorVersion: sharedGeneratorVersion
+                round: sharedRound(params.get('round'))
             });
             setCatalogMessage('shared.seeded', 'shared.seededBody');
             return;
