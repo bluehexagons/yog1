@@ -528,7 +528,7 @@
                 text('code', concept.example)
             );
             ui.feedback.appendChild(reflection);
-            const copyExample = text('button', t('action.share') + ' JSON', 'small-button');
+            const copyExample = text('button', t('action.copyJson'), 'small-button');
             copyExample.type = 'button';
             copyExample.dataset.copyLearning = 'true';
             ui.feedback.appendChild(copyExample);
@@ -1333,12 +1333,12 @@
         const value = JSON.stringify(core.learningExample(currentProblem.sides), null, 2);
         if (navigator.clipboard) {
             navigator.clipboard.writeText(value).then(function () {
-                setCatalogMessage('share.copied', 'share.ready');
+                setCatalogMessage('share.jsonCopied', 'share.jsonReady');
             }).catch(function () {
-                window.prompt(t('share.prompt'), value);
+                window.prompt(t('share.jsonPrompt'), value);
             });
         } else {
-            window.prompt(t('share.prompt'), value);
+            window.prompt(t('share.jsonPrompt'), value);
         }
     });
 

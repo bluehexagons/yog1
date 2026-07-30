@@ -292,7 +292,7 @@
                     <label><span data-i18n="custom.minimum">Minimum target</span><input id="custom_min" type="number" min="3" max="100" value="12"></label>
                     <label><span data-i18n="custom.maximum">Maximum target</span><input id="custom_max" type="number" min="3" max="100" value="35"></label>
                     <label><span data-i18n="custom.correct">Correct answers to finish</span><input id="custom_correct" type="number" min="1" max="100" value="10"></label>
-                    <label><span data-i18n="custom.rate">Minimum win rate (%)</span><input id="custom_rate" type="number" min="1" max="100" value="80"></label>
+                    <label><span data-i18n="custom.rate">Accuracy goal (%)</span><input id="custom_rate" type="number" min="1" max="100" value="80"></label>
                     <label><span data-i18n="custom.seed">Seed (optional)</span><input id="custom_seed" type="text" maxlength="80" placeholder="Same seed, same game" data-i18n-placeholder="custom.seedHint"></label>
                 </div>
                 <button class="primary" type="submit" data-i18n="custom.start">Start custom game</button>
@@ -307,7 +307,7 @@
             <dl id="session_summary" aria-label="Current session statistics" data-i18n-aria-label="aria.session"></dl>
         </div>
         <section id="workspace" aria-label="Current puzzle" data-i18n-aria-label="aria.puzzle">
-            <div id="flips"><strong data-i18n="action.yourMove">Your move</strong><span id="flip_count">1</span><span id="flip_text">flip remaining</span></div>
+            <div id="flips"><strong data-i18n="action.yourMove">Your move</strong><span id="flip_count">1</span><span id="flip_text">change remaining</span></div>
             <div id="problem" role="group" dir="ltr"></div>
             <div id="actions">
                 <span id="custom_progress" hidden></span>
@@ -341,14 +341,14 @@
                 <div class="settings-grid">
                     <label><span data-i18n="language.label">Language</span><select id="setting_language" aria-label="Language" data-i18n-aria-label="language.label"></select></label>
                     <label><span data-i18n="sidebar.label">Sidebar side</span><select id="setting_sidebar_side"><option value="auto" data-i18n="sidebar.auto">Automatic (follow language)</option><option value="left" data-i18n="sidebar.left">Left</option><option value="right" data-i18n="sidebar.right">Right</option></select></label>
-                    <label><span data-i18n="adaptive.style">Adaptive style</span><select id="setting_adaptive_style"><option value="flow" data-i18n="adaptive.flow">Flow · reinforce strengths</option><option value="coach" data-i18n="adaptive.coach">Coach · practice weaknesses</option></select></label>
-                    <label><span data-i18n="learning.practice">Math practice</span><select id="setting_learning_focus"></select></label>
+                    <label><span data-i18n="adaptive.style">Adaptive style</span><select id="setting_adaptive_style"><option value="flow" data-i18n="adaptive.flow">Flow · follow your pace</option><option value="coach" data-i18n="adaptive.coach">Coach · build confidence</option></select></label>
+                    <label><span data-i18n="learning.focus">Practice focus</span><select id="setting_learning_focus"></select></label>
                     <label><input id="setting_sound" type="checkbox"><span data-i18n="setting.sound">Sound effects</span></label>
                     <label><input id="setting_large_text" type="checkbox"><span data-i18n="setting.largeText">Larger text</span></label>
                     <label><input id="setting_contrast" type="checkbox"><span data-i18n="setting.contrast">Higher contrast</span></label>
                     <label><input id="setting_reduced_clutter" type="checkbox"><span data-i18n="setting.clutter">Reduced clutter</span></label>
                 </div>
-                <p class="wave-note" data-i18n="options.keyboard">Keys: ←/→ select · Space changes · Enter checks · H hints.</p>
+                <p class="wave-note" data-i18n="options.keyboard">Keys: ←/→ select · Space changes or restores · Enter checks · H opens a hint.</p>
                 <button id="install_app" class="secondary" type="button" data-i18n="action.install" hidden>Install offline app</button>
                 <div class="history-controls options-extras">
                     <button id="export_data" class="secondary" type="button" data-i18n="data.export">Export data</button>
@@ -364,7 +364,7 @@
             <section class="screen-panel">
                 <h3 data-i18n="page.statsDifficulty">Stats by difficulty</h3>
                 <div class="panel-body"><table>
-                    <thead><tr><th scope="col" data-i18n="stats.mode">Mode</th><th scope="col" data-i18n="stats.correct">Correct</th><th scope="col" data-i18n="stats.winRate">Win rate</th><th scope="col" data-i18n="stats.streak">Streak</th><th scope="col" data-i18n="stats.record">Record</th><th scope="col"><span class="sr-only" data-i18n="stats.actions">Actions</span></th></tr></thead>
+                    <thead><tr><th scope="col" data-i18n="stats.mode">Mode</th><th scope="col" data-i18n="stats.correct">Correct</th><th scope="col" data-i18n="stats.winRate">Accuracy</th><th scope="col" data-i18n="stats.streak">Streak</th><th scope="col" data-i18n="stats.record">Record</th><th scope="col"><span class="sr-only" data-i18n="stats.actions">Actions</span></th></tr></thead>
                     <tbody id="stats_rows"></tbody>
                 </table><div class="stats-actions"><button id="stats_reset_all" class="secondary" type="button" data-i18n="stats.resetAll">Reset all stats</button></div></div>
             </section>
@@ -383,7 +383,7 @@
                 <h3 data-i18n="nav.learn">Learn</h3>
                 <p id="learning_recommendation" class="wave-note"></p>
                 <div class="panel-body"><table>
-                    <thead><tr><th scope="col" data-i18n="learning.practice">Concept</th><th scope="col" data-i18n="learning.seen">Practiced</th><th scope="col" data-i18n="learning.mastery">Mastery</th><th scope="col" data-i18n="learning.unaided">Unaided</th></tr></thead>
+                    <thead><tr><th scope="col" data-i18n="learning.practice">Concept</th><th scope="col" data-i18n="learning.seen">Practiced</th><th scope="col" data-i18n="learning.mastery">Progress</th><th scope="col" data-i18n="learning.unaided">Independent</th></tr></thead>
                     <tbody id="learning_rows"></tbody>
                 </table></div>
                 <button id="learning_practice" class="secondary" type="button" data-i18n="mode.workshop">Math Lab</button>
@@ -400,15 +400,15 @@
                 <p data-i18n="about.summary">Change one number to 1 to balance an equation.</p>
                 <p data-i18n="about.origin">A refreshed version of bluehexagons’ Ludum Dare 28 game, with generated puzzles, settings, offline play, and local stats.</p>
                 <p class="app-version">
-                    <span data-i18n="about.version">Version</span> <strong id="app_version">0.1.0</strong><span aria-hidden="true"> · </span>
+                    <span data-i18n="about.version">Version</span> <strong id="app_version">0.1.1</strong><span aria-hidden="true"> · </span>
                     <span data-i18n="about.commitDate">Commit date</span> <time id="app_version_date" datetime="2026-07-30">July 30, 2026</time>
                 </p>
             </section>
             <section class="screen-panel about-copy">
                 <h3 data-i18n="about.translations">Translations</h3>
-                <p data-i18n="about.note">Translations are drafted and checked with a large language model.</p>
+                <p data-i18n="about.note">Translations were drafted with help from a large language model and may contain mistakes.</p>
                 <p><a href="https://github.com/bluehexagons/yog1/issues" data-i18n="about.contribute">Help improve translations on GitHub.</a></p>
-                <p data-i18n="about.review">Native-speaker review is especially welcome.</p>
+                <p data-i18n="about.review">Corrections from fluent speakers are always welcome.</p>
             </section>
         </section>
 

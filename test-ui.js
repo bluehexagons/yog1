@@ -127,5 +127,10 @@ assert(game.includes('core.updateLearningState') &&
 assert(game.includes('core.learningExample') &&
     game.includes('data-copy-learning'),
     'reviewed puzzles can expose structured reasoning examples');
+assert(game.includes("t('action.copyJson')") &&
+    game.includes("setCatalogMessage('share.copied', 'share.ready')") &&
+    game.includes("setCatalogMessage('share.jsonCopied', 'share.jsonReady')") &&
+    game.includes("window.prompt(t('share.jsonPrompt'), value)"),
+    'structured examples use copy-specific labels and feedback');
 
 console.log('UI audit tests passed.');

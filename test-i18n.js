@@ -131,6 +131,18 @@ for (const locale of i18n.availableLocales) {
     }
 }
 
+for (const phrase of ['practice weaknesses', 'rating was lowered', 'not counted', 'Native-speaker']) {
+    assert.strictEqual(Object.values(i18n.locales.en).some(function (value) {
+        return value.includes(phrase);
+    }), false, 'learner-facing English avoids judgmental wording: ' + phrase);
+}
+assert(i18n.locales.en['modeDescription.challenges'].startsWith('Ten '),
+    'the Challenge description matches the ten handcrafted puzzles');
+for (const key of ['action.copyJson', 'share.jsonCopied', 'share.jsonReady', 'share.jsonPrompt']) {
+    assert(Object.prototype.hasOwnProperty.call(i18n.locales.en, key),
+        key + ' has dedicated structured-example copy');
+}
+
 const html = fs.readFileSync('yog1.htm', 'utf8');
 const serviceWorker = fs.readFileSync('sw.js', 'utf8');
 const catalogKeys = Array.from(html.matchAll(/\bdata-i18n(?:-aria-label|-title|-placeholder|-content)?="([^"]+)"/g))

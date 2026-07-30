@@ -7,16 +7,17 @@ changing exactly one number into a `1`.
 
 The current version includes five difficulty settings, integer arithmetic from
 addition through roots, recurring warm-up and challenge rounds, and a custom game
-builder. Problem history and per-difficulty stats are stored locally in the
+builder. Problem history and per-mode stats are stored locally in the
 browser and can be cleared from the page.
 
 Additional modes include Adaptive difficulty, a shared Daily puzzle, a 60-second
 Timed sprint, a three-life Endless run, ten handcrafted Challenges, and a Math
 Lab for focused learning. Math Lab tracks confidence-aware mastery across
-balancing, multiplication, division, remainders, powers, and roots. It recommends
-concepts that need more practice while allowing learners to choose a focus.
-Adaptive mode responds to correct and incorrect answers and offers a Flow style
-that reinforces strengths or a Coach style that practices weaker operators.
+balancing, multiplication, division, remainders, powers, and roots. It suggests
+concepts to revisit while allowing learners to choose a focus. Adaptive mode
+responds to correct and incorrect answers and offers a Flow style that follows
+the learner’s pace or a Coach style that builds fluency with less-familiar
+operations.
 Daily results include a seven-day grid plus current and best streaks.
 
 Generated puzzles are sampled for a unique, safe solution and selected near the
