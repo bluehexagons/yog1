@@ -3,16 +3,11 @@
 
     const core = window.Yog1Core;
     const i18n = window.Yog1I18n;
+    const storage = window.Yog1Storage;
     const t = i18n.t;
-    const KEYS = {
-        history: 'yog1.problemHistory.v2',
-        stats: 'yog1.difficultyStats.v2',
-        custom: 'yog1.customSettings.v2',
-        achievements: 'yog1.achievements.v1',
-        settings: 'yog1.accessibility.v1',
-        daily: 'yog1.dailyResults.v1',
-        adaptive: 'yog1.adaptiveModel.v1'
-    };
+    const KEYS = storage.KEYS;
+    const load = storage.load;
+    const save = storage.save;
     const HISTORY_LIMIT = 100;
     const PAGE_SIZE = 10;
     const TIMED_SECONDS = 60;
@@ -26,28 +21,13 @@
         'custom_operations', 'custom_length', 'custom_length_value', 'custom_min',
         'custom_max', 'custom_correct', 'custom_rate', 'custom_seed', 'custom_progress',
         'history', 'history_page', 'history_prev', 'history_next', 'history_clear',
+        'practice_missed',
         'stats_rows', 'stats_reset_all', 'session_summary', 'achievement_list',
         'achievement_notice', 'setting_sound', 'setting_large_text', 'setting_contrast',
-        'setting_reduced_clutter', 'setting_language', 'quick_language', 'setting_sidebar_side', 'install_app'
+        'setting_reduced_clutter', 'setting_language', 'quick_language', 'setting_sidebar_side',
+        'setting_adaptive_style', 'install_app', 'export_data', 'import_data', 'import_file'
     ]) {
         ui[id] = document.getElementById(id);
-    }
-
-    function load(key, fallback) {
-        try {
-            const value = JSON.parse(localStorage.getItem(key));
-            return value === null ? fallback : value;
-        } catch (error) {
-            return fallback;
-        }
-    }
-
-    function save(key, value) {
-        try {
-            localStorage.setItem(key, JSON.stringify(value));
-        } catch (error) {
-            // The game remains playable when browser storage is unavailable.
-        }
     }
 
     function text(type, value, className) {
@@ -71,44 +51,18 @@
         return { type: 'root', value: value };
     }
 
-    const CURATED = [
-        {
-            titleKey: 'curated.original',
-            sides: [binary('subtract', number(7, 'c00'), number(2, 'c01')),
-                binary('add', number(3, 'c02', true), number(4, 'c03'))]
-        },
-        {
-            titleKey: 'curated.product',
-            sides: [binary('multiply', number(6, 'c10'), number(2, 'c11')),
-                binary('subtract', number(13, 'c12'), number(8, 'c13', true))]
-        },
-        {
-            titleKey: 'curated.root',
-            sides: [binary('modulo', number(25, 'c20'), number(7, 'c21')),
-                binary('add', squareRoot(number(9, 'c22')), number(6, 'c23', true))]
-        },
-        {
-            titleKey: 'curated.power',
-            sides: [binary('power', number(2, 'c30'), number(3, 'c31')),
-                binary('subtract', number(9, 'c32'), number(7, 'c33', true))]
-        },
-        {
-            titleKey: 'curated.divide',
-            sides: [binary('divide', number(42, 'c40'), number(6, 'c41')),
-                binary('subtract', number(8, 'c42'), number(5, 'c43', true))]
-        }
-    ];
-
-    const ACHIEVEMENTS = [
-        { id: 'first' }, { id: 'streak5' }, { id: 'twenty' }, { id: 'explorer' },
-        { id: 'daily' }, { id: 'nohint' }, { id: 'curated' }
-    ];
+    const content = window.Yog1Content({
+        number: number, binary: binary, squareRoot: squareRoot
+    });
+    const CURATED = content.curated;
+    const ACHIEVEMENTS = content.achievements;
 
     let history = load(KEYS.history, []);
     let stats = load(KEYS.stats, {});
     let achievementState = load(KEYS.achievements, { unlocked: [], operations: [], solved: 0 });
     const defaultSettings = {
-        sound: false, largeText: false, contrast: false, reducedClutter: false, sidebarSide: 'auto'
+        sound: false, largeText: false, contrast: false, reducedClutter: false,
+        sidebarSide: 'auto', adaptiveStyle: 'flow'
     };
     const loadedSettings = load(KEYS.settings, null);
     let settings = loadedSettings && typeof loadedSettings === 'object' &&
@@ -149,14 +103,15 @@
     let currentValues = {};
     let hintLevel = 0;
     let attemptsOnPuzzle = 0;
-    let awaitingAdvance = false;
     let activeCustomSettings = null;
     let customRun = { attempts: 0, correct: 0, won: false };
     let historyPage = 0;
     let forcedSeed = null;
     let forcedRound = null;
+    let generatorVersion = 2;
     let dailyDateOverride = null;
     let timerId = null;
+    let timerDeadline = 0;
     let timeRemaining = TIMED_SECONDS;
     let installPrompt = null;
     let audioContext = null;
@@ -171,7 +126,7 @@
             id: Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8),
             startedAt: Date.now(), puzzleStartedAt: Date.now(), attempts: 0, correct: 0,
             solved: 0, streak: 0, bestStreak: 0, hardest: 0, durations: [],
-            hints: 0, lives: 3, finished: false
+            hints: 0, lives: 3, phase: 'playing'
         };
         renderSession();
     }
@@ -253,6 +208,44 @@
         return dailyDateOverride || new Date().toISOString().slice(0, 10);
     }
 
+    function shiftDate(value, days) {
+        const date = new Date(value + 'T00:00:00Z');
+        date.setUTCDate(date.getUTCDate() + days);
+        return date.toISOString().slice(0, 10);
+    }
+
+    function dailyProgress() {
+        const solvedDates = Object.keys(dailyResults).filter(function (date) {
+            return dailyResults[date] && dailyResults[date].success === true;
+        }).sort();
+        let best = 0;
+        let run = 0;
+        let previous = null;
+        for (const date of solvedDates) {
+            run = previous && shiftDate(previous, 1) === date ? run + 1 : 1;
+            best = Math.max(best, run);
+            previous = date;
+        }
+        let anchor = new Date().toISOString().slice(0, 10);
+        if (!dailyResults[anchor]) anchor = shiftDate(anchor, -1);
+        let current = 0;
+        while (dailyResults[anchor] && dailyResults[anchor].success === true) {
+            current++;
+            anchor = shiftDate(anchor, -1);
+        }
+        const marks = [];
+        for (let offset = -6; offset <= 0; offset++) {
+            const result = dailyResults[shiftDate(utcDate(), offset)];
+            marks.push(!result ? '·' : (result.success ? '■' : '□'));
+        }
+        return {
+            solved: solvedDates.length,
+            current: current,
+            best: best,
+            grid: marks.join('')
+        };
+    }
+
     function modeProfile() {
         if (mode === 'adaptive') return core.adaptiveProfile(adaptiveState);
         if (mode === 'timed') return core.DIFFICULTIES.hard;
@@ -268,7 +261,7 @@
     }
 
     function problemSeed() {
-        if (mode === 'daily') return 'daily:' + utcDate() + ':v1';
+        if (mode === 'daily') return 'daily:' + utcDate() + ':v' + generatorVersion;
         if (forcedSeed) {
             const value = forcedSeed;
             forcedSeed = null;
@@ -289,12 +282,14 @@
         const options = {
             profile: selectedProfile,
             round: mode === 'daily' ? (core.hashSeed(utcDate()) % 40) + 1 : round,
-            random: core.createSeededRandom(currentSeed)
+            random: core.createSeededRandom(currentSeed),
+            candidateCount: generatorVersion >= 2 ? 12 : 1,
+            requireUnique: generatorVersion >= 2
         };
         if (mode === 'adaptive') {
-            options.target = Math.round(9 + adaptiveModel.rating * 43);
+            options.target = Math.round(6 + adaptiveModel.rating * 25);
             options.operationWeights =
-                core.adaptiveOperationWeights(adaptiveModel, selectedProfile);
+                core.adaptiveOperationWeights(adaptiveModel, selectedProfile, settings.adaptiveStyle);
         }
         if (mode === 'custom') {
             Object.assign(options, {
@@ -363,8 +358,12 @@
             }
         });
         ui.problem.setAttribute('aria-label', currentProblem.sides.map(function (side) {
-            return core.serialize(side, currentValues);
-        }).join(' = '));
+            const labels = {};
+            for (const key of Object.keys(core.OPERATIONS)) {
+                labels[key] = t('operation.' + key);
+            }
+            return core.describe(side, currentValues, labels);
+        }).join(' ' + t('aria.equals') + ' '));
         ui.flip_count.textContent = selectedId ? '0' : '1';
         ui.flip_text.textContent = t(selectedId ? 'flip.many' : 'flip.one');
         ui.round_label.textContent = mode === 'tutorial' ? t('round.tutorial') :
@@ -376,9 +375,9 @@
 
     function renderSubmitLabel() {
         const replayingChallenges = mode === 'challenges' &&
-            round === CURATED.length && awaitingAdvance;
+            round === CURATED.length && session.phase === 'review';
         ui.submit.textContent = t(replayingChallenges ? 'action.again' :
-            (awaitingAdvance ? 'action.next' : 'action.check'));
+            (session.phase === 'review' ? 'action.next' : 'action.check'));
     }
 
     function renderCatalogMessage() {
@@ -413,20 +412,42 @@
             left: details.currentTotals[0], right: details.currentTotals[1]
         }));
         ui.feedback.replaceChildren(current);
+        function appendSteps(label, groups) {
+            const disclosure = document.createElement('details');
+            const summary = text('summary', label);
+            const list = document.createElement('ol');
+            for (const steps of groups) {
+                for (const step of steps) {
+                    const item = document.createElement('li');
+                    item.appendChild(text('code', step.expression + ' = ' + step.value));
+                    list.appendChild(item);
+                }
+            }
+            if (list.children.length) {
+                disclosure.append(summary, list);
+                ui.feedback.appendChild(disclosure);
+            }
+        }
+        appendSteps(t('feedback.yourSteps'), details.currentSteps);
+        if (currentFeedback.alternate) {
+            ui.feedback.appendChild(text('p', t('feedback.alternate'), 'alternate-solution'));
+        }
         if (currentFeedback.revealSolution) {
             const solution = text('p', t('feedback.solution', {
                 number: details.solutionValue, total: details.solvedTotals[0]
             }));
             const equation = text('code', details.solvedExpression);
             ui.feedback.append(solution, equation);
+            appendSteps(t('feedback.solutionSteps'), details.solvedSteps);
         }
         ui.feedback.hidden = false;
     }
 
-    function showExplanation(revealSolution, attemptedValues) {
+    function showExplanation(revealSolution, attemptedValues, alternate) {
         currentFeedback = {
             revealSolution: revealSolution,
-            attemptedValues: attemptedValues
+            attemptedValues: attemptedValues,
+            alternate: !!alternate
         };
         renderExplanation();
     }
@@ -436,16 +457,16 @@
         currentValues = {};
         hintLevel = 0;
         attemptsOnPuzzle = 0;
-        awaitingAdvance = false;
+        session.phase = 'playing';
         currentSeed = problemSeed();
         adaptiveProblemState = mode === 'adaptive'
             ? core.normalizeAdaptiveState(adaptiveState) : null;
         currentProblem = generateCurrentProblem();
         session.puzzleStartedAt = Date.now();
         renderSubmitLabel();
-        ui.submit.disabled = session.finished;
-        ui.hint.disabled = mode === 'tutorial' || session.finished;
-        ui.skip.disabled = mode === 'tutorial' || session.finished;
+        ui.submit.disabled = session.phase === 'finished';
+        ui.hint.disabled = mode === 'tutorial' || session.phase === 'finished';
+        ui.skip.disabled = mode === 'tutorial' || session.phase === 'finished';
         ui.skip.textContent = t(mode === 'adaptive' ? 'action.skip' : 'action.reveal');
         ui.share.disabled = mode === 'tutorial';
         hideFeedback();
@@ -460,7 +481,8 @@
         } else if (mode === 'endless') {
             setCatalogMessage('message.endless', 'message.endlessBody');
         } else if (mode === 'adaptive') {
-            setCatalogMessage('mode.adaptive', 'modeDescription.adaptive');
+            setCatalogMessage('mode.adaptive', settings.adaptiveStyle === 'coach'
+                ? 'modeDescription.adaptiveCoach' : 'modeDescription.adaptive');
         } else if (mode === 'challenges') {
             setCatalogMessage(currentProblem.titleKey, 'message.curated', {
                 round: round, count: CURATED.length
@@ -511,6 +533,17 @@
 
     function recordHistory(correct) {
         if (mode === 'tutorial') return;
+        const replay = {
+            mode: mode,
+            round: round,
+            seed: currentSeed,
+            dailyDate: mode === 'daily' ? utcDate() : null,
+            custom: mode === 'custom' && activeCustomSettings
+                ? Object.assign({}, activeCustomSettings) : null,
+            adaptive: mode === 'adaptive' && adaptiveProblemState
+                ? core.normalizeAdaptiveState(adaptiveProblemState) : null,
+            generatorVersion: generatorVersion
+        };
         history.unshift({
             correct: correct,
             expression: currentProblem.sides.map(function (side) {
@@ -519,6 +552,7 @@
             modeId: mode,
             round: round,
             seed: currentSeed,
+            replay: replay,
             at: new Date().toISOString()
         });
         history = history.slice(0, HISTORY_LIMIT);
@@ -602,12 +636,14 @@
     }
 
     function correctAnswer() {
+        const intendedId = core.solutionDetails(currentProblem.sides, {}).solutionId;
+        const alternate = selectedId !== intendedId;
         adapt('correct');
         recordAttempt(true);
         updateAchievements();
         playSound('correct');
-        showExplanation(true);
-        awaitingAdvance = true;
+        showExplanation(true, undefined, alternate);
+        session.phase = 'review';
         renderSubmitLabel();
         ui.hint.disabled = true;
         ui.skip.disabled = true;
@@ -617,6 +653,8 @@
                 attempts: session.attempts, hints: session.hints, success: true, at: Date.now()
             };
             save(KEYS.daily, dailyResults);
+            updateProgress();
+            updateModeInfo();
             ui.submit.disabled = true;
             setCatalogMessage('daily.complete', 'daily.completeBody', {
                 attempts: session.attempts, hints: session.hints
@@ -641,7 +679,8 @@
                 count: CURATED.length
             });
         } else {
-            setCatalogMessage('result.balanced', 'result.balancedBody');
+            setCatalogMessage(alternate ? 'result.alternate' : 'result.balanced',
+                alternate ? 'result.alternateBody' : 'result.balancedBody');
         }
     }
 
@@ -669,7 +708,7 @@
     }
 
     function advanceRound() {
-        if (session.finished) return;
+        if (session.phase === 'finished') return;
         if (mode === 'challenges' && round === CURATED.length) {
             round = 1;
             newSession();
@@ -680,7 +719,7 @@
     }
 
     function finishSession(titleKey, messageKey, values) {
-        session.finished = true;
+        session.phase = 'finished';
         clearTimer();
         ui.submit.disabled = true;
         ui.hint.disabled = true;
@@ -694,7 +733,7 @@
     }
 
     function updateProgress() {
-        ui.custom_progress.hidden = !['custom', 'endless', 'adaptive'].includes(mode);
+        ui.custom_progress.hidden = !['custom', 'endless', 'adaptive', 'daily'].includes(mode);
         if (mode === 'custom') {
             if (!activeCustomSettings) {
                 ui.custom_progress.hidden = true;
@@ -714,6 +753,11 @@
             ui.custom_progress.textContent = t('progress.adaptive', {
                 level: t('mode.' + core.adaptiveProfile(adaptiveState).id),
                 skill: Math.round(adaptiveState.rating * 100)
+            });
+        } else if (mode === 'daily') {
+            const progress = dailyProgress();
+            ui.custom_progress.textContent = t('progress.daily', {
+                current: progress.current, best: progress.best, grid: progress.grid
             });
         }
     }
@@ -752,7 +796,9 @@
         const pages = Math.max(1, Math.ceil(history.length / PAGE_SIZE));
         historyPage = Math.max(0, Math.min(historyPage, pages - 1));
         ui.history.replaceChildren();
-        for (const item of history.slice(historyPage * PAGE_SIZE, (historyPage + 1) * PAGE_SIZE)) {
+        const pageStart = historyPage * PAGE_SIZE;
+        const pageItems = history.slice(pageStart, (historyPage + 1) * PAGE_SIZE);
+        pageItems.forEach(function (item, pageIndex) {
             const li = document.createElement('li');
             li.className = item.correct ? 'correct' : 'incorrect';
             const summary = text('div', (item.correct ? t('history.correct') : t('history.incorrect')) +
@@ -760,15 +806,25 @@
                 t('history.round', { round: item.round }), 'history-summary');
             summary.appendChild(text('time',
                 ' ' + new Date(item.at).toLocaleString(i18n.getLanguageTag()), 'history-date'));
-            li.append(summary, text('code', item.expression));
+            const actions = document.createElement('div');
+            actions.className = 'history-item-actions';
+            const replay = text('button', t('action.replay'), 'small-button');
+            replay.type = 'button';
+            replay.dataset.replayHistory = String(pageStart + pageIndex);
+            actions.appendChild(replay);
+            li.append(summary, text('code', item.expression), actions);
             ui.history.appendChild(li);
-        }
+        });
         if (!history.length) ui.history.appendChild(text('li', t('history.empty'), 'empty'));
         ui.history_page.textContent = t('history.page', {
             page: historyPage + 1, pages: pages, count: history.length, limit: HISTORY_LIMIT
         });
         ui.history_prev.disabled = historyPage === 0;
         ui.history_next.disabled = historyPage + 1 >= pages;
+        ui.practice_missed.textContent = t('action.replay') + ' · ' + t('history.incorrect');
+        ui.practice_missed.disabled = !history.some(function (item) {
+            return item && !item.correct && item.seed;
+        });
         ui.history_clear.disabled = history.length === 0;
     }
 
@@ -821,10 +877,20 @@
             const item = core.adaptiveProfile(adaptiveState);
             ui.mode_info.replaceChildren(
                 text('strong', t('mode.adaptive')),
-                text('span', t('modeDescription.adaptive')),
+                text('span', t(settings.adaptiveStyle === 'coach'
+                    ? 'modeDescription.adaptiveCoach' : 'modeDescription.adaptive')),
                 text('span', t('progress.adaptive', {
                     level: t('mode.' + item.id),
                     skill: Math.round(adaptiveState.rating * 100)
+                }))
+            );
+        } else if (mode === 'daily') {
+            const progress = dailyProgress();
+            ui.mode_info.replaceChildren(
+                text('strong', t('mode.daily')),
+                text('span', t('modeDescription.daily')),
+                text('span', t('progress.daily', {
+                    current: progress.current, best: progress.best, grid: progress.grid
                 }))
             );
         } else if (core.DIFFICULTIES[mode]) {
@@ -878,22 +944,25 @@
     function clearTimer() {
         if (timerId) window.clearInterval(timerId);
         timerId = null;
+        timerDeadline = 0;
         ui.timer_label.hidden = true;
     }
 
     function startTimer() {
         clearTimer();
         timeRemaining = TIMED_SECONDS;
+        timerDeadline = Date.now() + TIMED_SECONDS * 1000;
         ui.timer_label.hidden = false;
         ui.timer_label.textContent = t('timer.seconds', { seconds: timeRemaining });
-        timerId = window.setInterval(function () {
-            timeRemaining--;
+        function updateTimer() {
+            timeRemaining = Math.max(0, Math.ceil((timerDeadline - Date.now()) / 1000));
             ui.timer_label.textContent = t('timer.seconds', { seconds: timeRemaining });
             if (timeRemaining <= 0) {
                 finishSession('timed.complete', 'timed.result', { count: session.solved });
                 playSound('finish');
             }
-        }, 1000);
+        }
+        timerId = window.setInterval(updateTimer, 250);
     }
 
     function activateMode(nextMode, button, options) {
@@ -904,6 +973,7 @@
         round = options.round || 1;
         forcedSeed = options.seed || null;
         forcedRound = options.round || null;
+        generatorVersion = options.generatorVersion || 2;
         dailyDateOverride = options.date || null;
         if (mode === 'adaptive' && options.adaptiveState) {
             adaptiveState = core.normalizeAdaptiveState(options.adaptiveState);
@@ -934,10 +1004,11 @@
 
     function dailyShareText() {
         const result = dailyResults[utcDate()];
-        if (!result) return t('share.dailyDefault', { date: utcDate() });
+        const progress = dailyProgress();
+        if (!result) return t('share.dailyDefault', { date: utcDate() }) + '\n' + progress.grid;
         return t(result.success === false ? 'share.dailyRevealed' : 'share.dailySolved', {
             date: utcDate(), attempts: result.attempts, hints: result.hints
-        });
+        }) + '\n' + progress.grid + ' · ' + t('share.dailyStreak', { streak: progress.current });
     }
 
     function sharePuzzle() {
@@ -947,12 +1018,14 @@
         let shareText = 'You Only Get 1s';
         if (mode === 'daily') {
             url.searchParams.set('daily', utcDate());
+            url.searchParams.set('gen', String(generatorVersion));
             shareText = dailyShareText();
         } else if (mode === 'challenges') {
             url.searchParams.set('challenge', String(round));
             shareText += ' · ' + t('share.challenge', { round: round });
         } else {
             url.searchParams.set('seed', currentSeed);
+            url.searchParams.set('gen', String(generatorVersion));
             if (mode === 'adaptive') {
                 const sharedModel = adaptiveProblemState || adaptiveState;
                 url.searchParams.set('difficulty', 'adaptive');
@@ -1032,6 +1105,8 @@
         ui.setting_language.value = i18n.getLocale();
         ui.quick_language.value = i18n.getLocale();
         ui.setting_sidebar_side.value = requestedSide;
+        ui.setting_adaptive_style.value =
+            ['flow', 'coach'].includes(settings.adaptiveStyle) ? settings.adaptiveStyle : 'flow';
     }
 
     function refreshLocalizedUi() {
@@ -1055,7 +1130,7 @@
 
     ui.problem.addEventListener('click', function (event) {
         const button = event.target.closest('[data-number-id]');
-        if (!button || awaitingAdvance || session.finished || !currentProblem) return;
+        if (!button || session.phase !== 'playing' || !currentProblem) return;
         const keyboardActivation = event.detail === 0;
         const id = button.dataset.numberId;
         selectedId = selectedId === id ? null : id;
@@ -1075,11 +1150,11 @@
     });
 
     ui.submit.addEventListener('click', function () {
-        if (awaitingAdvance) {
+        if (session.phase === 'review') {
             advanceRound();
             return;
         }
-        if (!currentProblem || session.finished) return;
+        if (!currentProblem || session.phase === 'finished') return;
         if (isSolved()) {
             if (mode === 'tutorial') {
                 const easyButton = ui.mode_buttons.querySelector('[data-mode="easy"]');
@@ -1100,7 +1175,7 @@
     });
 
     ui.hint.addEventListener('click', function () {
-        if (!currentProblem || awaitingAdvance || session.finished || hintLevel >= 2) return;
+        if (!currentProblem || session.phase !== 'playing' || hintLevel >= 2) return;
         hintLevel = Math.min(2, hintLevel + 1);
         session.hints++;
         adapt('hint');
@@ -1111,11 +1186,11 @@
     });
 
     ui.skip.addEventListener('click', function () {
-        if (!currentProblem || awaitingAdvance || session.finished) return;
+        if (!currentProblem || session.phase !== 'playing') return;
         adapt('skip');
         recordAttempt(false);
         showExplanation(true);
-        awaitingAdvance = true;
+        session.phase = 'review';
         renderSubmitLabel();
         ui.hint.disabled = true;
         ui.skip.disabled = true;
@@ -1124,6 +1199,8 @@
                 attempts: session.attempts, hints: session.hints, success: false, at: Date.now()
             };
             save(KEYS.daily, dailyResults);
+            updateProgress();
+            updateModeInfo();
             ui.submit.disabled = true;
             setCatalogMessage('daily.revealed', 'daily.revealedBody');
             return;
@@ -1199,8 +1276,56 @@
     ui.custom_length.addEventListener('input', function () {
         ui.custom_length_value.textContent = ui.custom_length.value;
     });
+    ui.history.addEventListener('click', function (event) {
+        const button = event.target.closest('[data-replay-history]');
+        if (!button) return;
+        const item = history[Number(button.dataset.replayHistory)];
+        if (!item) return;
+        const saved = item.replay || {
+            mode: item.modeId || item.mode,
+            round: item.round,
+            seed: item.seed
+        };
+        const modeId = i18n.getMessageId('mode', saved.mode) || saved.mode;
+        const modeButton = ui.mode_buttons.querySelector('[data-mode="' + modeId + '"]');
+        if (!modeButton) return;
+        if (modeId === 'custom' && saved.custom) {
+            activateMode('custom', modeButton, {
+                seed: saved.seed,
+                round: saved.round,
+                generatorVersion: saved.generatorVersion || 1
+            });
+            for (const input of ui.custom_operations.querySelectorAll('input')) {
+                input.checked = saved.custom.operations.includes(input.value);
+            }
+            for (const key of ['length', 'min', 'max', 'correct', 'rate', 'seed']) {
+                if (saved.custom[key] !== undefined) ui['custom_' + key].value = saved.custom[key];
+            }
+            ui.custom_length_value.textContent = ui.custom_length.value;
+            ui.custom_form.requestSubmit();
+        } else {
+            activateMode(modeId, modeButton, {
+                seed: saved.seed,
+                round: saved.round,
+                date: saved.dailyDate,
+                adaptiveState: saved.adaptive,
+                generatorVersion: saved.generatorVersion || 1
+            });
+        }
+        setCatalogMessage('history.replaying', 'history.replayingBody');
+    });
     ui.history_prev.addEventListener('click', function () { historyPage--; renderHistory(); });
     ui.history_next.addEventListener('click', function () { historyPage++; renderHistory(); });
+    ui.practice_missed.addEventListener('click', function () {
+        const index = history.findIndex(function (item) {
+            return item && !item.correct && item.seed;
+        });
+        if (index < 0) return;
+        historyPage = Math.floor(index / PAGE_SIZE);
+        renderHistory();
+        const replay = ui.history.querySelector('[data-replay-history="' + index + '"]');
+        if (replay) replay.click();
+    });
     ui.history_clear.addEventListener('click', function () {
         if (window.confirm(t('confirm.clearHistory'))) {
             history = [];
@@ -1233,7 +1358,8 @@
                 largeText: ui.setting_large_text.checked,
                 contrast: ui.setting_contrast.checked,
                 reducedClutter: ui.setting_reduced_clutter.checked,
-                sidebarSide: ui.setting_sidebar_side.value
+                sidebarSide: ui.setting_sidebar_side.value,
+                adaptiveStyle: ui.setting_adaptive_style.value
             };
             save(KEYS.settings, settings);
             applySettings();
@@ -1250,6 +1376,11 @@
         settings.sidebarSide = ui.setting_sidebar_side.value;
         save(KEYS.settings, settings);
         applySettings();
+    });
+    ui.setting_adaptive_style.addEventListener('change', function () {
+        settings.adaptiveStyle = ui.setting_adaptive_style.value;
+        save(KEYS.settings, settings);
+        updateModeInfo();
     });
 
     document.addEventListener('keydown', function (event) {
@@ -1286,9 +1417,37 @@
             ui.install_app.hidden = true;
         }
     });
+    ui.export_data.addEventListener('click', function () {
+        const snapshot = storage.exportData();
+        const blob = new Blob([JSON.stringify(snapshot, null, 2)], { type: 'application/json' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'yog1-backup-' + new Date().toISOString().slice(0, 10) + '.json';
+        link.click();
+        window.setTimeout(function () { URL.revokeObjectURL(link.href); }, 0);
+        setCatalogMessage('data.exported', 'data.exportedBody');
+    });
+    ui.import_data.addEventListener('click', function () {
+        ui.import_file.click();
+    });
+    ui.import_file.addEventListener('change', function () {
+        const file = ui.import_file.files && ui.import_file.files[0];
+        if (!file) return;
+        file.text().then(function (value) {
+            const snapshot = JSON.parse(value);
+            if (!window.confirm(t('confirm.importData'))) return;
+            storage.importData(snapshot);
+            window.location.reload();
+        }).catch(function () {
+            setCatalogMessage('data.importFailed', 'data.importFailedBody');
+        }).finally(function () {
+            ui.import_file.value = '';
+        });
+    });
 
     function bootFromUrl() {
         const params = new URLSearchParams(window.location.search);
+        const sharedGeneratorVersion = params.get('gen') === '2' ? 2 : 1;
         const requestedDaily = params.get('daily');
         function sharedDailyDate(value) {
             if (!/^\d{4}-\d{2}-\d{2}$/.test(value || '')) return null;
@@ -1306,7 +1465,10 @@
         }
         if (daily) {
             const button = ui.mode_buttons.querySelector('[data-mode="daily"]');
-            activateMode('daily', button, { date: daily });
+            activateMode('daily', button, {
+                date: daily,
+                generatorVersion: sharedGeneratorVersion
+            });
             return;
         }
         if (challenge) {
@@ -1333,7 +1495,8 @@
                     adaptiveState: {
                         rating: Number(params.get('rating')),
                         operations: operations
-                    }
+                    },
+                    generatorVersion: sharedGeneratorVersion
                 });
                 setCatalogMessage('shared.seeded', 'shared.seededBody');
                 return;
@@ -1342,7 +1505,8 @@
                 const button = ui.mode_buttons.querySelector('[data-mode="custom"]');
                 activateMode('custom', button, {
                     seed: safeSeed,
-                    round: sharedRound(params.get('round'))
+                    round: sharedRound(params.get('round')),
+                    generatorVersion: sharedGeneratorVersion
                 });
                 const requestedOperations = Array.from(new Set(
                     (params.get('ops') || '').split(',').filter(function (key) {
@@ -1366,7 +1530,8 @@
             const button = ui.mode_buttons.querySelector('[data-mode="' + difficulty + '"]');
             activateMode(difficulty, button, {
                 seed: safeSeed,
-                round: sharedRound(params.get('round'))
+                round: sharedRound(params.get('round')),
+                generatorVersion: sharedGeneratorVersion
             });
             setCatalogMessage('shared.seeded', 'shared.seededBody');
             return;

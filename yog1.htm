@@ -52,7 +52,12 @@
         #view_buttons { display: grid; grid-template-columns: repeat(2, 1fr); gap: 7px; margin: 7px 0 18px; }
         #view_buttons button { padding: 7px; border: 1px solid var(--ink); background: var(--paper); box-shadow: 2px 2px var(--ink); }
         #view_buttons button.active { background: #aaa9a2; font-weight: bold; box-shadow: inset 3px 0 var(--ink), 2px 2px var(--ink); }
-        #mode_buttons { display: grid; grid-template-columns: repeat(2, 1fr); gap: 7px; margin: 7px 0 16px; }
+        #mode_buttons { display: grid; gap: 10px; margin: 7px 0 16px; }
+        .mode-group { display: grid; grid-template-columns: repeat(2, 1fr); gap: 7px; }
+        .mode-group-label {
+            grid-column: 1 / -1; color: var(--muted);
+            font: bold .65rem "Courier New", monospace; letter-spacing: .08em; text-transform: uppercase;
+        }
         #mode_buttons button, .primary, .secondary, .small-button {
             border: 1px solid var(--ink); background: var(--paper); box-shadow: 2px 2px var(--ink);
         }
@@ -96,6 +101,10 @@
         #custom_progress { margin-inline-end: auto; font: bold .78rem "Courier New", monospace; }
         #feedback { margin-top: 14px; padding: 10px; border: 1px solid var(--line); background: #eeede6; font-size: .78rem; }
         #feedback p { margin: 0 0 5px; }
+        #feedback details { margin: 7px 0; }
+        #feedback summary { cursor: pointer; color: var(--blue); font-weight: bold; }
+        #feedback ol { margin: 6px 0; padding-inline-start: 24px; }
+        #feedback .alternate-solution { color: var(--green); font-weight: bold; }
         #feedback code { display: block; overflow-x: auto; color: var(--blue); white-space: nowrap; }
         #timer_label { padding: 2px 8px; color: var(--red); border: 1px solid var(--red); background: var(--paper); font-weight: bold; }
         .primary { padding: 9px 14px; font: bold .85rem "Courier New", monospace; text-transform: uppercase; }
@@ -125,6 +134,7 @@
         #history code { display: block; overflow-x: auto; padding-top: 4px; color: inherit; white-space: nowrap; }
         .history-summary { font-size: .72rem; font-weight: bold; }
         .history-date { color: var(--muted); font-weight: normal; }
+        .history-item-actions { display: flex; gap: 6px; margin-top: 6px; }
         .history-controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 10px; }
         #history_page { margin-inline-end: auto; font-size: .72rem; color: var(--muted); }
         .secondary, .small-button { padding: 5px 9px; font-size: .72rem; }
@@ -166,7 +176,7 @@
             body.sidebar-right #wrapper, body.sidebar-left #wrapper, html[dir="rtl"] #wrapper { flex-direction: column; }
             #menu { width: 100%; border-right: 0; border-bottom: 2px solid var(--ink); }
             body.sidebar-right #menu, html[dir="rtl"] #menu { border-left: 0; border-bottom: 2px solid var(--ink); }
-            #mode_buttons { grid-template-columns: repeat(2, 1fr); }
+            .mode-group { grid-template-columns: repeat(2, 1fr); }
             #game { padding: 16px 13px; }
             .difficulty-grid { grid-template-columns: 1fr; }
             #score_label { display: none; }
@@ -188,7 +198,7 @@
             #wrapper.sidebar-collapsed #menu > :not(.menu-heading) { display: none; }
         }
         @media (max-width: 420px) {
-            #view_buttons, #mode_buttons, #custom_operations, .custom-fields { grid-template-columns: 1fr; }
+            #view_buttons, .mode-group, #custom_operations, .custom-fields { grid-template-columns: 1fr; }
             #game_toolbar, .toolbar-controls { justify-content: flex-start; }
             #quick_language { min-width: 0; max-width: none; flex: 1; }
         }
@@ -221,18 +231,27 @@
         </div>
         <div class="section-label" data-i18n="nav.mode">Mode</div>
         <div id="mode_buttons" role="group" aria-label="Game mode" data-i18n-aria-label="aria.mode">
-            <button type="button" data-mode="tutorial" class="active" aria-pressed="true" data-i18n="mode.tutorial">Tutorial</button>
-            <button type="button" data-mode="adaptive" aria-pressed="false" data-i18n="mode.adaptive">Adaptive</button>
-            <button type="button" data-mode="easy" aria-pressed="false" data-i18n="mode.easy">Easy</button>
-            <button type="button" data-mode="normal" aria-pressed="false" data-i18n="mode.normal">Normal</button>
-            <button type="button" data-mode="hard" aria-pressed="false" data-i18n="mode.hard">Hard</button>
-            <button type="button" data-mode="expert" aria-pressed="false" data-i18n="mode.expert">Expert</button>
-            <button type="button" data-mode="extreme" aria-pressed="false" data-i18n="mode.extreme">Extreme</button>
-            <button type="button" data-mode="daily" aria-pressed="false" data-i18n="mode.daily">Daily</button>
-            <button type="button" data-mode="timed" aria-pressed="false" data-i18n="mode.timed">Timed</button>
-            <button type="button" data-mode="endless" aria-pressed="false" data-i18n="mode.endless">Endless</button>
-            <button type="button" data-mode="challenges" aria-pressed="false" data-i18n="mode.challenges">Challenges</button>
-            <button type="button" data-mode="custom" aria-pressed="false" data-i18n="mode.custom">Custom</button>
+            <div class="mode-group">
+                <span class="mode-group-label" data-i18n="nav.learn">Learn</span>
+                <button type="button" data-mode="tutorial" class="active" aria-pressed="true" data-i18n="mode.tutorial">Tutorial</button>
+                <button type="button" data-mode="adaptive" aria-pressed="false" data-i18n="mode.adaptive">Adaptive</button>
+            </div>
+            <div class="mode-group">
+                <span class="mode-group-label" data-i18n="nav.classic">Classic</span>
+                <button type="button" data-mode="easy" aria-pressed="false" data-i18n="mode.easy">Easy</button>
+                <button type="button" data-mode="normal" aria-pressed="false" data-i18n="mode.normal">Normal</button>
+                <button type="button" data-mode="hard" aria-pressed="false" data-i18n="mode.hard">Hard</button>
+                <button type="button" data-mode="expert" aria-pressed="false" data-i18n="mode.expert">Expert</button>
+                <button type="button" data-mode="extreme" aria-pressed="false" data-i18n="mode.extreme">Extreme</button>
+            </div>
+            <div class="mode-group">
+                <span class="mode-group-label" data-i18n="nav.challenge">Challenge</span>
+                <button type="button" data-mode="daily" aria-pressed="false" data-i18n="mode.daily">Daily</button>
+                <button type="button" data-mode="timed" aria-pressed="false" data-i18n="mode.timed">Timed</button>
+                <button type="button" data-mode="endless" aria-pressed="false" data-i18n="mode.endless">Endless</button>
+                <button type="button" data-mode="challenges" aria-pressed="false" data-i18n="mode.challenges">Challenges</button>
+                <button type="button" data-mode="custom" aria-pressed="false" data-i18n="mode.custom">Custom</button>
+            </div>
         </div>
         <div id="mode_info" aria-live="polite"></div>
     </aside>
@@ -308,6 +327,7 @@
                 <div class="settings-grid">
                     <label><span data-i18n="language.label">Language</span><select id="setting_language" aria-label="Language" data-i18n-aria-label="language.label"></select></label>
                     <label><span data-i18n="sidebar.label">Sidebar side</span><select id="setting_sidebar_side"><option value="auto" data-i18n="sidebar.auto">Automatic (follow language)</option><option value="left" data-i18n="sidebar.left">Left</option><option value="right" data-i18n="sidebar.right">Right</option></select></label>
+                    <label><span data-i18n="adaptive.style">Adaptive style</span><select id="setting_adaptive_style"><option value="flow" data-i18n="adaptive.flow">Flow · reinforce strengths</option><option value="coach" data-i18n="adaptive.coach">Coach · practice weaknesses</option></select></label>
                     <label><input id="setting_sound" type="checkbox"><span data-i18n="setting.sound">Sound effects</span></label>
                     <label><input id="setting_large_text" type="checkbox"><span data-i18n="setting.largeText">Larger text</span></label>
                     <label><input id="setting_contrast" type="checkbox"><span data-i18n="setting.contrast">Higher contrast</span></label>
@@ -315,6 +335,11 @@
                 </div>
                 <p class="wave-note" data-i18n="options.keyboard">Keys: ←/→ select · Space changes · Enter checks · H hints.</p>
                 <button id="install_app" class="secondary" type="button" data-i18n="action.install" hidden>Install offline app</button>
+                <div class="history-controls options-extras">
+                    <button id="export_data" class="secondary" type="button" data-i18n="data.export">Export data</button>
+                    <button id="import_data" class="secondary" type="button" data-i18n="data.import">Import data</button>
+                    <input id="import_file" class="sr-only" type="file" accept="application/json">
+                </div>
             </section>
             </div>
         </section>
@@ -335,6 +360,7 @@
                     <span id="history_page"></span>
                     <button id="history_prev" class="secondary" type="button" data-i18n="stats.previous">Previous</button>
                     <button id="history_next" class="secondary" type="button" data-i18n="stats.next">Next</button>
+                    <button id="practice_missed" class="secondary" type="button">Replay · Incorrect</button>
                     <button id="history_clear" class="secondary" type="button" data-i18n="stats.clearHistory">Clear history</button>
                 </div>
             </section>
@@ -365,8 +391,11 @@
         </footer>
     </main>
 </div>
+<script src="locales.js"></script>
+<script src="storage.js"></script>
 <script src="game-core.js"></script>
 <script src="i18n.js"></script>
+<script src="game-content.js"></script>
 <script src="game.js"></script>
 </body>
 </html>

@@ -5,6 +5,7 @@ const fs = require('fs');
 
 const html = fs.readFileSync('yog1.htm', 'utf8');
 const game = fs.readFileSync('game.js', 'utf8');
+const storage = fs.readFileSync('storage.js', 'utf8');
 
 const ids = Array.from(html.matchAll(/\bid="([^"]+)"/g)).map(function (match) {
     return match[1];
@@ -92,5 +93,24 @@ assert(game.includes("ui.custom_min.setAttribute('aria-invalid', 'true')") &&
 assert(game.includes('Number.isSafeInteger(parsed)') &&
     game.includes("Math.min(100000, parsed)"),
     'shared round parameters are bounded before reaching the generator');
+assert(game.includes("phase: 'playing'") &&
+    game.includes("session.phase = 'review'") &&
+    game.includes("session.phase = 'finished'"),
+    'session transitions use explicit phases');
+assert(game.includes('timerDeadline = Date.now() + TIMED_SECONDS * 1000') &&
+    game.includes('(timerDeadline - Date.now()) / 1000'),
+    'Timed mode follows an absolute deadline');
+assert(game.includes('data-replay-history') && game.includes('replay: replay'),
+    'history records carry replay metadata and controls');
+assert(game.includes("url.searchParams.set('gen', String(generatorVersion))") &&
+    game.includes("params.get('gen') === '2'"),
+    'new share links version the generator while legacy links remain reproducible');
+assert(storage.includes('SCHEMA_VERSION') && storage.includes('exportData') &&
+    storage.includes('importData'),
+    'persistent data has a versioned backup boundary');
+assert(html.includes('class="mode-group"') &&
+    html.includes('data-i18n="nav.learn"') &&
+    html.includes('data-i18n="nav.challenge"'),
+    'the mode list is grouped by player intent');
 
 console.log('UI audit tests passed.');

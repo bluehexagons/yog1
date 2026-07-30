@@ -5,20 +5,9 @@
     // Internal IDs stay short for backwards-compatible links and storage.
     // Language tags and autonyms live here so selectors, document metadata,
     // formatting, and install manifests cannot drift apart.
-    const LOCALE_OPTIONS = [
-        { id: 'en', tag: 'en', label: 'English', direction: 'ltr' },
-        { id: 'es', tag: 'es', label: 'Español', direction: 'ltr' },
-        { id: 'zh', tag: 'zh-Hans', label: '简体中文', direction: 'ltr' },
-        { id: 'ar', tag: 'ar', label: 'العربية', direction: 'rtl' },
-        { id: 'bn', tag: 'bn', label: 'বাংলা', direction: 'ltr' },
-        { id: 'ja', tag: 'ja', label: '日本語', direction: 'ltr' },
-        { id: 'hi', tag: 'hi', label: 'हिन्दी', direction: 'ltr' },
-        { id: 'pt', tag: 'pt-BR', label: 'Português (Brasil)', direction: 'ltr' },
-        { id: 'ru', tag: 'ru', label: 'Русский', direction: 'ltr' },
-        { id: 'vi', tag: 'vi', label: 'Tiếng Việt', direction: 'ltr' },
-        { id: 'tr', tag: 'tr', label: 'Türkçe', direction: 'ltr' },
-        { id: 'ur', tag: 'ur', label: 'اردو', direction: 'rtl' }
-    ];
+    const LOCALE_OPTIONS = root.Yog1Locales.map(function (item) {
+        return Object.assign({}, item);
+    });
     const AVAILABLE_LOCALES = LOCALE_OPTIONS.map(function (item) { return item.id; });
     const RTL_LOCALES = LOCALE_OPTIONS.filter(function (item) {
         return item.direction === 'rtl';
@@ -1317,6 +1306,204 @@
         }
     };
     for (const code of AVAILABLE_LOCALES) Object.assign(messages[code], adaptiveMessages[code]);
+
+    const improvementMessages = {
+        en: {
+            'nav.learn': 'Learn', 'nav.classic': 'Classic', 'nav.challenge': 'Challenge',
+            'adaptive.style': 'Adaptive style', 'adaptive.flow': 'Flow · reinforce strengths',
+            'adaptive.coach': 'Coach · practice weaknesses',
+            'modeDescription.adaptiveCoach': 'Difficulty follows your answers while less-comfortable operators receive more practice.',
+            'aria.equals': 'equals', 'feedback.yourSteps': 'Your arithmetic',
+            'feedback.solutionSteps': 'Solution arithmetic',
+            'feedback.alternate': 'You found a valid alternate solution.',
+            'result.alternate': 'Alternate solution', 'result.alternateBody': 'That move balances the equation too.',
+            'progress.daily': '{grid} · streak {current} · best {best}',
+            'share.dailyStreak': 'streak {streak}', 'action.replay': 'Replay',
+            'history.replaying': 'Replaying puzzle', 'history.replayingBody': 'This saved puzzle has been restored.',
+            'data.export': 'Export data', 'data.import': 'Import data',
+            'data.exported': 'Data exported', 'data.exportedBody': 'Your local progress was saved as a JSON backup.',
+            'data.importFailed': 'Import failed', 'data.importFailedBody': 'Choose a valid YOG1 JSON backup.',
+            'confirm.importData': 'Replace matching local progress with this backup?'
+        },
+        es: {
+            'nav.learn': 'Aprender', 'nav.classic': 'Clásico', 'nav.challenge': 'Desafío',
+            'adaptive.style': 'Estilo adaptativo', 'adaptive.flow': 'Fluir · reforzar fortalezas',
+            'adaptive.coach': 'Entrenador · practicar debilidades',
+            'modeDescription.adaptiveCoach': 'La dificultad sigue tus respuestas y practica más los operadores menos dominados.',
+            'aria.equals': 'es igual a', 'feedback.yourSteps': 'Tu cálculo',
+            'feedback.solutionSteps': 'Cálculo de la solución',
+            'feedback.alternate': 'Encontraste otra solución válida.',
+            'result.alternate': 'Solución alternativa', 'result.alternateBody': 'Ese cambio también equilibra la ecuación.',
+            'progress.daily': '{grid} · racha {current} · récord {best}',
+            'share.dailyStreak': 'racha {streak}', 'action.replay': 'Repetir',
+            'history.replaying': 'Repitiendo problema', 'history.replayingBody': 'Se restauró este problema guardado.',
+            'data.export': 'Exportar datos', 'data.import': 'Importar datos',
+            'data.exported': 'Datos exportados', 'data.exportedBody': 'Tu progreso local se guardó como copia JSON.',
+            'data.importFailed': 'Error de importación', 'data.importFailedBody': 'Elige una copia JSON válida de YOG1.',
+            'confirm.importData': '¿Reemplazar el progreso local correspondiente con esta copia?'
+        },
+        zh: {
+            'nav.learn': '学习', 'nav.classic': '经典', 'nav.challenge': '挑战',
+            'adaptive.style': '自适应方式', 'adaptive.flow': '流畅 · 巩固强项',
+            'adaptive.coach': '教练 · 练习弱项',
+            'modeDescription.adaptiveCoach': '难度会根据答题表现调整，并增加不熟悉运算的练习。',
+            'aria.equals': '等于', 'feedback.yourSteps': '你的计算',
+            'feedback.solutionSteps': '解答计算', 'feedback.alternate': '你找到了另一个有效解法。',
+            'result.alternate': '另一种解法', 'result.alternateBody': '这个改动也能使等式平衡。',
+            'progress.daily': '{grid} · 连续 {current} · 最佳 {best}',
+            'share.dailyStreak': '连续 {streak}', 'action.replay': '重玩',
+            'history.replaying': '正在重玩', 'history.replayingBody': '已恢复这道保存的题目。',
+            'data.export': '导出数据', 'data.import': '导入数据',
+            'data.exported': '数据已导出', 'data.exportedBody': '本地进度已保存为 JSON 备份。',
+            'data.importFailed': '导入失败', 'data.importFailedBody': '请选择有效的 YOG1 JSON 备份。',
+            'confirm.importData': '用此备份替换相应的本地进度吗？'
+        },
+        ar: {
+            'nav.learn': 'تعلّم', 'nav.classic': 'كلاسيكي', 'nav.challenge': 'تحدٍّ',
+            'adaptive.style': 'أسلوب التكيف', 'adaptive.flow': 'تدفق · تعزيز نقاط القوة',
+            'adaptive.coach': 'مدرب · تدريب نقاط الضعف',
+            'modeDescription.adaptiveCoach': 'تتبع الصعوبة إجاباتك مع تدريب أكثر على العمليات الأقل إتقانًا.',
+            'aria.equals': 'يساوي', 'feedback.yourSteps': 'حسابك',
+            'feedback.solutionSteps': 'حساب الحل', 'feedback.alternate': 'وجدت حلاً بديلاً صحيحًا.',
+            'result.alternate': 'حل بديل', 'result.alternateBody': 'هذه الخطوة توازن المعادلة أيضًا.',
+            'progress.daily': '{grid} · سلسلة {current} · الأفضل {best}',
+            'share.dailyStreak': 'سلسلة {streak}', 'action.replay': 'إعادة',
+            'history.replaying': 'إعادة المسألة', 'history.replayingBody': 'تمت استعادة المسألة المحفوظة.',
+            'data.export': 'تصدير البيانات', 'data.import': 'استيراد البيانات',
+            'data.exported': 'صُدّرت البيانات', 'data.exportedBody': 'حُفظ تقدمك المحلي كنسخة JSON.',
+            'data.importFailed': 'فشل الاستيراد', 'data.importFailedBody': 'اختر نسخة YOG1 JSON صالحة.',
+            'confirm.importData': 'استبدال التقدم المحلي المطابق بهذه النسخة؟'
+        },
+        bn: {
+            'nav.learn': 'শিখুন', 'nav.classic': 'ক্লাসিক', 'nav.challenge': 'চ্যালেঞ্জ',
+            'adaptive.style': 'অভিযোজিত ধরন', 'adaptive.flow': 'প্রবাহ · শক্তি বাড়ান',
+            'adaptive.coach': 'কোচ · দুর্বলতা অনুশীলন',
+            'modeDescription.adaptiveCoach': 'উত্তর অনুযায়ী কঠিনতা বদলায় এবং কম স্বচ্ছন্দ ক্রিয়া বেশি অনুশীলন হয়।',
+            'aria.equals': 'সমান', 'feedback.yourSteps': 'আপনার হিসাব',
+            'feedback.solutionSteps': 'সমাধানের হিসাব', 'feedback.alternate': 'আপনি আরেকটি সঠিক সমাধান পেয়েছেন।',
+            'result.alternate': 'বিকল্প সমাধান', 'result.alternateBody': 'এই পরিবর্তনেও সমীকরণ সমান হয়।',
+            'progress.daily': '{grid} · ধারা {current} · সেরা {best}',
+            'share.dailyStreak': 'ধারা {streak}', 'action.replay': 'আবার খেলুন',
+            'history.replaying': 'প্রশ্ন আবার চলছে', 'history.replayingBody': 'সংরক্ষিত প্রশ্নটি ফিরিয়ে আনা হয়েছে।',
+            'data.export': 'ডেটা রপ্তানি', 'data.import': 'ডেটা আমদানি',
+            'data.exported': 'ডেটা রপ্তানি হয়েছে', 'data.exportedBody': 'স্থানীয় অগ্রগতি JSON ব্যাকআপে রাখা হয়েছে।',
+            'data.importFailed': 'আমদানি ব্যর্থ', 'data.importFailedBody': 'সঠিক YOG1 JSON ব্যাকআপ বেছে নিন।',
+            'confirm.importData': 'এই ব্যাকআপ দিয়ে মিলে যাওয়া স্থানীয় অগ্রগতি বদলাবেন?'
+        },
+        ja: {
+            'nav.learn': '学ぶ', 'nav.classic': 'クラシック', 'nav.challenge': 'チャレンジ',
+            'adaptive.style': '適応スタイル', 'adaptive.flow': 'フロー · 得意を強化',
+            'adaptive.coach': 'コーチ · 苦手を練習',
+            'modeDescription.adaptiveCoach': '正誤に応じて難易度を変え、苦手な演算子を多めに練習します。',
+            'aria.equals': 'イコール', 'feedback.yourSteps': 'あなたの計算',
+            'feedback.solutionSteps': '解答の計算', 'feedback.alternate': '別の正しい解答を見つけました。',
+            'result.alternate': '別解', 'result.alternateBody': 'その変更でも式がつり合います。',
+            'progress.daily': '{grid} · 連続 {current} · 最高 {best}',
+            'share.dailyStreak': '連続 {streak}', 'action.replay': '再挑戦',
+            'history.replaying': '問題を再挑戦', 'history.replayingBody': '保存した問題を復元しました。',
+            'data.export': 'データを書き出す', 'data.import': 'データを読み込む',
+            'data.exported': 'データを書き出しました', 'data.exportedBody': 'ローカル進捗を JSON バックアップに保存しました。',
+            'data.importFailed': '読み込み失敗', 'data.importFailedBody': '有効な YOG1 JSON バックアップを選んでください。',
+            'confirm.importData': '一致するローカル進捗をこのバックアップで置き換えますか？'
+        },
+        hi: {
+            'nav.learn': 'सीखें', 'nav.classic': 'क्लासिक', 'nav.challenge': 'चुनौती',
+            'adaptive.style': 'अनुकूली शैली', 'adaptive.flow': 'प्रवाह · ताकत बढ़ाएँ',
+            'adaptive.coach': 'कोच · कमजोरियाँ अभ्यास करें',
+            'modeDescription.adaptiveCoach': 'कठिनाई उत्तरों के अनुसार बदलती है और कम सहज संक्रियाओं का अधिक अभ्यास कराती है।',
+            'aria.equals': 'बराबर', 'feedback.yourSteps': 'आपकी गणना',
+            'feedback.solutionSteps': 'हल की गणना', 'feedback.alternate': 'आपने एक और सही हल खोजा।',
+            'result.alternate': 'वैकल्पिक हल', 'result.alternateBody': 'इस बदलाव से भी समीकरण संतुलित होता है।',
+            'progress.daily': '{grid} · सिलसिला {current} · सर्वश्रेष्ठ {best}',
+            'share.dailyStreak': 'सिलसिला {streak}', 'action.replay': 'फिर खेलें',
+            'history.replaying': 'पहेली फिर खेल रहे हैं', 'history.replayingBody': 'सहेजी गई पहेली वापस आ गई है।',
+            'data.export': 'डेटा निर्यात', 'data.import': 'डेटा आयात',
+            'data.exported': 'डेटा निर्यात हुआ', 'data.exportedBody': 'स्थानीय प्रगति JSON बैकअप में सहेजी गई।',
+            'data.importFailed': 'आयात विफल', 'data.importFailedBody': 'मान्य YOG1 JSON बैकअप चुनें।',
+            'confirm.importData': 'मिलती स्थानीय प्रगति को इस बैकअप से बदलें?'
+        },
+        pt: {
+            'nav.learn': 'Aprender', 'nav.classic': 'Clássico', 'nav.challenge': 'Desafio',
+            'adaptive.style': 'Estilo adaptativo', 'adaptive.flow': 'Fluxo · reforçar pontos fortes',
+            'adaptive.coach': 'Treinador · praticar pontos fracos',
+            'modeDescription.adaptiveCoach': 'A dificuldade segue suas respostas e pratica mais os operadores menos dominados.',
+            'aria.equals': 'é igual a', 'feedback.yourSteps': 'Seu cálculo',
+            'feedback.solutionSteps': 'Cálculo da solução', 'feedback.alternate': 'Você encontrou outra solução válida.',
+            'result.alternate': 'Solução alternativa', 'result.alternateBody': 'Essa mudança também equilibra a equação.',
+            'progress.daily': '{grid} · sequência {current} · melhor {best}',
+            'share.dailyStreak': 'sequência {streak}', 'action.replay': 'Repetir',
+            'history.replaying': 'Repetindo problema', 'history.replayingBody': 'O problema salvo foi restaurado.',
+            'data.export': 'Exportar dados', 'data.import': 'Importar dados',
+            'data.exported': 'Dados exportados', 'data.exportedBody': 'Seu progresso local foi salvo em um backup JSON.',
+            'data.importFailed': 'Falha ao importar', 'data.importFailedBody': 'Escolha um backup JSON válido do YOG1.',
+            'confirm.importData': 'Substituir o progresso local correspondente por este backup?'
+        },
+        ru: {
+            'nav.learn': 'Обучение', 'nav.classic': 'Классика', 'nav.challenge': 'Испытание',
+            'adaptive.style': 'Стиль адаптации', 'adaptive.flow': 'Поток · укреплять сильное',
+            'adaptive.coach': 'Тренер · отрабатывать слабое',
+            'modeDescription.adaptiveCoach': 'Сложность следует за ответами, а менее знакомые операции встречаются чаще.',
+            'aria.equals': 'равно', 'feedback.yourSteps': 'Ваши вычисления',
+            'feedback.solutionSteps': 'Вычисления решения', 'feedback.alternate': 'Вы нашли другое верное решение.',
+            'result.alternate': 'Другой способ', 'result.alternateBody': 'Эта замена тоже уравнивает выражение.',
+            'progress.daily': '{grid} · серия {current} · рекорд {best}',
+            'share.dailyStreak': 'серия {streak}', 'action.replay': 'Повторить',
+            'history.replaying': 'Повтор задачи', 'history.replayingBody': 'Сохранённая задача восстановлена.',
+            'data.export': 'Экспорт данных', 'data.import': 'Импорт данных',
+            'data.exported': 'Данные экспортированы', 'data.exportedBody': 'Локальный прогресс сохранён в резервной копии JSON.',
+            'data.importFailed': 'Ошибка импорта', 'data.importFailedBody': 'Выберите корректную копию YOG1 в формате JSON.',
+            'confirm.importData': 'Заменить соответствующий локальный прогресс этой копией?'
+        },
+        vi: {
+            'nav.learn': 'Học', 'nav.classic': 'Cổ điển', 'nav.challenge': 'Thử thách',
+            'adaptive.style': 'Kiểu thích ứng', 'adaptive.flow': 'Nhịp độ · củng cố điểm mạnh',
+            'adaptive.coach': 'Huấn luyện · luyện điểm yếu',
+            'modeDescription.adaptiveCoach': 'Độ khó theo câu trả lời và cho luyện nhiều hơn các phép toán chưa quen.',
+            'aria.equals': 'bằng', 'feedback.yourSteps': 'Phép tính của bạn',
+            'feedback.solutionSteps': 'Phép tính lời giải', 'feedback.alternate': 'Bạn đã tìm thấy một lời giải đúng khác.',
+            'result.alternate': 'Lời giải khác', 'result.alternateBody': 'Thay đổi đó cũng cân bằng phương trình.',
+            'progress.daily': '{grid} · chuỗi {current} · tốt nhất {best}',
+            'share.dailyStreak': 'chuỗi {streak}', 'action.replay': 'Chơi lại',
+            'history.replaying': 'Chơi lại câu đố', 'history.replayingBody': 'Câu đố đã lưu đã được khôi phục.',
+            'data.export': 'Xuất dữ liệu', 'data.import': 'Nhập dữ liệu',
+            'data.exported': 'Đã xuất dữ liệu', 'data.exportedBody': 'Tiến trình cục bộ đã lưu thành bản sao JSON.',
+            'data.importFailed': 'Nhập thất bại', 'data.importFailedBody': 'Chọn bản sao YOG1 JSON hợp lệ.',
+            'confirm.importData': 'Thay tiến trình cục bộ tương ứng bằng bản sao này?'
+        },
+        tr: {
+            'nav.learn': 'Öğren', 'nav.classic': 'Klasik', 'nav.challenge': 'Meydan okuma',
+            'adaptive.style': 'Uyarlama tarzı', 'adaptive.flow': 'Akış · güçlü yanları pekiştir',
+            'adaptive.coach': 'Koç · zayıf yanları çalış',
+            'modeDescription.adaptiveCoach': 'Zorluk yanıtlara uyar ve daha az rahat işlemleri daha çok çalıştırır.',
+            'aria.equals': 'eşittir', 'feedback.yourSteps': 'Hesabınız',
+            'feedback.solutionSteps': 'Çözüm hesabı', 'feedback.alternate': 'Başka bir geçerli çözüm buldunuz.',
+            'result.alternate': 'Alternatif çözüm', 'result.alternateBody': 'Bu değişiklik de denklemi dengeler.',
+            'progress.daily': '{grid} · seri {current} · en iyi {best}',
+            'share.dailyStreak': 'seri {streak}', 'action.replay': 'Tekrar oyna',
+            'history.replaying': 'Bulmaca tekrarı', 'history.replayingBody': 'Kayıtlı bulmaca geri yüklendi.',
+            'data.export': 'Veriyi dışa aktar', 'data.import': 'Veriyi içe aktar',
+            'data.exported': 'Veri dışa aktarıldı', 'data.exportedBody': 'Yerel ilerleme JSON yedeği olarak kaydedildi.',
+            'data.importFailed': 'İçe aktarma başarısız', 'data.importFailedBody': 'Geçerli bir YOG1 JSON yedeği seçin.',
+            'confirm.importData': 'Eşleşen yerel ilerleme bu yedekle değiştirilsin mi?'
+        },
+        ur: {
+            'nav.learn': 'سیکھیں', 'nav.classic': 'کلاسک', 'nav.challenge': 'چیلنج',
+            'adaptive.style': 'موافق انداز', 'adaptive.flow': 'روانی · مضبوط پہلو بڑھائیں',
+            'adaptive.coach': 'کوچ · کمزور پہلو آزمائیں',
+            'modeDescription.adaptiveCoach': 'مشکل جوابوں کے مطابق بدلتی ہے اور کم مانوس عملیات کی زیادہ مشق کراتی ہے۔',
+            'aria.equals': 'برابر', 'feedback.yourSteps': 'آپ کا حساب',
+            'feedback.solutionSteps': 'حل کا حساب', 'feedback.alternate': 'آپ نے ایک اور درست حل تلاش کیا۔',
+            'result.alternate': 'متبادل حل', 'result.alternateBody': 'اس تبدیلی سے بھی مساوات برابر ہوتی ہے۔',
+            'progress.daily': '{grid} · سلسلہ {current} · بہترین {best}',
+            'share.dailyStreak': 'سلسلہ {streak}', 'action.replay': 'دوبارہ کھیلیں',
+            'history.replaying': 'سوال دوبارہ', 'history.replayingBody': 'محفوظ سوال بحال کر دیا گیا ہے۔',
+            'data.export': 'ڈیٹا برآمد', 'data.import': 'ڈیٹا درآمد',
+            'data.exported': 'ڈیٹا برآمد ہوا', 'data.exportedBody': 'مقامی پیش رفت JSON بیک اپ میں محفوظ ہوئی۔',
+            'data.importFailed': 'درآمد ناکام', 'data.importFailedBody': 'درست YOG1 JSON بیک اپ منتخب کریں۔',
+            'confirm.importData': 'ملتی مقامی پیش رفت کو اس بیک اپ سے بدلیں؟'
+        }
+    };
+    for (const code of AVAILABLE_LOCALES) Object.assign(messages[code], improvementMessages[code]);
 
     function translate(value) {
         if (typeof value !== 'string') return value;

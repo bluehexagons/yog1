@@ -11,16 +11,24 @@ builder. Problem history and per-difficulty stats are stored locally in the
 browser and can be cleared from the page.
 
 Additional modes include Adaptive difficulty, a shared Daily puzzle, a 60-second
-Timed sprint, a three-life Endless run, and five handcrafted Challenges. Adaptive
-mode responds to correct and incorrect answers, applies rating penalties for
-hints and skipped questions, and shows less-comfortable operators less often.
-Every generated puzzle has a reproducible share link. Incorrect answers can be
-retried, hints reveal the relevant side and then the intended number, and
-completed puzzles explain both side totals.
+Timed sprint, a three-life Endless run, and ten handcrafted Challenges. Adaptive
+mode responds to correct and incorrect answers and offers a Flow style that
+reinforces strengths or a Coach style that practices weaker operators. Daily
+results include a seven-day grid plus current and best streaks.
 
-The game also tracks achievements and session summaries. Accessibility options
-provide larger text, higher contrast, and reduced clutter. Simple synthesized
-waveform sound effects are available but disabled by default.
+Generated puzzles are sampled for a unique, safe solution and selected near the
+round's displayed complexity target. Every generated puzzle has a reproducible
+share link, and saved history entries can be replayed. Incorrect answers can be
+retried, hints reveal the relevant side and then the intended number, and
+completed puzzles include collapsible step-by-step arithmetic. Valid alternate
+solutions are recognized explicitly if one appears in legacy or handcrafted
+content.
+
+The game also tracks achievements and session summaries. Local progress can be
+exported to or restored from a versioned JSON backup. Accessibility options
+provide larger text, higher contrast, reduced clutter, natural-language equation
+labels, and logical left-to-right math inside right-to-left layouts. Simple
+synthesized waveform sound effects are available but disabled by default.
 
 Keyboard controls:
 
@@ -49,6 +57,22 @@ Run the generator, localization, and dependency-free UI audit tests with:
 
 ```sh
 node test-core.js
+node test-content.js
+node test-storage.js
 node test-i18n.js
 node test-ui.js
+```
+
+## Development
+
+The shipped game remains a dependency-free static site. `game-core.js` owns
+arithmetic generation and analysis, `game-content.js` owns handcrafted content,
+`storage.js` owns versioned persistence and backup data, `locales.js` owns locale
+metadata, and `game.js` coordinates session state and rendering.
+
+After changing runtime files, locale metadata, descriptions, icons, or install
+metadata, regenerate localized manifests and the content-hashed offline cache:
+
+```sh
+node scripts/update-assets.js
 ```
