@@ -2,10 +2,15 @@
   "name": "You Only Get 1s",
   "short_name": "YOG1",
   "lang": "zh-Hant",
+  "id": "/yog1/",
   "description": "只要把一個數字改為 1，就能使整數等式成立。",
   "start_url": "../../?lang=zh-Hant",
   "scope": "../../",
   "display": "standalone",
+  "categories": [
+    "games",
+    "education"
+  ],
   "background_color": "#191919",
   "theme_color": "#191919",
   "icons": [

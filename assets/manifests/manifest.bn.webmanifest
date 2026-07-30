@@ -2,10 +2,15 @@
   "name": "You Only Get 1s",
   "short_name": "YOG1",
   "lang": "bn",
+  "id": "/yog1/",
   "description": "ঠিক একটি সংখ্যা 1 করে পূর্ণসংখ্যার সমীকরণ সমান করুন।",
   "start_url": "../../?lang=bn",
   "scope": "../../",
   "display": "standalone",
+  "categories": [
+    "games",
+    "education"
+  ],
   "background_color": "#191919",
   "theme_color": "#191919",
   "icons": [

@@ -2,10 +2,15 @@
   "name": "You Only Get 1s",
   "short_name": "YOG1",
   "lang": "tr",
+  "id": "/yog1/",
   "description": "Tam sayı denklemlerini tam olarak bir sayıyı 1 yaparak dengeleyin.",
   "start_url": "../../?lang=tr",
   "scope": "../../",
   "display": "standalone",
+  "categories": [
+    "games",
+    "education"
+  ],
   "background_color": "#191919",
   "theme_color": "#191919",
   "icons": [

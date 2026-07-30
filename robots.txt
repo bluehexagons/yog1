@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://bluehexagons.github.io/yog1/sitemap.xml

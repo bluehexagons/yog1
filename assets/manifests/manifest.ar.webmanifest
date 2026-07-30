@@ -3,10 +3,15 @@
   "short_name": "YOG1",
   "lang": "ar",
   "dir": "rtl",
+  "id": "/yog1/",
   "description": "وازن معادلات الأعداد الصحيحة بتغيير عدد واحد فقط إلى 1.",
   "start_url": "../../?lang=ar",
   "scope": "../../",
   "display": "standalone",
+  "categories": [
+    "games",
+    "education"
+  ],
   "background_color": "#191919",
   "theme_color": "#191919",
   "icons": [

@@ -189,6 +189,11 @@ assert(serviceWorker.includes("event.data.type === 'cache-all-locales'") &&
 assert(fs.readFileSync('index.html', 'utf8')
     .includes('<link rel="stylesheet" href="assets/css/game.css">'),
     'the Pages entry point loads its organized stylesheet');
+assert(html.includes('http-equiv="Content-Security-Policy"') &&
+    html.includes('script-src \'self\'') &&
+    html.includes('rel="canonical"') &&
+    html.includes('property="og:title"'),
+    'the public entry point declares security and discovery metadata');
 assert(html.includes('class="mode-group"') &&
     html.includes('data-i18n="nav.learn"') &&
     html.includes('data-i18n="nav.challenge"'),

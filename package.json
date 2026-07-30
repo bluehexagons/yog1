@@ -1,0 +1,20 @@
+{
+  "name": "you-only-get-1s",
+  "private": true,
+  "description": "Balance integer equations by changing exactly one number into a 1.",
+  "license": "MIT",
+  "homepage": "https://bluehexagons.github.io/yog1/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bluehexagons/yog1.git"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "node scripts/update-assets.js",
+    "package": "node scripts/build-site.js",
+    "test": "node scripts/test-all.js",
+    "check": "npm test && node scripts/check-site.js"
+  }
+}

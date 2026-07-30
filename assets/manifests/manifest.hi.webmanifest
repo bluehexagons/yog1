@@ -2,10 +2,15 @@
   "name": "You Only Get 1s",
   "short_name": "YOG1",
   "lang": "hi",
+  "id": "/yog1/",
   "description": "ठीक एक संख्या को 1 में बदलकर पूर्णांक समीकरणों को संतुलित करें।",
   "start_url": "../../?lang=hi",
   "scope": "../../",
   "display": "standalone",
+  "categories": [
+    "games",
+    "education"
+  ],
   "background_color": "#191919",
   "theme_color": "#191919",
   "icons": [

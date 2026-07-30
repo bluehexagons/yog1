@@ -265,6 +265,8 @@ for (const locale of i18n.availableLocales) {
     assert.strictEqual(manifest.lang, localeOption.tag, filename + ' declares its full language tag');
     assert.strictEqual(manifest.description, i18n.locales[locale]['meta.description'],
         filename + ' uses the cataloged localized description');
+    assert.strictEqual(manifest.id, '/yog1/',
+        filename + ' keeps one stable installed-app identity');
     assert.strictEqual(new URL(manifest.start_url, 'https://example.test/').searchParams.get('lang'),
         locale, filename + ' preserves its locale when the installed app launches');
     assert.strictEqual(manifest.dir, ['ar', 'ur'].includes(locale) ? 'rtl' : undefined,

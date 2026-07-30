@@ -2,10 +2,15 @@
   "name": "You Only Get 1s",
   "short_name": "YOG1",
   "lang": "de",
+  "id": "/yog1/",
   "description": "Balancieren Sie Gleichungen mit ganzen Zahlen, indem Sie genau eine Zahl in 1 ändern.",
   "start_url": "../../?lang=de",
   "scope": "../../",
   "display": "standalone",
+  "categories": [
+    "games",
+    "education"
+  ],
   "background_color": "#191919",
   "theme_color": "#191919",
   "icons": [

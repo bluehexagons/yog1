@@ -2,10 +2,15 @@
   "name": "You Only Get 1s",
   "short_name": "YOG1",
   "lang": "ko",
+  "id": "/yog1/",
   "description": "숫자 하나만 1로 바꾸어 정수 등식을 맞추세요.",
   "start_url": "../../?lang=ko",
   "scope": "../../",
   "display": "standalone",
+  "categories": [
+    "games",
+    "education"
+  ],
   "background_color": "#191919",
   "theme_color": "#191919",
   "icons": [

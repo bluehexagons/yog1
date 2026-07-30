@@ -2,10 +2,15 @@
   "name": "You Only Get 1s",
   "short_name": "YOG1",
   "lang": "pt-BR",
+  "id": "/yog1/",
   "description": "Equilibre equações com números inteiros mudando exatamente um número para 1.",
   "start_url": "../../?lang=pt",
   "scope": "../../",
   "display": "standalone",
+  "categories": [
+    "games",
+    "education"
+  ],
   "background_color": "#191919",
   "theme_color": "#191919",
   "icons": [

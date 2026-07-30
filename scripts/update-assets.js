@@ -58,10 +58,12 @@ for (const locale of i18n.localeOptions) {
     };
     if (locale.direction === 'rtl') manifest.dir = 'rtl';
     Object.assign(manifest, {
+        id: '/yog1/',
         description: i18n.locales[locale.id]['meta.description'],
         start_url: '../../?lang=' + locale.id,
         scope: '../../',
         display: 'standalone',
+        categories: ['games', 'education'],
         background_color: '#191919',
         theme_color: '#191919',
         icons: icons

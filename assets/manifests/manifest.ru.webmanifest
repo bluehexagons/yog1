@@ -2,10 +2,15 @@
   "name": "You Only Get 1s",
   "short_name": "YOG1",
   "lang": "ru",
+  "id": "/yog1/",
   "description": "Уравновесьте уравнения с целыми числами, заменив ровно одно число на 1.",
   "start_url": "../../?lang=ru",
   "scope": "../../",
   "display": "standalone",
+  "categories": [
+    "games",
+    "education"
+  ],
   "background_color": "#191919",
   "theme_color": "#191919",
   "icons": [

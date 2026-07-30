@@ -2,10 +2,15 @@
   "name": "You Only Get 1s",
   "short_name": "YOG1",
   "lang": "en",
+  "id": "/yog1/",
   "description": "Balance integer equations by changing exactly one number into a 1.",
   "start_url": "../../?lang=en",
   "scope": "../../",
   "display": "standalone",
+  "categories": [
+    "games",
+    "education"
+  ],
   "background_color": "#191919",
   "theme_color": "#191919",
   "icons": [

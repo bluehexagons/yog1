@@ -1,5 +1,7 @@
 # You Only Get 1s
 
+[![CI](https://github.com/bluehexagons/yog1/actions/workflows/ci.yml/badge.svg)](https://github.com/bluehexagons/yog1/actions/workflows/ci.yml)
+
 [Play the game](https://bluehexagons.github.io/yog1/).
 
 Originally a 48-hour Ludum Dare 28 game by bluehexagons. Solve each equation by
@@ -45,7 +47,7 @@ but disabled by default.
 Keyboard controls:
 
 - Left/Right: move between numbers
-- Space: flip the focused number
+- Space: change or restore the focused number
 - Enter: check the equation
 - Ctrl/Command+Enter: check from elsewhere in the game
 - H: request a hint
@@ -60,24 +62,19 @@ query parameters and fragments from existing shared links.
 
 `assets/js/i18n.js` contains the English catalog, while
 `assets/js/translations/` contains the lazy-loaded translated catalogs for Spanish,
-Simplified Chinese,
-Arabic, Bengali, Japanese, Hindi, Brazilian Portuguese, Russian, Vietnamese,
-Turkish, and Urdu. The Options screen remembers the chosen language, preserves
-it in shared links and installed-app metadata, and lets players choose the
-sidebar side. Centralized locale metadata supplies each language autonym,
-direction, and full BCP 47 document tag. Arabic and Urdu enable the RTL layout
-while equations remain left-to-right. Use `data-i18n` for static markup and
-`Yog1I18n.t(key, values)` for generated text.
+German, French, Simplified and Traditional Chinese, Arabic, Bengali, Japanese,
+Korean, Hindi, Brazilian Portuguese, Polish, Russian, Vietnamese, Turkish, and
+Urdu. The Options screen remembers the chosen language, preserves it in shared
+links and installed-app metadata, and lets players choose the sidebar side.
+Centralized locale metadata supplies each language autonym, direction, and full
+BCP 47 document tag. Arabic and Urdu enable the RTL layout while equations remain
+left-to-right. Use `data-i18n` for static markup and `Yog1I18n.t(key, values)` for
+generated text.
 
-Run the generator, localization, and dependency-free UI audit tests with:
+Run the complete test, syntax, and site audit with:
 
 ```sh
-node tests/test-core.js
-node tests/test-content.js
-node tests/test-storage.js
-node tests/test-i18n.js
-node tests/test-ui.js
-node tests/test-version.js
+npm run check
 ```
 
 ## Development
@@ -96,13 +93,22 @@ After changing runtime files, locale metadata, descriptions, icons, or install
 metadata, regenerate localized manifests and the content-hashed offline cache:
 
 ```sh
-node scripts/update-assets.js
+npm run build
 ```
+
+`npm run package` creates the exact Pages artifact in `dist/`. Pull requests run
+the same checks in CI. Pushes to `main` are validated, packaged, and deployed
+through the pinned GitHub Pages workflow; only runtime files are published.
+GitHub Actions updates are grouped into weekly Dependabot pull requests.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for repository conventions and the
+pre-submission checklist.
 
 ## Versioning and releases
 
-The About screen reads its version and commit date from `version.js`. The release
-tool can set an exact semantic version or bump the patch, minor, or major part:
+The About screen reads its version and commit date from `assets/js/version.js`.
+The release tool can set an exact semantic version or bump the patch, minor, or
+major part:
 
 ```sh
 node scripts/release.js patch
