@@ -274,9 +274,20 @@ assert.strictEqual(storage.validResume(finishedTimedResume), true,
     'finished Timed sessions do not need a live deadline');
 assert.strictEqual(storage.validResume({ ...finishedTimedResume, phase: 'playing' }), false,
     'active Timed sessions must keep their deadline');
+assert.strictEqual(storage.validResume({ ...finishedTimedResume, phase: 'review' }), false,
+    'Timed review screens must keep counting down after reload');
 assert.strictEqual(storage.validResume({
     ...resumeSnapshot,
     message: { titleKey: 'x', messageKey: 'y', values: { unsafe: {} } }
 }), false, 'resume message interpolation values must be simple data');
+assert.strictEqual(storage.validResume({
+    ...resumeSnapshot,
+    feedback: {
+        revealSolution: false,
+        alternate: false,
+        moveId: null,
+        attemptedValues: { n1: 2 }
+    }
+}), false, 'resume feedback only accepts a single valid number-to-one move');
 
 console.log('Storage tests passed.');

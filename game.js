@@ -141,6 +141,7 @@
     let audioContext = null;
     let session = null;
     let currentMessage = null;
+    let currentPersistentMessage = null;
     let currentFeedback = null;
     let currentAchievementId = null;
     let adaptiveProblemState = null;
@@ -161,9 +162,9 @@
         if (!currentProblem || !session) return;
         const resumedSelection = arguments.length ? selectedOverride : selectedId;
         const messageValues = {};
-        if (currentMessage) {
-            for (const key of Object.keys(currentMessage.values)) {
-                const value = currentMessage.values[key];
+        if (currentPersistentMessage) {
+            for (const key of Object.keys(currentPersistentMessage.values)) {
+                const value = currentPersistentMessage.values[key];
                 const resolved = typeof value === 'function' ? value() : value;
                 if (typeof resolved === 'string' || typeof resolved === 'boolean' ||
                     (typeof resolved === 'number' && Number.isFinite(resolved))) {
@@ -207,9 +208,9 @@
             customRun: mode === 'custom' ? Object.assign({}, customRun) : null,
             timerDeadline: mode === 'timed' ? timerDeadline : 0,
             phase: session.phase,
-            message: currentMessage ? {
-                titleKey: currentMessage.titleKey,
-                messageKey: currentMessage.messageKey,
+            message: currentPersistentMessage ? {
+                titleKey: currentPersistentMessage.titleKey,
+                messageKey: currentPersistentMessage.messageKey,
                 values: messageValues
             } : null,
             feedback: currentFeedback ? {
@@ -581,6 +582,12 @@
     }
 
     function setCatalogMessage(titleKey, messageKey, values) {
+        currentMessage = { titleKey: titleKey, messageKey: messageKey, values: values || {} };
+        currentPersistentMessage = currentMessage;
+        renderCatalogMessage();
+    }
+
+    function setTransientCatalogMessage(titleKey, messageKey, values) {
         currentMessage = { titleKey: titleKey, messageKey: messageKey, values: values || {} };
         renderCatalogMessage();
     }
@@ -1349,7 +1356,7 @@
             navigator.share({ title: 'You Only Get 1s', text: shareText, url: url.toString() }).catch(function () {});
         } else if (navigator.clipboard) {
             navigator.clipboard.writeText(value).then(function () {
-                setCatalogMessage('share.copied', 'share.ready');
+                setTransientCatalogMessage('share.copied', 'share.ready');
             }).catch(function () {
                 window.prompt(t('share.prompt'), value);
             });
@@ -1470,7 +1477,7 @@
         const value = JSON.stringify(core.learningExample(currentProblem.sides), null, 2);
         if (navigator.clipboard) {
             navigator.clipboard.writeText(value).then(function () {
-                setCatalogMessage('share.jsonCopied', 'share.jsonReady');
+                setTransientCatalogMessage('share.jsonCopied', 'share.jsonReady');
             }).catch(function () {
                 window.prompt(t('share.jsonPrompt'), value);
             });
@@ -1664,6 +1671,7 @@
             });
         }
         setCatalogMessage('history.replaying', 'history.replayingBody');
+        persistResume();
     });
     ui.history_prev.addEventListener('click', function () {
         historyPage--;
@@ -1803,9 +1811,9 @@
                 URL.revokeObjectURL(link.href);
                 link.remove();
             }, 0);
-            setCatalogMessage('data.exported', 'data.exportedBody');
+            setTransientCatalogMessage('data.exported', 'data.exportedBody');
         } catch (error) {
-            setCatalogMessage('data.exportFailed', 'data.exportFailedBody');
+            setTransientCatalogMessage('data.exportFailed', 'data.exportFailedBody');
         }
     });
     ui.import_data.addEventListener('click', function () {
@@ -1820,7 +1828,7 @@
             storage.importData(snapshot);
             window.location.reload();
         }).catch(function () {
-            setCatalogMessage('data.importFailed', 'data.importFailedBody');
+            setTransientCatalogMessage('data.importFailed', 'data.importFailedBody');
         }).finally(function () {
             ui.import_file.value = '';
         });
@@ -1894,6 +1902,7 @@
                 messageKey: saved.message.messageKey,
                 values: Object.assign({}, saved.message.values)
             };
+            currentPersistentMessage = currentMessage;
         }
         if (mode === 'custom' && customRun.won) {
             session.phase = 'review';
@@ -1925,11 +1934,12 @@
         renderExplanation();
         renderCatalogMessage();
         persistResume();
-        if (mode === 'timed' && session.phase === 'playing') {
+        if (mode === 'timed' && session.phase !== 'finished') {
             startTimer(saved.timerDeadline);
         }
 
         if (preferredView !== 'play') {
+            setSidebarCollapsed(preferredCollapsed);
             showView(preferredView);
         } else {
             setSidebarCollapsed(preferredCollapsed);

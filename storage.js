@@ -115,6 +115,14 @@
             });
     }
 
+    function validAttemptedValues(value) {
+        return value && typeof value === 'object' && !Array.isArray(value) &&
+            Object.keys(value).length <= 1 &&
+            Object.entries(value).every(function (entry) {
+                return entry[0].length <= 32 && entry[1] === 1;
+            });
+    }
+
     function validResume(value) {
         return value && typeof value === 'object' && !Array.isArray(value) &&
             RESUME_MODES.has(value.mode) &&
@@ -137,7 +145,7 @@
             validSession(value.session) &&
             (value.mode !== 'custom' || validCustomRun(value.customRun)) &&
             Number.isSafeInteger(value.timerDeadline) && value.timerDeadline >= 0 &&
-            (value.mode !== 'timed' || value.phase !== 'playing' || value.timerDeadline > 0) &&
+            (value.mode !== 'timed' || value.phase === 'finished' || value.timerDeadline > 0) &&
             ['playing', 'review', 'finished'].includes(value.phase) &&
             (value.message === null || value.message === undefined ||
                 validResumeMessage(value.message)) &&
@@ -150,9 +158,7 @@
                         (typeof value.feedback.moveId === 'string' &&
                             value.feedback.moveId.length <= 32)) &&
                     (value.feedback.attemptedValues === null ||
-                        (value.feedback.attemptedValues &&
-                            typeof value.feedback.attemptedValues === 'object' &&
-                            !Array.isArray(value.feedback.attemptedValues)))));
+                        validAttemptedValues(value.feedback.attemptedValues))));
     }
 
     function load(key, fallback) {

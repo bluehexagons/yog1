@@ -120,7 +120,7 @@ assert(html.includes('data-i18n="data.title"') &&
     !html.includes('class="screen-panel options-extras save-data-panel"'),
     'Options always offers a dedicated save-data backup section');
 assert(game.includes("'yog1-save-'") &&
-    game.includes("setCatalogMessage('data.exportFailed', 'data.exportFailedBody')"),
+    game.includes("setTransientCatalogMessage('data.exportFailed', 'data.exportFailedBody')"),
     'save export downloads a dated JSON file and reports failures');
 assert(storage.includes('localStorage.removeItem(key)') &&
     storage.includes('Could not restore YOG1 backup'),
@@ -153,14 +153,19 @@ assert(game.includes('attemptsOnPuzzle: attemptsOnPuzzle') &&
     game.includes('persistResume();\n        }\n        setCatalogMessage(\'result.retry\'') &&
     game.includes('if (saved.mode === \'adaptive\') adaptiveState = latestAdaptiveState') &&
     game.includes('phase: session.phase') &&
-    game.includes('message: currentMessage ?') &&
+    game.includes('message: currentPersistentMessage ?') &&
     game.includes('values: Object.assign({}, saved.message.values)') &&
     game.includes('renderExplanation();'),
     'resume records preserve session, messages, Custom, Endless, and Timed progress');
+assert(game.includes('currentPersistentMessage = currentMessage') &&
+    game.includes("setTransientCatalogMessage('share.copied'") &&
+    game.includes("mode === 'timed' && session.phase !== 'finished'"),
+    'transient notices stay transient and Timed review continues after reload');
 assert(game.includes("lastView: 'play', sidebarCollapsed: false") &&
     game.includes('settings.lastView = selected.dataset.screen') &&
     game.includes('settings.sidebarCollapsed = !!collapsed') &&
     game.includes('settings.historyPage = historyPage') &&
+    game.includes("if (preferredView !== 'play') {\n            setSidebarCollapsed(preferredCollapsed);") &&
     game.includes('? !!settings.sidebarCollapsed : false, false'),
     'screen, history page, and sidebar convenience preferences persist');
 assert(game.includes('achievementIds.has(id)') &&
@@ -193,8 +198,8 @@ assert(game.includes('core.learningExample') &&
     game.includes('data-copy-learning'),
     'reviewed puzzles can expose structured reasoning examples');
 assert(game.includes("t('action.copyJson')") &&
-    game.includes("setCatalogMessage('share.copied', 'share.ready')") &&
-    game.includes("setCatalogMessage('share.jsonCopied', 'share.jsonReady')") &&
+    game.includes("setTransientCatalogMessage('share.copied', 'share.ready')") &&
+    game.includes("setTransientCatalogMessage('share.jsonCopied', 'share.jsonReady')") &&
     game.includes("window.prompt(t('share.jsonPrompt'), value)"),
     'structured examples use copy-specific labels and feedback');
 
