@@ -3,6 +3,10 @@
 
     const catalog = {
     "language.label": "Ngôn ngữ",
+    "theme.label": "Bảng màu",
+    "theme.auto": "Tự động (theo thiết bị)",
+    "theme.light": "Sáng",
+    "theme.dark": "Tối",
     "sidebar.label": "Vị trí thanh bên",
     "sidebar.auto": "Tự động (theo ngôn ngữ)",
     "sidebar.left": "Trái",

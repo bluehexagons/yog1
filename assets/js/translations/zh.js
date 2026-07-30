@@ -3,6 +3,10 @@
 
     const catalog = {
     "language.label": "语言",
+    "theme.label": "配色方案",
+    "theme.auto": "自动（跟随设备）",
+    "theme.light": "浅色",
+    "theme.dark": "深色",
     "sidebar.label": "侧边栏位置",
     "sidebar.auto": "自动（跟随语言）",
     "sidebar.left": "左侧",

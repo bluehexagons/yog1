@@ -3,6 +3,10 @@
 
     const catalog = {
     "language.label": "भाषा",
+    "theme.label": "रंग योजना",
+    "theme.auto": "स्वचालित (डिवाइस के अनुसार)",
+    "theme.light": "हल्का",
+    "theme.dark": "गहरा",
     "sidebar.label": "साइडबार की स्थिति",
     "sidebar.auto": "स्वचालित (भाषा के अनुसार)",
     "sidebar.left": "बायाँ",

@@ -3,6 +3,10 @@
 
     const catalog = {
     "language.label": "Sprache",
+    "theme.label": "Farbschema",
+    "theme.auto": "Automatisch (Geräteeinstellung)",
+    "theme.light": "Hell",
+    "theme.dark": "Dunkel",
     "sidebar.label": "Seitenleiste",
     "sidebar.auto": "Automatisch (abhängig von der Sprache)",
     "sidebar.left": "Links",

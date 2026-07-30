@@ -3,6 +3,10 @@
 
     const catalog = {
     "language.label": "Язык",
+    "theme.label": "Цветовая схема",
+    "theme.auto": "Автоматически (как на устройстве)",
+    "theme.light": "Светлая",
+    "theme.dark": "Тёмная",
     "sidebar.label": "Сторона боковой панели",
     "sidebar.auto": "Автоматически (по языку)",
     "sidebar.left": "Слева",

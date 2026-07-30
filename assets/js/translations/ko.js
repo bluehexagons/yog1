@@ -3,6 +3,10 @@
 
     const catalog = {
     "language.label": "언어",
+    "theme.label": "색상 테마",
+    "theme.auto": "자동(기기 설정 따름)",
+    "theme.light": "라이트",
+    "theme.dark": "다크",
     "sidebar.label": "사이드바 측",
     "sidebar.auto": "자동(언어 따르기)",
     "sidebar.left": "왼쪽",

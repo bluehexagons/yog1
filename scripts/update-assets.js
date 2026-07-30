@@ -73,7 +73,7 @@ for (const locale of i18n.localeOptions) {
 }
 
 const files = [
-    'index.html', 'yog1.htm', 'assets/css/game.css',
+    'index.html', 'yog1.htm', 'assets/css/game.css', 'assets/js/theme.js',
     'assets/js/locales.js', 'assets/js/locale-loader.js',
     'assets/js/storage.js', 'assets/js/game-core.js', 'assets/js/i18n.js',
     'assets/js/game-content.js', 'assets/js/version.js', 'assets/js/game.js'

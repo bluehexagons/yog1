@@ -3,6 +3,10 @@
 
     const catalog = {
     "language.label": "اللغة",
+    "theme.label": "نظام الألوان",
+    "theme.auto": "تلقائي (حسب الجهاز)",
+    "theme.light": "فاتح",
+    "theme.dark": "داكن",
     "sidebar.label": "موضع الشريط الجانبي",
     "sidebar.auto": "تلقائي (حسب اللغة)",
     "sidebar.left": "اليسار",

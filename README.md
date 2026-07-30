@@ -82,7 +82,8 @@ npm run check
 The shipped game remains a dependency-free static site. Runtime code lives in
 `assets/js/`: `game-core.js` owns arithmetic generation and analysis,
 `game-content.js` owns handcrafted content, `storage.js` owns versioned
-persistence and backup data, `locales.js` owns locale metadata, and `game.js`
+persistence and backup data, `theme.js` applies the saved color scheme before
+the page renders, `locales.js` owns locale metadata, and `game.js`
 coordinates session state and rendering. Install manifests and icons live in
 `assets/manifests/` and `assets/icons/`; the stylesheet lives in `assets/css/`,
 and tests live in `tests/`.

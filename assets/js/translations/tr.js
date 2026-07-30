@@ -3,6 +3,10 @@
 
     const catalog = {
     "language.label": "Dil",
+    "theme.label": "Renk şeması",
+    "theme.auto": "Otomatik (cihazı izle)",
+    "theme.light": "Açık",
+    "theme.dark": "Koyu",
     "sidebar.label": "Kenar çubuğu konumu",
     "sidebar.auto": "Otomatik (dile göre)",
     "sidebar.left": "Sol",

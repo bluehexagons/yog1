@@ -11,7 +11,9 @@ const commands = [
     ['node', ['tests/test-storage.js']],
     ['node', ['tests/test-i18n.js']],
     ['node', ['tests/test-ui.js']],
+    ['node', ['tests/test-theme.js']],
     ['node', ['tests/test-version.js']],
+    ['node', ['--check', 'assets/js/theme.js']],
     ['node', ['--check', 'assets/js/game.js']],
     ['node', ['--check', 'assets/js/i18n.js']],
     ['node', ['--check', 'sw.js']]

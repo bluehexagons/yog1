@@ -7,6 +7,7 @@ const html = fs.readFileSync('index.html', 'utf8') + '\n' +
     fs.readFileSync('assets/css/game.css', 'utf8');
 const game = fs.readFileSync('assets/js/game.js', 'utf8');
 const storage = fs.readFileSync('assets/js/storage.js', 'utf8');
+const theme = fs.readFileSync('assets/js/theme.js', 'utf8');
 
 const ids = Array.from(html.matchAll(/\bid="([^"]+)"/g)).map(function (match) {
     return match[1];
@@ -66,6 +67,15 @@ assert(html.includes('viewport-fit=cover') && html.includes('env(safe-area-inset
     'mobile layout accounts for standalone safe areas');
 assert(html.includes(':focus-visible') && html.includes('@media (forced-colors: active)'),
     'keyboard focus and forced-colors states are explicit');
+assert(html.includes('@media (prefers-color-scheme: dark)') &&
+    html.includes(':root[data-color-scheme="dark"]') &&
+    html.includes('id="setting_color_scheme"'),
+    'automatic, light, and dark color-scheme controls are available');
+assert(theme.includes("STORAGE_KEY = 'yog1.v2.settings'") &&
+    theme.includes("media.addEventListener('change'") &&
+    game.includes('window.Yog1Theme.apply(settings.colorScheme)') &&
+    game.includes('settings.colorScheme = ui.setting_color_scheme.value'),
+    'the color scheme is restored early, follows browser changes, and persists');
 assert(html.includes('min-height: 44px') && html.includes('@media (max-width: 420px)'),
     'mobile controls have touch-sized targets and a narrow-phone layout');
 assert(html.includes('html.large-text { font-size: 118.75%; }') &&

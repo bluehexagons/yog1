@@ -24,7 +24,8 @@
         'practice_missed',
         'stats_rows', 'stats_reset_all', 'session_summary', 'achievement_list',
         'achievement_notice', 'setting_sound', 'setting_large_text', 'setting_contrast',
-        'setting_reduced_clutter', 'setting_language', 'quick_language', 'setting_sidebar_side',
+        'setting_reduced_clutter', 'setting_language', 'quick_language', 'setting_color_scheme',
+        'setting_sidebar_side',
         'setting_adaptive_style', 'setting_learning_focus', 'learning_goal',
         'learning_goal_name', 'learning_goal_example', 'learning_recommendation',
         'learning_rows', 'learning_practice', 'install_app', 'export_data', 'import_data',
@@ -68,7 +69,8 @@
     let achievementState = load(KEYS.achievements, { unlocked: [], operations: [], solved: 0 });
     const defaultSettings = {
         sound: false, largeText: false, contrast: false, reducedClutter: false,
-        sidebarSide: 'auto', adaptiveStyle: 'flow', learningFocus: 'recommended',
+        colorScheme: 'auto', sidebarSide: 'auto', adaptiveStyle: 'flow',
+        learningFocus: 'recommended',
         lastView: 'play', sidebarCollapsed: false, historyPage: 0
     };
     const loadedSettings = load(KEYS.settings, null);
@@ -1424,6 +1426,8 @@
         document.documentElement.classList.toggle('large-text', !!settings.largeText);
         document.body.classList.toggle('high-contrast', !!settings.contrast);
         document.body.classList.toggle('reduced-clutter', !!settings.reducedClutter);
+        const colorScheme = window.Yog1Theme.apply(settings.colorScheme);
+        settings.colorScheme = colorScheme;
         const requestedSide = ['auto', 'left', 'right'].includes(settings.sidebarSide) ? settings.sidebarSide : 'auto';
         const sidebarSide = requestedSide === 'auto'
             ? (i18n.getDirection() === 'rtl' ? 'right' : 'left') : requestedSide;
@@ -1435,6 +1439,7 @@
         ui.setting_reduced_clutter.checked = !!settings.reducedClutter;
         ui.setting_language.value = i18n.getLocale();
         ui.quick_language.value = i18n.getLocale();
+        ui.setting_color_scheme.value = colorScheme;
         ui.setting_sidebar_side.value = requestedSide;
         ui.setting_adaptive_style.value =
             ['flow', 'coach'].includes(settings.adaptiveStyle) ? settings.adaptiveStyle : 'flow';
@@ -1764,6 +1769,11 @@
     });
     ui.quick_language.addEventListener('change', function () {
         chooseLanguage(ui.quick_language.value);
+    });
+    ui.setting_color_scheme.addEventListener('change', function () {
+        settings.colorScheme = ui.setting_color_scheme.value;
+        save(KEYS.settings, settings);
+        applySettings();
     });
     ui.setting_sidebar_side.addEventListener('change', function () {
         settings.sidebarSide = ui.setting_sidebar_side.value;

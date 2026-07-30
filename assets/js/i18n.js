@@ -12,6 +12,10 @@
     const messages = {
         en: {
     "language.label": "Language",
+    "theme.label": "Color scheme",
+    "theme.auto": "Automatic (follow device)",
+    "theme.light": "Light",
+    "theme.dark": "Dark",
     "sidebar.label": "Sidebar side",
     "sidebar.auto": "Automatic (follow language)",
     "sidebar.left": "Left",

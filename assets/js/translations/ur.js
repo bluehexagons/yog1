@@ -3,6 +3,10 @@
 
     const catalog = {
     "language.label": "زبان",
+    "theme.label": "رنگوں کی اسکیم",
+    "theme.auto": "خودکار (ڈیوائس کے مطابق)",
+    "theme.light": "روشن",
+    "theme.dark": "تاریک",
     "sidebar.label": "سائیڈبار کی جگہ",
     "sidebar.auto": "خودکار (زبان کے مطابق)",
     "sidebar.left": "بائیں",
