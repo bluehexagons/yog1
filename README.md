@@ -53,6 +53,8 @@ Keyboard controls:
 It remains a dependency-free static site. Open `index.html` in a browser to play.
 When served over HTTPS or localhost, its web app manifest and service worker make
 it installable and available offline.
+The legacy `yog1.htm` URL redirects to the root entry point while preserving
+query parameters and fragments from existing shared links.
 
 ## Localization
 
@@ -85,7 +87,8 @@ The shipped game remains a dependency-free static site. Runtime code lives in
 `game-content.js` owns handcrafted content, `storage.js` owns versioned
 persistence and backup data, `locales.js` owns locale metadata, and `game.js`
 coordinates session state and rendering. Install manifests and icons live in
-`assets/manifests/` and `assets/icons/`; tests live in `tests/`.
+`assets/manifests/` and `assets/icons/`; the stylesheet lives in `assets/css/`,
+and tests live in `tests/`.
 Pre-release builds intentionally support only the current saved-data, backup,
 and shared-link formats.
 

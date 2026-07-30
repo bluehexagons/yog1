@@ -3,7 +3,8 @@
 const assert = require('assert');
 const fs = require('fs');
 
-const html = fs.readFileSync('index.html', 'utf8');
+const html = fs.readFileSync('index.html', 'utf8') + '\n' +
+    fs.readFileSync('assets/css/game.css', 'utf8');
 const game = fs.readFileSync('assets/js/game.js', 'utf8');
 const storage = fs.readFileSync('assets/js/storage.js', 'utf8');
 
@@ -185,6 +186,9 @@ assert(serviceWorker.includes("key.startsWith(CACHE_PREFIX) && key !== CACHE") &
 assert(serviceWorker.includes("event.data.type === 'cache-all-locales'") &&
     game.includes("postMessage({ type: 'cache-all-locales' })"),
     'explicit offline installation makes every language available without bloating startup');
+assert(fs.readFileSync('index.html', 'utf8')
+    .includes('<link rel="stylesheet" href="assets/css/game.css">'),
+    'the Pages entry point loads its organized stylesheet');
 assert(html.includes('class="mode-group"') &&
     html.includes('data-i18n="nav.learn"') &&
     html.includes('data-i18n="nav.challenge"'),

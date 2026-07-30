@@ -234,7 +234,8 @@ for (const key of ['action.copyJson', 'share.jsonCopied', 'share.jsonReady', 'sh
         key + ' has dedicated structured-example copy');
 }
 
-const html = fs.readFileSync('index.html', 'utf8');
+const html = fs.readFileSync('index.html', 'utf8') + '\n' +
+    fs.readFileSync('assets/css/game.css', 'utf8');
 const serviceWorker = fs.readFileSync('sw.js', 'utf8');
 const catalogKeys = Array.from(html.matchAll(/\bdata-i18n(?:-aria-label|-title|-placeholder|-content)?="([^"]+)"/g))
     .map(function (match) { return match[1]; });

@@ -43,6 +43,7 @@ assert.throws(function () {
 const html = fs.readFileSync('index.html', 'utf8');
 const game = fs.readFileSync('assets/js/game.js', 'utf8');
 const updater = fs.readFileSync('scripts/update-assets.js', 'utf8');
+const legacyEntry = fs.readFileSync('yog1.htm', 'utf8');
 assert(html.includes('id="app_version"') && html.includes('id="app_version_date"'),
     'the About screen exposes version and date elements');
 assert(html.includes('<strong id="app_version">' + current.version + '</strong>') &&
@@ -60,6 +61,8 @@ assert(game.includes("date.toLocaleDateString(i18n.getLanguageTag()"),
     'the commit date follows the selected display language');
 assert(updater.includes("'assets/js/game-content.js', 'assets/js/version.js', 'assets/js/game.js'"),
     'version metadata is included in the offline cache');
+assert(legacyEntry.includes("window.location.replace('./' + window.location.search + window.location.hash)"),
+    'the former entry point preserves old links while redirecting to the Pages root');
 assert(updater.includes("hash.update(filename).update('\\0')") &&
     updater.includes("hash.update(String(contents.length)).update('\\0')"),
     'offline cache hashes preserve asset boundaries');
