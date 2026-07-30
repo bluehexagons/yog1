@@ -102,6 +102,10 @@ assert(html.includes('input[type="number"], input[type="text"], select') &&
     'text fields and native choice controls participate in every theme');
 assert(html.includes('min-height: 44px') && html.includes('@media (max-width: 420px)'),
     'mobile controls have touch-sized targets and a narrow-phone layout');
+assert(html.includes('class="flip-allowance"') && html.includes('.flip-allowance { white-space: nowrap; }'),
+    'the move count and its label cannot split across lines');
+assert(html.includes('<dl class="app-version">') && html.includes('.app-version div { display: flex; flex-wrap: nowrap;'),
+    'About metadata keeps each label, punctuation mark, and value together');
 assert(html.includes('html.large-text { font-size: 118.75%; }') &&
     html.includes('font: 1rem/1.45') &&
     game.includes("document.documentElement.classList.toggle('large-text'"),

@@ -125,7 +125,7 @@
             <dl id="session_summary" aria-label="Current session statistics" data-i18n-aria-label="aria.session"></dl>
         </div>
         <section id="workspace" aria-label="Current puzzle" data-i18n-aria-label="aria.puzzle">
-            <div id="flips"><strong data-i18n="action.yourMove">Your move</strong><span id="flip_count">1</span><span id="flip_text">change remaining</span></div>
+            <div id="flips"><strong data-i18n="action.yourMove">Your move</strong><span class="flip-allowance"><span id="flip_count">1</span> <span id="flip_text">change remaining</span></span></div>
             <div id="problem" role="group" dir="ltr"></div>
             <div id="actions">
                 <span id="custom_progress" hidden></span>
@@ -142,14 +142,14 @@
         <section id="options_screen" class="screen" data-screen="options" aria-label="Options" data-i18n-aria-label="aria.options" hidden>
             <h2 data-i18n="nav.options">Options</h2>
             <div class="options-grid">
-            <section class="screen-panel">
+            <section class="screen-panel options-difficulty">
                 <h3 data-i18n="options.difficulty">Difficulty guide</h3>
                 <div class="difficulty-grid">
-                    <article><h3 data-i18n="mode.easy">Easy</h3><span data-i18n="difficulty.easy">Three values with + and −.</span></article>
-                    <article><h3 data-i18n="mode.normal">Normal</h3><span data-i18n="difficulty.normal">Short puzzles with × and frequent three-value rounds.</span></article>
-                    <article><h3 data-i18n="mode.hard">Hard</h3><span data-i18n="difficulty.hard">Short puzzles with integer ÷ and some three-value rounds.</span></article>
-                    <article><h3 data-i18n="mode.expert">Expert</h3><span data-i18n="difficulty.expert">Adds % and ^, with some three-value rounds.</span></article>
-                    <article><h3 data-i18n="mode.extreme">Extreme</h3><span data-i18n="difficulty.extreme">Longer puzzles with every operation, including √.</span></article>
+                    <article><h4 data-i18n="mode.easy">Easy</h4><span data-i18n="difficulty.easy">Three values with + and −.</span></article>
+                    <article><h4 data-i18n="mode.normal">Normal</h4><span data-i18n="difficulty.normal">Short puzzles with × and frequent three-value rounds.</span></article>
+                    <article><h4 data-i18n="mode.hard">Hard</h4><span data-i18n="difficulty.hard">Short puzzles with integer ÷ and some three-value rounds.</span></article>
+                    <article><h4 data-i18n="mode.expert">Expert</h4><span data-i18n="difficulty.expert">Adds % and ^, with some three-value rounds.</span></article>
+                    <article><h4 data-i18n="mode.extreme">Extreme</h4><span data-i18n="difficulty.extreme">Longer puzzles with every operation, including √.</span></article>
                 </div>
                 <p class="wave-note" data-i18n="options.wave">Each mode repeats an eight-round wave of warm-ups, standard rounds, and gentler challenges.</p>
             </section>
@@ -219,22 +219,17 @@
 
         <section id="about_screen" class="screen" data-screen="about" aria-label="About" data-i18n-aria-label="aria.about" hidden>
             <h2 data-i18n="about.title">About</h2>
-            <section class="screen-panel about-copy">
+            <div class="about-grid">
+            <section class="screen-panel about-copy about-intro">
                 <h3>You Only Get 1s</h3>
                 <p data-i18n="about.summary">Change one number to 1 to balance an equation.</p>
                 <p data-i18n="about.origin">A refreshed version of bluehexagons’ Ludum Dare 28 game, with generated puzzles, settings, offline play, and local stats.</p>
-                <p class="app-version">
-                    <span data-i18n="about.version">Version</span> <strong id="app_version">1.0.1</strong><span aria-hidden="true"> · </span>
-                    <span data-i18n="about.commitDate">Commit date</span> <time id="app_version_date" datetime="2026-07-30">July 30, 2026</time>
-                </p>
+                <dl class="app-version">
+                    <div><dt data-i18n="about.version">Version</dt><dd><strong id="app_version">1.0.1</strong></dd></div>
+                    <div><dt data-i18n="about.commitDate">Commit date</dt><dd><time id="app_version_date" datetime="2026-07-30">July 30, 2026</time></dd></div>
+                </dl>
             </section>
-            <section class="screen-panel about-copy">
-                <h3 data-i18n="about.translations">Translations</h3>
-                <p data-i18n="about.note">Translations were drafted with help from a large language model and may contain mistakes.</p>
-                <p><a href="https://github.com/bluehexagons/yog1/issues" data-i18n="about.contribute">Help improve translations on GitHub.</a></p>
-                <p data-i18n="about.review">Corrections from fluent speakers are always welcome.</p>
-            </section>
-            <section class="screen-panel about-copy">
+            <section class="screen-panel about-copy about-author">
                 <h3 data-i18n="about.author">About the author</h3>
                 <p data-i18n="about.authorBody">Loren Crain makes games and interactive experiences as bluehexagons.</p>
                 <nav aria-label="More from bluehexagons" data-i18n-aria-label="about.links">
@@ -250,6 +245,12 @@
                 </nav>
             </section>
             <section class="screen-panel about-copy">
+                <h3 data-i18n="about.translations">Translations</h3>
+                <p data-i18n="about.note">Translations were drafted with help from a large language model and may contain mistakes.</p>
+                <p><a href="https://github.com/bluehexagons/yog1/issues" target="_blank" rel="noopener noreferrer" data-i18n="about.contribute">Help improve translations on GitHub.</a></p>
+                <p data-i18n="about.review">Corrections from fluent speakers are always welcome.</p>
+            </section>
+            <section class="screen-panel about-copy">
                 <h3 data-i18n="about.support">Support development</h3>
                 <p data-i18n="about.supportBody">If you enjoy this game, you can support future bluehexagons projects through any of these platforms.</p>
                 <ul class="about-links support-links">
@@ -258,6 +259,7 @@
                     <li><a href="https://ko-fi.com/bluehexagons" target="_blank" rel="noopener noreferrer">Ko-fi</a></li>
                 </ul>
             </section>
+            </div>
         </section>
 
         <footer id="app_footer" hidden>
