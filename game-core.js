@@ -19,27 +19,27 @@
 
     const DIFFICULTIES = {
         easy: {
-            id: 'easy', name: 'Easy', target: 9, length: [1, 1], shortRoundChance: 1,
+            id: 'easy', name: 'Easy', target: 6, length: [1, 1], shortRoundChance: 1,
             operations: ['add', 'subtract'], maxNumber: 18,
             description: 'Three-number addition and subtraction with small positive integers.'
         },
         normal: {
-            id: 'normal', name: 'Normal', target: 17, length: [2, 4], shortRoundChance: 0.45,
+            id: 'normal', name: 'Normal', target: 11, length: [2, 4], shortRoundChance: 0.45,
             operations: ['add', 'subtract', 'multiply'], maxNumber: 30,
             description: 'Compact expressions that introduce multiplication, with frequent three-number warm-ups.'
         },
         hard: {
-            id: 'hard', name: 'Hard', target: 27, length: [3, 5], shortRoundChance: 0.35,
+            id: 'hard', name: 'Hard', target: 16, length: [3, 5], shortRoundChance: 0.35,
             operations: ['add', 'subtract', 'multiply', 'divide'], maxNumber: 50,
             description: 'Compact expressions with integer (whole-quotient) division and some three-number rounds.'
         },
         expert: {
-            id: 'expert', name: 'Expert', target: 39, length: [3, 6], shortRoundChance: 0.25,
+            id: 'expert', name: 'Expert', target: 20, length: [3, 6], shortRoundChance: 0.25,
             operations: ['add', 'subtract', 'multiply', 'divide', 'modulo', 'power'], maxNumber: 80,
             description: 'Adds remainders and powers, while retaining occasional three-number rounds.'
         },
         extreme: {
-            id: 'extreme', name: 'Extreme', target: 52, length: [4, 8],
+            id: 'extreme', name: 'Extreme', target: 31, length: [4, 8],
             operations: Object.keys(OPERATIONS), maxNumber: 120,
             description: 'Every operation, including roots, in the longest expressions.'
         }
@@ -426,14 +426,16 @@
         return DIFFICULTIES.extreme;
     }
 
-    function adaptiveOperationWeights(state, profile) {
+    function adaptiveOperationWeights(state, profile, strategy) {
         const normalized = normalizeAdaptiveState(state);
         const selectedProfile = profile || adaptiveProfile(normalized);
         const result = {};
         for (const operation of selectedProfile.operations) {
-            // Retain a small exploration chance while making low-comfort
-            // operations substantially less likely to be selected.
-            result[operation] = 0.1 + Math.pow(normalized.operations[operation], 2) * 0.9;
+            const comfort = normalized.operations[operation];
+            // Flow reinforces familiar operations. Coach gives weak operations
+            // more practice while preserving a small chance for every operation.
+            const emphasis = strategy === 'coach' ? 1 - comfort : comfort;
+            result[operation] = 0.1 + Math.pow(emphasis, 2) * 0.9;
         }
         return result;
     }
@@ -472,6 +474,10 @@
         const length = options.length || randomInt(random, profile.length[0], profile.length[1]);
         const shortRound = !options.length && profile.shortRoundChance &&
             random() < profile.shortRoundChance;
+        const operationCount = shortRound ? 1 : Math.max(2, Math.round(length * scheduled.factor));
+        // A compact identity cannot meaningfully reach the same score as a
+        // long expression. Keep the visible target honest for short rounds.
+        scheduled.target = Math.min(scheduled.target, 5 + operationCount * 5);
         return {
             profile: profile,
             random: random,
@@ -483,12 +489,12 @@
             // Targets measure arithmetic complexity; they should not also make
             // every high-level expression longer.  A one-operation identity
             // yields exactly three selectable numbers.
-            operationCount: shortRound ? 1 : Math.max(2, Math.round(length * scheduled.factor)),
+            operationCount: operationCount,
             scheduled: scheduled
         };
     }
 
-    function generateProblem(options) {
+    function generateCandidate(options) {
         options = options || {};
         const settings = normalizeOptions(options || {});
         if (!settings.operations.length) {
@@ -533,7 +539,7 @@
             : settings.operations, settings.random, settings.operationWeights);
         disguiseOnes(sides, settings.random, settings.maxNumber);
         if (evaluate(sides[0]) === evaluate(sides[1]) && (options._attempt || 0) < 30) {
-            return generateProblem(Object.assign({}, options, { _attempt: (options._attempt || 0) + 1 }));
+            return generateCandidate(Object.assign({}, options, { _attempt: (options._attempt || 0) + 1 }));
         }
         return {
             sides: sides,
@@ -543,6 +549,77 @@
             factor: settings.scheduled.factor,
             operationCount: countOperations(sides[0]) + countOperations(sides[1])
         };
+    }
+
+    function analyzeProblem(sides) {
+        const nodes = [];
+        sides.forEach(function (side) {
+            visitNumbers(side, function (node) { nodes.push(node); });
+        });
+        const solutions = [];
+        for (const node of nodes) {
+            const values = { [node.id]: 1 };
+            try {
+                const totals = sides.map(function (side) { return evaluate(side, values); });
+                if (totals.every(Number.isSafeInteger) && totals[0] === totals[1]) {
+                    solutions.push({
+                        id: node.id,
+                        value: node.value,
+                        totals: totals
+                    });
+                }
+            } catch (error) {
+                // Invalid player flips are reported through safe=false below.
+            }
+        }
+        let safe = true;
+        for (const node of nodes) {
+            try {
+                const values = { [node.id]: 1 };
+                if (!sides.every(function (side) {
+                    return Number.isSafeInteger(evaluate(side, values));
+                })) {
+                    safe = false;
+                }
+            } catch (error) {
+                safe = false;
+            }
+        }
+        return {
+            solutions: solutions,
+            solutionCount: solutions.length,
+            unique: solutions.length === 1,
+            safe: safe,
+            numberCount: nodes.length
+        };
+    }
+
+    function generateProblem(options) {
+        options = options || {};
+        const candidateCount = Math.max(1, Math.min(40, options.candidateCount || 12));
+        const requireUnique = options.requireUnique !== false;
+        let best = null;
+        let bestRank = Infinity;
+        let intendedOperationCount = null;
+        for (let index = 0; index < candidateCount; index++) {
+            const candidate = generateCandidate(options);
+            if (intendedOperationCount === null) {
+                intendedOperationCount = candidate.operationCount;
+            }
+            const analysis = analyzeProblem(candidate.sides);
+            candidate.analysis = analysis;
+            const uniquenessPenalty = requireUnique && !analysis.unique ? 1000 : 0;
+            const safetyPenalty = analysis.safe ? 0 : 10000;
+            const structurePenalty = candidate.operationCount === intendedOperationCount ? 0 : 100;
+            const rank = safetyPenalty + uniquenessPenalty + structurePenalty +
+                Math.abs(candidate.score - candidate.target);
+            if (rank < bestRank) {
+                best = candidate;
+                bestRank = rank;
+            }
+            if (rank === 0) break;
+        }
+        return best;
     }
 
     function serialize(expression, values) {
@@ -557,6 +634,37 @@
         return '(' + serialize(expression.left, values) + ' ' +
             OPERATIONS[expression.operation].symbol + ' ' +
             serialize(expression.right, values) + ')';
+    }
+
+    function evaluationSteps(expression, values, result) {
+        result = result || [];
+        if (expression.type === 'number') return result;
+        if (expression.type === 'root') {
+            evaluationSteps(expression.value, values, result);
+        } else {
+            evaluationSteps(expression.left, values, result);
+            evaluationSteps(expression.right, values, result);
+        }
+        result.push({
+            expression: serialize(expression, values),
+            value: evaluate(expression, values)
+        });
+        return result;
+    }
+
+    function describe(expression, values, operationLabels) {
+        operationLabels = operationLabels || {};
+        if (expression.type === 'number') {
+            return String(values && Object.prototype.hasOwnProperty.call(values, expression.id)
+                ? values[expression.id] : expression.value);
+        }
+        if (expression.type === 'root') {
+            return (operationLabels.root || 'square root of') + ' ' +
+                describe(expression.value, values, operationLabels);
+        }
+        return describe(expression.left, values, operationLabels) + ' ' +
+            (operationLabels[expression.operation] || OPERATIONS[expression.operation].label) + ' ' +
+            describe(expression.right, values, operationLabels);
     }
 
     function solutionDetails(sides, currentValues) {
@@ -586,6 +694,12 @@
             currentTotals: sides.map(function (side) { return evaluate(side, currentValues); }),
             solvedTotals: sides.map(function (side) { return evaluate(side, solvedValues); }),
             solvedExpression: sides.map(function (side) { return serialize(side, solvedValues); }).join(' = '),
+            currentSteps: sides.map(function (side) {
+                return evaluationSteps(side, currentValues, []);
+            }),
+            solvedSteps: sides.map(function (side) {
+                return evaluationSteps(side, solvedValues, []);
+            }),
             operations: Array.from(operations)
         };
     }
@@ -607,8 +721,11 @@
         adaptiveProfile: adaptiveProfile,
         adaptiveOperationWeights: adaptiveOperationWeights,
         updateAdaptiveState: updateAdaptiveState,
+        analyzeProblem: analyzeProblem,
         generateProblem: generateProblem,
         serialize: serialize,
+        evaluationSteps: evaluationSteps,
+        describe: describe,
         solutionDetails: solutionDetails
     };
 }));

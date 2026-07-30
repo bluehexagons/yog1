@@ -40,6 +40,15 @@ for (const profile of Object.values(core.DIFFICULTIES)) {
             core.evaluate(problem.sides[1], values),
             profile.name + ' is solved by one flip'
         );
+        const analysis = core.analyzeProblem(problem.sides);
+        assert.strictEqual(analysis.unique, true,
+            profile.name + ' round ' + round + ' has exactly one valid flip');
+        assert.strictEqual(analysis.safe, true,
+            profile.name + ' round ' + round + ' keeps every player flip safe');
+        assert.strictEqual(problem.analysis.solutionCount, 1,
+            'generated analysis is attached to the problem');
+        assert(Math.abs(problem.score - problem.target) <= Math.max(12, problem.target * 0.7),
+            profile.name + ' round ' + round + ' is reasonably close to its target score');
         assert(Number.isInteger(core.evaluate(problem.sides[0], values)));
         assert(Number.isInteger(core.evaluate(problem.sides[1], values)));
         const allNumbers = [];
@@ -187,6 +196,10 @@ assert.deepStrictEqual(seededA, seededB, 'the same seed reproduces a puzzle');
 const details = core.solutionDetails(seededA.sides, {});
 assert(details.solutionId, 'solution details identify the intended flip');
 assert.strictEqual(details.solvedTotals[0], details.solvedTotals[1]);
+assert(details.solvedSteps.some(function (side) { return side.length > 0; }),
+    'solution details include step-by-step arithmetic');
+assert(core.describe(seededA.sides[0], {}, { add: 'plus' }).length > 0,
+    'expressions have a natural-language description');
 
 const allOperations = new Set();
 for (let seed = 1; seed <= 100; seed++) {
@@ -242,6 +255,9 @@ for (let seed = 1; seed <= 200; seed++) {
 }
 assert(addQuestions > subtractQuestions * 1.5,
     'operators with lower comfort appear substantially less often');
+const coachWeights = core.adaptiveOperationWeights(comfortable, adaptiveProfile, 'coach');
+assert(coachWeights.subtract > coachWeights.add,
+    'Coach strategy emphasizes less-comfortable operators');
 
 for (const rating of [0, 0.2, 0.4, 0.6, 0.8, 1]) {
     const model = core.normalizeAdaptiveState({ rating: rating });
