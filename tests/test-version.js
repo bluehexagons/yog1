@@ -3,11 +3,11 @@
 const assert = require('assert');
 const fs = require('fs');
 const vm = require('vm');
-const release = require('./scripts/release.js');
+const release = require('../scripts/release.js');
 
-const versionSource = fs.readFileSync('version.js', 'utf8');
+const versionSource = fs.readFileSync('assets/js/version.js', 'utf8');
 const context = { window: {} };
-vm.runInNewContext(versionSource, context, { filename: 'version.js' });
+vm.runInNewContext(versionSource, context, { filename: 'assets/js/version.js' });
 const current = release.readVersion(versionSource);
 
 assert(/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/.test(current.version),
@@ -40,8 +40,8 @@ assert.throws(function () {
     release.parseArguments(['patch', '--push']);
 }, /requires --tag/, 'pushing cannot accidentally omit the version tag');
 
-const html = fs.readFileSync('yog1.htm', 'utf8');
-const game = fs.readFileSync('game.js', 'utf8');
+const html = fs.readFileSync('index.html', 'utf8');
+const game = fs.readFileSync('assets/js/game.js', 'utf8');
 const updater = fs.readFileSync('scripts/update-assets.js', 'utf8');
 assert(html.includes('id="app_version"') && html.includes('id="app_version_date"'),
     'the About screen exposes version and date elements');
@@ -53,11 +53,12 @@ assert.strictEqual(
     html,
     'the checked-in About fallback uses the release generator format'
 );
-assert(html.indexOf('<script src="version.js">') < html.indexOf('<script src="game.js">'),
+assert(html.indexOf('<script src="assets/js/version.js">') <
+    html.indexOf('<script src="assets/js/game.js">'),
     'version metadata loads before the UI renders it');
 assert(game.includes("date.toLocaleDateString(i18n.getLanguageTag()"),
     'the commit date follows the selected display language');
-assert(updater.includes("'game-content.js', 'version.js', 'game.js'"),
+assert(updater.includes("'assets/js/game-content.js', 'assets/js/version.js', 'assets/js/game.js'"),
     'version metadata is included in the offline cache');
 assert(updater.includes("hash.update(filename).update('\\0')") &&
     updater.includes("hash.update(String(contents.length)).update('\\0')"),

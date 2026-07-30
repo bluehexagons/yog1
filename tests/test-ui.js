@@ -3,9 +3,9 @@
 const assert = require('assert');
 const fs = require('fs');
 
-const html = fs.readFileSync('yog1.htm', 'utf8');
-const game = fs.readFileSync('game.js', 'utf8');
-const storage = fs.readFileSync('storage.js', 'utf8');
+const html = fs.readFileSync('index.html', 'utf8');
+const game = fs.readFileSync('assets/js/game.js', 'utf8');
+const storage = fs.readFileSync('assets/js/storage.js', 'utf8');
 
 const ids = Array.from(html.matchAll(/\bid="([^"]+)"/g)).map(function (match) {
     return match[1];

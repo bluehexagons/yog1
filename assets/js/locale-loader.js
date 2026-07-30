@@ -17,6 +17,6 @@
     // This script runs while the document is still being parsed, ensuring the
     // selected catalog is available before the game initializes. Other
     // catalogs are fetched only if the player selects them later.
-    document.write('<script src="translations/' +
+    document.write('<script src="assets/js/translations/' +
         encodeURIComponent(locale) + '.js"><\/script>');
 }(window, document));

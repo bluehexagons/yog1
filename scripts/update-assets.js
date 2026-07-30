@@ -26,15 +26,15 @@ context.window.navigator = context.navigator;
 context.window.localStorage = context.localStorage;
 context.window.document = document;
 
-vm.runInNewContext(fs.readFileSync(path.join(root, 'locales.js'), 'utf8'), context, {
-    filename: 'locales.js'
+vm.runInNewContext(fs.readFileSync(path.join(root, 'assets/js/locales.js'), 'utf8'), context, {
+    filename: 'assets/js/locales.js'
 });
 const localeBundles = context.window.Yog1Locales.filter(function (locale) {
     return locale.id !== 'en';
 }).map(function (locale) {
-    return 'translations/' + locale.id + '.js';
+    return 'assets/js/translations/' + locale.id + '.js';
 });
-for (const filename of localeBundles.concat(['i18n.js'])) {
+for (const filename of localeBundles.concat(['assets/js/i18n.js'])) {
     vm.runInNewContext(fs.readFileSync(path.join(root, filename), 'utf8'), context, {
         filename: filename
     });
@@ -42,14 +42,15 @@ for (const filename of localeBundles.concat(['i18n.js'])) {
 
 const i18n = context.window.Yog1I18n;
 const icons = [
-    { src: 'icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
-    { src: 'icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
-    { src: 'icon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any' }
+    { src: '../icons/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+    { src: '../icons/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+    { src: '../icons/icon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any' }
 ];
 const manifests = [];
 for (const locale of i18n.localeOptions) {
     const filename = locale.id === 'en'
-        ? 'manifest.webmanifest' : 'manifest.' + locale.id + '.webmanifest';
+        ? 'assets/manifests/manifest.webmanifest'
+        : 'assets/manifests/manifest.' + locale.id + '.webmanifest';
     const manifest = {
         name: 'You Only Get 1s',
         short_name: 'YOG1',
@@ -58,8 +59,8 @@ for (const locale of i18n.localeOptions) {
     if (locale.direction === 'rtl') manifest.dir = 'rtl';
     Object.assign(manifest, {
         description: i18n.locales[locale.id]['meta.description'],
-        start_url: './yog1.htm?lang=' + locale.id,
-        scope: './',
+        start_url: '../../?lang=' + locale.id,
+        scope: '../../',
         display: 'standalone',
         background_color: '#191919',
         theme_color: '#191919',
@@ -70,9 +71,12 @@ for (const locale of i18n.localeOptions) {
 }
 
 const files = [
-    'yog1.htm', 'locales.js', 'locale-loader.js', 'storage.js', 'game-core.js', 'i18n.js',
-    'game-content.js', 'version.js', 'game.js'
-].concat(manifests, ['icon.svg', 'icon-192.png', 'icon-512.png']);
+    'index.html', 'assets/js/locales.js', 'assets/js/locale-loader.js',
+    'assets/js/storage.js', 'assets/js/game-core.js', 'assets/js/i18n.js',
+    'assets/js/game-content.js', 'assets/js/version.js', 'assets/js/game.js'
+].concat(manifests, [
+    'assets/icons/icon.svg', 'assets/icons/icon-192.png', 'assets/icons/icon-512.png'
+]);
 const hash = crypto.createHash('sha256');
 for (const filename of files.concat(localeBundles)) {
     const contents = fs.readFileSync(path.join(root, filename));

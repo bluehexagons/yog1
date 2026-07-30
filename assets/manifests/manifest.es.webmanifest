@@ -1,28 +1,28 @@
 {
   "name": "You Only Get 1s",
   "short_name": "YOG1",
-  "lang": "pt-BR",
-  "description": "Equilibre equações com números inteiros mudando exatamente um número para 1.",
-  "start_url": "./yog1.htm?lang=pt",
-  "scope": "./",
+  "lang": "es",
+  "description": "Equilibra ecuaciones con enteros cambiando exactamente un número por 1.",
+  "start_url": "../../?lang=es",
+  "scope": "../../",
   "display": "standalone",
   "background_color": "#191919",
   "theme_color": "#191919",
   "icons": [
     {
-      "src": "icon-192.png",
+      "src": "../icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "icon-512.png",
+      "src": "../icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "icon.svg",
+      "src": "../icons/icon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any"

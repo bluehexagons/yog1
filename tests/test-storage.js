@@ -22,8 +22,8 @@ const context = {
     window: {}
 };
 context.window.localStorage = context.localStorage;
-vm.runInNewContext(fs.readFileSync('storage.js', 'utf8'), context, {
-    filename: 'storage.js'
+vm.runInNewContext(fs.readFileSync('assets/js/storage.js', 'utf8'), context, {
+    filename: 'assets/js/storage.js'
 });
 const storage = context.window.Yog1Storage;
 

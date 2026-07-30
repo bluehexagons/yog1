@@ -6,17 +6,20 @@ const fs = require('fs');
 const path = require('path');
 
 const root = path.resolve(__dirname, '..');
-const versionPath = path.join(root, 'version.js');
-const htmlPath = path.join(root, 'yog1.htm');
+const versionPath = path.join(root, 'assets/js/version.js');
+const htmlPath = path.join(root, 'index.html');
 const manifestFiles = [
-    'manifest.webmanifest', 'manifest.es.webmanifest', 'manifest.zh.webmanifest',
-    'manifest.de.webmanifest', 'manifest.fr.webmanifest', 'manifest.zh-Hant.webmanifest',
-    'manifest.ar.webmanifest', 'manifest.bn.webmanifest', 'manifest.ja.webmanifest',
-    'manifest.ko.webmanifest', 'manifest.hi.webmanifest', 'manifest.pt.webmanifest',
-    'manifest.pl.webmanifest', 'manifest.ru.webmanifest',
-    'manifest.vi.webmanifest', 'manifest.tr.webmanifest', 'manifest.ur.webmanifest'
+    'assets/manifests/manifest.webmanifest', 'assets/manifests/manifest.es.webmanifest',
+    'assets/manifests/manifest.zh.webmanifest', 'assets/manifests/manifest.de.webmanifest',
+    'assets/manifests/manifest.fr.webmanifest', 'assets/manifests/manifest.zh-Hant.webmanifest',
+    'assets/manifests/manifest.ar.webmanifest', 'assets/manifests/manifest.bn.webmanifest',
+    'assets/manifests/manifest.ja.webmanifest', 'assets/manifests/manifest.ko.webmanifest',
+    'assets/manifests/manifest.hi.webmanifest', 'assets/manifests/manifest.pt.webmanifest',
+    'assets/manifests/manifest.pl.webmanifest', 'assets/manifests/manifest.ru.webmanifest',
+    'assets/manifests/manifest.vi.webmanifest', 'assets/manifests/manifest.tr.webmanifest',
+    'assets/manifests/manifest.ur.webmanifest'
 ];
-const releaseFiles = ['version.js', 'yog1.htm', 'sw.js'].concat(manifestFiles);
+const releaseFiles = ['assets/js/version.js', 'index.html', 'sw.js'].concat(manifestFiles);
 const semverPattern = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/;
 
 function localDate() {

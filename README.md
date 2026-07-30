@@ -1,6 +1,6 @@
 # You Only Get 1s
 
-[Play the game](https://bluehexagons.github.io/yog1/yog1.htm).
+[Play the game](https://bluehexagons.github.io/yog1/).
 
 Originally a 48-hour Ludum Dare 28 game by bluehexagons. Solve each equation by
 changing exactly one number into a `1`.
@@ -50,13 +50,15 @@ Keyboard controls:
 - Ctrl/Command+Enter: check from elsewhere in the game
 - H: request a hint
 
-It remains a dependency-free static site. Open `yog1.htm` in a browser to play.
+It remains a dependency-free static site. Open `index.html` in a browser to play.
 When served over HTTPS or localhost, its web app manifest and service worker make
 it installable and available offline.
 
 ## Localization
 
-`i18n.js` contains complete catalogs for English, Spanish, Simplified Chinese,
+`assets/js/i18n.js` contains the English catalog, while
+`assets/js/translations/` contains the lazy-loaded translated catalogs for Spanish,
+Simplified Chinese,
 Arabic, Bengali, Japanese, Hindi, Brazilian Portuguese, Russian, Vietnamese,
 Turkish, and Urdu. The Options screen remembers the chosen language, preserves
 it in shared links and installed-app metadata, and lets players choose the
@@ -68,20 +70,22 @@ while equations remain left-to-right. Use `data-i18n` for static markup and
 Run the generator, localization, and dependency-free UI audit tests with:
 
 ```sh
-node test-core.js
-node test-content.js
-node test-storage.js
-node test-i18n.js
-node test-ui.js
-node test-version.js
+node tests/test-core.js
+node tests/test-content.js
+node tests/test-storage.js
+node tests/test-i18n.js
+node tests/test-ui.js
+node tests/test-version.js
 ```
 
 ## Development
 
-The shipped game remains a dependency-free static site. `game-core.js` owns
-arithmetic generation and analysis, `game-content.js` owns handcrafted content,
-`storage.js` owns versioned persistence and backup data, `locales.js` owns locale
-metadata, and `game.js` coordinates session state and rendering.
+The shipped game remains a dependency-free static site. Runtime code lives in
+`assets/js/`: `game-core.js` owns arithmetic generation and analysis,
+`game-content.js` owns handcrafted content, `storage.js` owns versioned
+persistence and backup data, `locales.js` owns locale metadata, and `game.js`
+coordinates session state and rendering. Install manifests and icons live in
+`assets/manifests/` and `assets/icons/`; tests live in `tests/`.
 Pre-release builds intentionally support only the current saved-data, backup,
 and shared-link formats.
 

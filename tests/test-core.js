@@ -1,7 +1,7 @@
 'use strict';
 
 const assert = require('assert');
-const core = require('./game-core.js');
+const core = require('../assets/js/game-core.js');
 
 function seededRandom(seed) {
     return function () {

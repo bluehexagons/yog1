@@ -3,11 +3,11 @@
 const assert = require('assert');
 const fs = require('fs');
 const vm = require('vm');
-const core = require('./game-core.js');
+const core = require('../assets/js/game-core.js');
 
 const context = { window: {} };
-vm.runInNewContext(fs.readFileSync('game-content.js', 'utf8'), context, {
-    filename: 'game-content.js'
+vm.runInNewContext(fs.readFileSync('assets/js/game-content.js', 'utf8'), context, {
+    filename: 'assets/js/game-content.js'
 });
 function number(value, id, solution) {
     return { type: 'number', value: value, id: id, solution: !!solution };

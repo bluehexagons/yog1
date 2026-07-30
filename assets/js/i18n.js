@@ -333,8 +333,8 @@
     if (!messages[locale]) locale = 'en';
 
     function localeSource(code) {
-        return code === 'en' ? 'i18n.js' :
-            'translations/' + encodeURIComponent(code) + '.js';
+        return code === 'en' ? 'assets/js/i18n.js' :
+            'assets/js/translations/' + encodeURIComponent(code) + '.js';
     }
 
     function loadLocale(code) {
@@ -392,8 +392,8 @@
             element.setAttribute('content', t(element.dataset.i18nContent));
         }
         for (const element of root.document.querySelectorAll('link[rel="manifest"]')) {
-            element.href = locale === 'en' ? 'manifest.webmanifest' :
-                'manifest.' + locale + '.webmanifest';
+            element.href = locale === 'en' ? 'assets/manifests/manifest.webmanifest' :
+                'assets/manifests/manifest.' + locale + '.webmanifest';
         }
         const option = localeOption(locale);
         root.document.documentElement.lang = option.tag;
