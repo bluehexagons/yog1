@@ -1507,7 +1507,7 @@
 
     const learningMessages = {
         en: {
-            'mode.workshop': 'Math Lab',
+            'mode.workshop': 'Guided Practice',
             'modeDescription.workshop': 'Focused practice follows your concept mastery and revisits ideas that need more confidence.',
             'learning.goal': 'Learning goal', 'learning.practice': 'Concept',
             'learning.recommended': 'Recommended next', 'learning.seen': 'Practiced',
@@ -1522,7 +1522,7 @@
             'feedback.effect': 'Changing {number} to 1 changed the {side} side from {before} to {after} ({delta}).'
         },
         es: {
-            'mode.workshop': 'Laboratorio matemático',
+            'mode.workshop': 'Práctica guiada',
             'modeDescription.workshop': 'La práctica sigue tu dominio de conceptos y repasa las ideas que necesitan más confianza.',
             'learning.goal': 'Objetivo de aprendizaje', 'learning.practice': 'Concepto',
             'learning.recommended': 'Siguiente recomendado', 'learning.seen': 'Practicado',
@@ -1537,7 +1537,7 @@
             'feedback.effect': 'Cambiar {number} por 1 cambió el lado {side} de {before} a {after} ({delta}).'
         },
         zh: {
-            'mode.workshop': '数学实验室',
+            'mode.workshop': '引导练习',
             'modeDescription.workshop': '根据概念掌握情况进行专项练习，并复习仍需巩固的内容。',
             'learning.goal': '学习目标', 'learning.practice': '概念',
             'learning.recommended': '推荐下一项', 'learning.seen': '练习次数',
@@ -1552,7 +1552,7 @@
             'feedback.effect': '把 {number} 改为 1 后，{side}边从 {before} 变为 {after}（{delta}）。'
         },
         ar: {
-            'mode.workshop': 'مختبر الرياضيات',
+            'mode.workshop': 'تدريب موجّه',
             'modeDescription.workshop': 'يتبع التدريب إتقانك للمفاهيم ويعيد الأفكار التي تحتاج إلى ثقة أكبر.',
             'learning.goal': 'هدف التعلم', 'learning.practice': 'المفهوم',
             'learning.recommended': 'المقترح التالي', 'learning.seen': 'مرات التدريب',
@@ -1567,7 +1567,7 @@
             'feedback.effect': 'تغيير {number} إلى 1 غيّر الطرف {side} من {before} إلى {after} ({delta}).'
         },
         bn: {
-            'mode.workshop': 'গণিত ল্যাব',
+            'mode.workshop': 'নির্দেশিত অনুশীলন',
             'modeDescription.workshop': 'ধারণার দক্ষতা অনুযায়ী অনুশীলন হয় এবং যেগুলোতে আরও আত্মবিশ্বাস দরকার সেগুলো ফিরে আসে।',
             'learning.goal': 'শেখার লক্ষ্য', 'learning.practice': 'ধারণা',
             'learning.recommended': 'পরের সুপারিশ', 'learning.seen': 'অনুশীলন',
@@ -1582,7 +1582,7 @@
             'feedback.effect': '{number} কে 1 করায় {side} পাশ {before} থেকে {after} হয়েছে ({delta})।'
         },
         ja: {
-            'mode.workshop': '数学ラボ',
+            'mode.workshop': 'ガイド付き練習',
             'modeDescription.workshop': '概念の習熟度に合わせ、まだ自信が必要な考え方を復習します。',
             'learning.goal': '学習目標', 'learning.practice': '概念',
             'learning.recommended': '次のおすすめ', 'learning.seen': '練習回数',
@@ -1597,7 +1597,7 @@
             'feedback.effect': '{number} を1にすると、{side}辺は {before} から {after} に変わりました（{delta}）。'
         },
         hi: {
-            'mode.workshop': 'गणित प्रयोगशाला',
+            'mode.workshop': 'मार्गदर्शित अभ्यास',
             'modeDescription.workshop': 'अभ्यास अवधारणा-दक्षता के अनुसार चलता है और कम आत्मविश्वास वाले विचार दोहराता है।',
             'learning.goal': 'सीखने का लक्ष्य', 'learning.practice': 'अवधारणा',
             'learning.recommended': 'अगला सुझाव', 'learning.seen': 'अभ्यास',
@@ -1612,7 +1612,7 @@
             'feedback.effect': '{number} को 1 करने से {side} पक्ष {before} से {after} हो गया ({delta})।'
         },
         pt: {
-            'mode.workshop': 'Laboratório de matemática',
+            'mode.workshop': 'Prática guiada',
             'modeDescription.workshop': 'A prática acompanha seu domínio dos conceitos e retoma ideias que precisam de mais confiança.',
             'learning.goal': 'Objetivo de aprendizagem', 'learning.practice': 'Conceito',
             'learning.recommended': 'Próximo recomendado', 'learning.seen': 'Praticado',
@@ -1627,7 +1627,7 @@
             'feedback.effect': 'Mudar {number} para 1 alterou o lado {side} de {before} para {after} ({delta}).'
         },
         ru: {
-            'mode.workshop': 'Математическая лаборатория',
+            'mode.workshop': 'Практика с поддержкой',
             'modeDescription.workshop': 'Практика следует за освоением понятий и возвращает идеи, в которых нужно больше уверенности.',
             'learning.goal': 'Цель обучения', 'learning.practice': 'Понятие',
             'learning.recommended': 'Далее рекомендуется', 'learning.seen': 'Практика',
@@ -1642,7 +1642,7 @@
             'feedback.effect': 'Замена {number} на 1 изменила сторону {side} с {before} до {after} ({delta}).'
         },
         vi: {
-            'mode.workshop': 'Phòng lab toán',
+            'mode.workshop': 'Luyện tập có hướng dẫn',
             'modeDescription.workshop': 'Bài luyện theo mức độ nắm vững khái niệm và ôn lại ý tưởng cần thêm tự tin.',
             'learning.goal': 'Mục tiêu học tập', 'learning.practice': 'Khái niệm',
             'learning.recommended': 'Đề xuất tiếp theo', 'learning.seen': 'Đã luyện',
@@ -1657,7 +1657,7 @@
             'feedback.effect': 'Đổi {number} thành 1 làm vế {side} đổi từ {before} thành {after} ({delta}).'
         },
         tr: {
-            'mode.workshop': 'Matematik laboratuvarı',
+            'mode.workshop': 'Rehberli alıştırma',
             'modeDescription.workshop': 'Alıştırmalar kavram ustalığını izler ve daha çok güven gereken fikirleri tekrarlar.',
             'learning.goal': 'Öğrenme hedefi', 'learning.practice': 'Kavram',
             'learning.recommended': 'Sıradaki öneri', 'learning.seen': 'Alıştırma',
@@ -1672,7 +1672,7 @@
             'feedback.effect': "{number} sayısını 1 yapmak {side} tarafı {before}'den {after}'e değiştirdi ({delta})."
         },
         ur: {
-            'mode.workshop': 'ریاضی لیب',
+            'mode.workshop': 'رہنمائی کے ساتھ مشق',
             'modeDescription.workshop': 'مشق تصور کی مہارت کے مطابق چلتی ہے اور کم اعتماد والے خیالات دوبارہ لاتی ہے۔',
             'learning.goal': 'سیکھنے کا مقصد', 'learning.practice': 'تصور',
             'learning.recommended': 'اگلی تجویز', 'learning.seen': 'مشق',

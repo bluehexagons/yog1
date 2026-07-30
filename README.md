@@ -11,13 +11,13 @@ builder. Problem history and per-mode stats are stored locally in the
 browser and can be cleared from the page.
 
 Additional modes include Adaptive difficulty, a shared Daily puzzle, a 60-second
-Timed sprint, a three-life Endless run, ten handcrafted Challenges, and a Math
-Lab for focused learning. Math Lab tracks confidence-aware mastery across
-balancing, multiplication, division, remainders, powers, and roots. It suggests
-concepts to revisit while allowing learners to choose a focus. Adaptive mode
-responds to correct and incorrect answers and offers a Flow style that follows
-the learner’s pace or a Coach style that builds fluency with less-familiar
-operations.
+Timed sprint, a three-life Endless run, ten handcrafted Challenges, and Guided
+Practice for focused learning. Guided Practice tracks confidence-aware progress
+across balancing, multiplication, division, remainders, powers, and roots. It
+suggests concepts to revisit while allowing learners to choose a focus.
+Adaptive mode responds to correct and incorrect answers and offers a Flow style
+that follows the learner’s pace or a Coach style that builds fluency with
+less-familiar operations.
 Daily results include a seven-day grid plus current and best streaks.
 
 Generated puzzles are sampled for a unique, safe solution and selected near the

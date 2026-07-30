@@ -138,6 +138,11 @@ for (const phrase of ['practice weaknesses', 'rating was lowered', 'not counted'
 }
 assert(i18n.locales.en['modeDescription.challenges'].startsWith('Ten '),
     'the Challenge description matches the ten handcrafted puzzles');
+const laboratoryTerms = /lab|laborat|лаборатор|实验室|مختبر|ল্যাব|ラボ|प्रयोगशाला|لیب/i;
+for (const locale of i18n.availableLocales) {
+    assert.strictEqual(laboratoryTerms.test(i18n.locales[locale]['mode.workshop']), false,
+        locale + ' uses a neutral Guided Practice label');
+}
 for (const key of ['action.copyJson', 'share.jsonCopied', 'share.jsonReady', 'share.jsonPrompt']) {
     assert(Object.prototype.hasOwnProperty.call(i18n.locales.en, key),
         key + ' has dedicated structured-example copy');
