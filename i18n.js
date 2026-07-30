@@ -2071,6 +2071,18 @@
         const previous = locale;
         locale = supported(nextLocale);
         try { localStorage.setItem(STORAGE_KEY, locale); } catch (error) {}
+        if (root.history && typeof root.history.replaceState === 'function' &&
+            root.location && root.location.href) {
+            try {
+                const url = new URL(root.location.href);
+                if (url.searchParams.has('lang')) {
+                    url.searchParams.set('lang', locale);
+                    root.history.replaceState(null, '', url.pathname + url.search + url.hash);
+                }
+            } catch (error) {
+                // Locale persistence still works when URL history is unavailable.
+            }
+        }
         apply();
         if (locale !== previous && typeof root.CustomEvent === 'function' && root.dispatchEvent) {
             root.dispatchEvent(new root.CustomEvent('yog1localechange'));

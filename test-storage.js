@@ -77,6 +77,37 @@ assert.throws(function () {
         data: { history: {} }
     });
 }, /Unsupported/, 'save entries with invalid shapes are rejected');
+const validDailyDate = '2026-07-30';
+const validHistoryTime = new Date().toISOString();
+storage.importData({
+    application: 'You Only Get 1s',
+    schemaVersion: storage.SCHEMA_VERSION,
+    exportedAt: validHistoryTime,
+    data: {
+        history: [{
+            correct: true,
+            expression: '(8 ÷ 1) = 8',
+            mode: 'custom',
+            round: 2,
+            seed: 'custom:2',
+            custom: {
+                operations: ['divide'], length: 5, min: 3, max: 100,
+                correct: 10, rate: 80, seed: 'custom'
+            },
+            adaptive: null,
+            learningConcept: null,
+            dailyDate: null,
+            at: validHistoryTime
+        }],
+        daily: {
+            [validDailyDate]: { attempts: 2, hints: 1, success: true, at: Date.now() }
+        }
+    }
+});
+assert.strictEqual(storage.load(storage.KEYS.history, [])[0].custom.operations[0], 'divide',
+    'current custom history records pass backup validation');
+assert.strictEqual(storage.load(storage.KEYS.daily, {})[validDailyDate].success, true,
+    'current Daily records pass backup validation');
 assert.throws(function () {
     storage.importData({
         application: 'You Only Get 1s',
@@ -101,6 +132,44 @@ assert.throws(function () {
         }
     });
 }, /Unsupported/, 'custom history records require replayable operation settings');
+assert.throws(function () {
+    storage.importData({
+        application: 'You Only Get 1s',
+        schemaVersion: storage.SCHEMA_VERSION,
+        data: {
+            history: [{
+                correct: true,
+                expression: '1 = 1',
+                mode: 'challenges',
+                round: 0,
+                seed: 'test',
+                at: new Date().toISOString()
+            }]
+        }
+    });
+}, /Unsupported/, 'history rounds must be valid replay inputs');
+assert.throws(function () {
+    storage.importData({
+        application: 'You Only Get 1s',
+        schemaVersion: storage.SCHEMA_VERSION,
+        data: {
+            daily: {
+                'not-a-date': { attempts: 1, hints: 0, success: true, at: Date.now() }
+            }
+        }
+    });
+}, /Unsupported/, 'daily backups reject invalid dates before streak calculations');
+assert.throws(function () {
+    storage.importData({
+        application: 'You Only Get 1s',
+        schemaVersion: storage.SCHEMA_VERSION,
+        data: {
+            daily: {
+                '2026-07-30': { attempts: -1, hints: 0, success: 'yes', at: Date.now() }
+            }
+        }
+    });
+}, /Unsupported/, 'daily backups reject malformed result records');
 storage.save(storage.KEYS.stats, { attempts: 7 });
 const beforeFailedImport = new Map(values);
 failNextWriteTo = storage.KEYS.custom;
@@ -117,5 +186,12 @@ assert.deepStrictEqual(Array.from(values.entries()), Array.from(beforeFailedImpo
 values.set(storage.KEYS.stats, '{bad json');
 assert.deepStrictEqual(storage.load(storage.KEYS.stats, { safe: true }), { safe: true },
     'corrupt storage falls back safely');
+assert.throws(function () {
+    storage.exportData();
+}, /JSON|property name/, 'syntactically corrupt storage cannot produce a partial backup');
+values.set(storage.KEYS.stats, '[]');
+assert.throws(function () {
+    storage.exportData();
+}, /Unsupported/, 'shape-invalid storage cannot produce a backup that restore would reject');
 
 console.log('Storage tests passed.');

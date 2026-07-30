@@ -627,7 +627,7 @@
         let best = null;
         let bestRank = Infinity;
         let intendedOperationCount = null;
-        for (let index = 0; index < candidateCount; index++) {
+        function considerCandidate() {
             const candidate = generateCandidate(options);
             if (intendedOperationCount === null) {
                 intendedOperationCount = candidate.operationCount;
@@ -643,7 +643,23 @@
                 best = candidate;
                 bestRank = rank;
             }
-            if (rank === 0) break;
+            return rank;
+        }
+        for (let index = 0; index < candidateCount; index++) {
+            if (considerCandidate() === 0) break;
+        }
+        const acceptable = function (candidate) {
+            return candidate && candidate.analysis.safe &&
+                (!requireUnique || candidate.analysis.unique);
+        };
+        // Some operation sets, notably long division-only expressions, produce
+        // many accidental 0 = 0 alternatives. Keep searching rather than
+        // violating the requireUnique contract when the scoring sample misses.
+        for (let index = 0; !acceptable(best) && index < 80; index++) {
+            considerCandidate();
+        }
+        if (!acceptable(best)) {
+            throw new Error('Unable to generate a safe puzzle with the requested solution rules');
         }
         return best;
     }

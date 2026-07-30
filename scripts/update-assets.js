@@ -66,12 +66,19 @@ const files = [
     'game-content.js', 'version.js', 'game.js'
 ].concat(manifests, ['icon.svg', 'icon-192.png', 'icon-512.png']);
 const hash = crypto.createHash('sha256');
-for (const filename of files) hash.update(fs.readFileSync(path.join(root, filename)));
+for (const filename of files) {
+    const contents = fs.readFileSync(path.join(root, filename));
+    hash.update(filename).update('\0');
+    hash.update(String(contents.length)).update('\0');
+    hash.update(contents);
+}
 const cacheName = 'yog1-' + hash.digest('hex').slice(0, 12);
 
 const serviceWorkerPath = path.join(root, 'sw.js');
 const serviceWorker = fs.readFileSync(serviceWorkerPath, 'utf8');
-const handlers = serviceWorker.slice(serviceWorker.indexOf("self.addEventListener('install'"));
+const handlerStart = serviceWorker.indexOf("self.addEventListener('install'");
+if (handlerStart < 0) throw new Error('Could not find service worker event handlers.');
+const handlers = serviceWorker.slice(handlerStart);
 const fileList = files.map(function (filename) {
     return "    './" + filename + "'";
 }).join(',\n');

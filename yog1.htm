@@ -290,10 +290,10 @@
                     <label><span data-i18n="custom.length">Length</span>: <strong><span id="custom_length_value">5</span> <span data-i18n="custom.operationCount">operations</span></strong>
                         <input id="custom_length" type="range" min="2" max="12" value="5">
                     </label>
-                    <label><span data-i18n="custom.minimum">Minimum target</span><input id="custom_min" type="number" min="3" max="100" value="12"></label>
-                    <label><span data-i18n="custom.maximum">Maximum target</span><input id="custom_max" type="number" min="3" max="100" value="35"></label>
-                    <label><span data-i18n="custom.correct">Correct answers to finish</span><input id="custom_correct" type="number" min="1" max="100" value="10"></label>
-                    <label><span data-i18n="custom.rate">Accuracy goal (%)</span><input id="custom_rate" type="number" min="1" max="100" value="80"></label>
+                    <label><span data-i18n="custom.minimum">Minimum target</span><input id="custom_min" type="number" min="3" max="100" value="12" required></label>
+                    <label><span data-i18n="custom.maximum">Maximum target</span><input id="custom_max" type="number" min="3" max="100" value="35" required></label>
+                    <label><span data-i18n="custom.correct">Correct answers to finish</span><input id="custom_correct" type="number" min="1" max="100" value="10" required></label>
+                    <label><span data-i18n="custom.rate">Accuracy goal (%)</span><input id="custom_rate" type="number" min="1" max="100" value="80" required></label>
                     <label><span data-i18n="custom.seed">Seed (optional)</span><input id="custom_seed" type="text" maxlength="80" placeholder="Same seed, same game" data-i18n-placeholder="custom.seedHint"></label>
                 </div>
                 <button class="primary" type="submit" data-i18n="custom.start">Start custom game</button>

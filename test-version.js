@@ -59,5 +59,10 @@ assert(game.includes("date.toLocaleDateString(i18n.getLanguageTag()"),
     'the commit date follows the selected display language');
 assert(updater.includes("'game-content.js', 'version.js', 'game.js'"),
     'version metadata is included in the offline cache');
+assert(updater.includes("hash.update(filename).update('\\0')") &&
+    updater.includes("hash.update(String(contents.length)).update('\\0')"),
+    'offline cache hashes preserve asset boundaries');
+assert(updater.includes('if (handlerStart < 0)'),
+    'asset generation fails clearly if the service-worker template is malformed');
 
 console.log('Version metadata and release tool tests passed.');

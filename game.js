@@ -59,6 +59,9 @@
     });
     const CURATED = content.curated;
     const ACHIEVEMENTS = content.achievements;
+    const MODE_IDS = new Set(Object.keys(core.DIFFICULTIES).concat([
+        'adaptive', 'guided', 'custom', 'daily', 'timed', 'endless', 'challenges'
+    ]));
 
     let history = load(KEYS.history, []);
     let stats = load(KEYS.stats, {});
@@ -80,20 +83,36 @@
         return item && typeof item === 'object' &&
             typeof item.correct === 'boolean' &&
             typeof item.expression === 'string' &&
-            typeof item.mode === 'string' &&
-            Number.isSafeInteger(item.round) &&
+            MODE_IDS.has(item.mode) &&
+            Number.isSafeInteger(item.round) && item.round >= 1 &&
             typeof item.seed === 'string' &&
-            typeof item.at === 'string';
+            validTimestamp(item.at) &&
+            (item.mode !== 'daily' || validDate(item.dailyDate)) &&
+            (item.mode !== 'custom' || !item.custom ||
+                Array.isArray(item.custom.operations));
     }).slice(0, HISTORY_LIMIT);
     if (!stats || typeof stats !== 'object' || Array.isArray(stats)) stats = {};
-    if (!achievementState || !Array.isArray(achievementState.unlocked)) {
+    if (!achievementState || typeof achievementState !== 'object' ||
+        Array.isArray(achievementState)) {
         achievementState = { unlocked: [], operations: [], solved: 0 };
     }
-    if (!Array.isArray(achievementState.operations)) achievementState.operations = [];
-    if (!Number.isFinite(achievementState.solved)) achievementState.solved = 0;
+    const achievementIds = new Set(ACHIEVEMENTS.map(function (item) { return item.id; }));
+    achievementState.unlocked = Array.isArray(achievementState.unlocked)
+        ? Array.from(new Set(achievementState.unlocked.filter(function (id) {
+            return achievementIds.has(id);
+        }))) : [];
+    achievementState.operations = Array.isArray(achievementState.operations)
+        ? Array.from(new Set(achievementState.operations.filter(function (operation) {
+            return Object.prototype.hasOwnProperty.call(core.OPERATIONS, operation);
+        }))) : [];
+    achievementState.solved = Number.isFinite(achievementState.solved)
+        ? Math.max(0, Math.trunc(achievementState.solved)) : 0;
     if (!dailyResults || typeof dailyResults !== 'object' || Array.isArray(dailyResults)) {
         dailyResults = {};
     }
+    dailyResults = Object.fromEntries(Object.entries(dailyResults).filter(function (entry) {
+        return validDailyResult(entry[0], entry[1]);
+    }));
 
     let mode = 'tutorial';
     let profile = core.DIFFICULTIES.easy;
@@ -245,6 +264,37 @@
 
     function utcDate() {
         return dailyDateOverride || new Date().toISOString().slice(0, 10);
+    }
+
+    function validDate(value) {
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(value || '')) return false;
+        const parsed = new Date(value + 'T00:00:00Z');
+        return Number.isFinite(parsed.getTime()) &&
+            parsed.toISOString().slice(0, 10) === value;
+    }
+
+    function validTimestamp(value) {
+        return typeof value === 'string' && Number.isFinite(Date.parse(value));
+    }
+
+    function validDailyResult(date, result) {
+        return validDate(date) && result && typeof result === 'object' &&
+            typeof result.success === 'boolean' &&
+            Number.isSafeInteger(result.at) &&
+            Number.isSafeInteger(result.attempts) && result.attempts >= 0 &&
+            Number.isSafeInteger(result.hints) && result.hints >= 0;
+    }
+
+    function recordDailyResult(success) {
+        const date = utcDate();
+        if (Object.prototype.hasOwnProperty.call(dailyResults, date)) return;
+        dailyResults[date] = {
+            attempts: session.attempts,
+            hints: session.hints,
+            success: success,
+            at: Date.now()
+        };
+        save(KEYS.daily, dailyResults);
     }
 
     function shiftDate(value, days) {
@@ -604,8 +654,10 @@
             stats[id] = { attempts: 0, correct: 0, bestStreak: 0, streak: 0, bestScore: 0 };
         }
         for (const key of ['attempts', 'correct', 'bestStreak', 'streak', 'bestScore']) {
-            if (!Number.isFinite(stats[id][key])) stats[id][key] = 0;
+            stats[id][key] = Number.isFinite(stats[id][key])
+                ? Math.max(0, Math.trunc(stats[id][key])) : 0;
         }
+        stats[id].correct = Math.min(stats[id].correct, stats[id].attempts);
         return stats[id];
     }
 
@@ -733,7 +785,10 @@
         if (achievementState.operations.length === Object.keys(core.OPERATIONS).length) unlock('explorer');
         if (mode === 'daily') unlock('daily');
         if (currentProblem.roundKind === 'challenge' && hintLevel === 0) unlock('nohint');
-        if (mode === 'challenges' && round === CURATED.length) unlock('curated');
+        if (mode === 'challenges' && round === CURATED.length &&
+            session.solved >= CURATED.length) {
+            unlock('curated');
+        }
     }
 
     function correctAnswer() {
@@ -751,10 +806,7 @@
         ui.skip.disabled = true;
 
         if (mode === 'daily') {
-            dailyResults[utcDate()] = {
-                attempts: session.attempts, hints: session.hints, success: true, at: Date.now()
-            };
-            save(KEYS.daily, dailyResults);
+            recordDailyResult(true);
             updateProgress();
             updateModeInfo();
             ui.submit.disabled = true;
@@ -776,7 +828,8 @@
                 return;
             }
         }
-        if (mode === 'challenges' && round === CURATED.length) {
+        if (mode === 'challenges' && round === CURATED.length &&
+            session.solved >= CURATED.length) {
             setCatalogMessage('challenges.complete', 'challenges.completeBody', {
                 count: CURATED.length
             });
@@ -1391,10 +1444,7 @@
         ui.hint.disabled = true;
         ui.skip.disabled = true;
         if (mode === 'daily') {
-            dailyResults[utcDate()] = {
-                attempts: session.attempts, hints: session.hints, success: false, at: Date.now()
-            };
-            save(KEYS.daily, dailyResults);
+            recordDailyResult(false);
             updateProgress();
             updateModeInfo();
             ui.submit.disabled = true;
@@ -1661,10 +1711,7 @@
         const params = new URLSearchParams(window.location.search);
         const requestedDaily = params.get('daily');
         function sharedDailyDate(value) {
-            if (!/^\d{4}-\d{2}-\d{2}$/.test(value || '')) return null;
-            const parsed = new Date(value + 'T00:00:00Z');
-            return Number.isFinite(parsed.getTime()) &&
-                parsed.toISOString().slice(0, 10) === value ? value : null;
+            return validDate(value) ? value : null;
         }
         const daily = sharedDailyDate(requestedDaily);
         const challenge = params.get('challenge');

@@ -139,6 +139,21 @@ const customWarmup = core.generateProblem({
     random: seededRandom(7)
 });
 assert.strictEqual(customWarmup.target, 10, 'warm-up round reaches custom minimum target');
+const divisionFallback = core.generateProblem({
+    profile: core.DIFFICULTIES.extreme,
+    operations: ['divide'],
+    length: 5,
+    targetRange: [3, 100],
+    maxNumber: 200,
+    round: 5,
+    random: core.createSeededRandom('divide:5:4'),
+    candidateCount: 40,
+    requireUnique: true
+});
+assert.strictEqual(divisionFallback.analysis.unique, true,
+    'unique generation searches beyond an ambiguous division-heavy candidate sample');
+assert.strictEqual(divisionFallback.analysis.safe, true,
+    'the unique-generation fallback still requires every selectable flip to be safe');
 assert.throws(function () {
     core.generateProblem({
         profile: core.DIFFICULTIES.easy,

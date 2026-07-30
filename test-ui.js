@@ -90,6 +90,10 @@ assert.strictEqual(
 assert(game.includes("ui.custom_min.setAttribute('aria-invalid', 'true')") &&
     game.includes('ui.custom_min.focus()'),
     'custom target validation identifies and focuses invalid fields');
+for (const id of ['custom_min', 'custom_max', 'custom_correct', 'custom_rate']) {
+    assert(new RegExp('id="' + id + '"[^>]*\\brequired(?:\\s|>)').test(html),
+        id + ' cannot silently submit an empty value as zero');
+}
 assert(game.includes('Number.isSafeInteger(parsed)') &&
     game.includes("Math.min(100000, parsed)"),
     'shared round parameters are bounded before reaching the generator');
@@ -127,11 +131,20 @@ assert(game.includes('history = history.filter(function (item)') &&
 assert(game.includes('ui.share.disabled = true') &&
     game.includes("if (mode === 'custom')"),
     'the custom builder disables puzzle actions until a game has started');
+assert(game.includes('if (Object.prototype.hasOwnProperty.call(dailyResults, date)) return;'),
+    'replaying a Daily puzzle cannot overwrite its first recorded outcome');
+assert(game.includes('session.solved >= CURATED.length'),
+    'the handcrafted-set achievement requires completing the whole set');
+assert(game.includes('achievementIds.has(id)') &&
+    game.includes('hasOwnProperty.call(core.OPERATIONS, operation)') &&
+    game.includes('Math.min(stats[id].correct, stats[id].attempts)'),
+    'corrupt achievement and statistics values are normalized before use');
 const serviceWorker = fs.readFileSync('sw.js', 'utf8');
 assert(serviceWorker.includes("key.startsWith(CACHE_PREFIX) && key !== CACHE") &&
     serviceWorker.includes('caches.open(CACHE)') &&
+    serviceWorker.includes('return self.skipWaiting()') &&
     !serviceWorker.includes('caches.match(event.request'),
-    'offline cleanup and lookups stay inside the YOG1 cache namespace');
+    'offline installation, cleanup, and lookups stay within their lifecycle and namespace');
 assert(html.includes('class="mode-group"') &&
     html.includes('data-i18n="nav.learn"') &&
     html.includes('data-i18n="nav.challenge"'),

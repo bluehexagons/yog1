@@ -13,7 +13,9 @@ const document = {
     }
 };
 const storage = new Map();
+let replacedUrl = null;
 const context = {
+    URL: URL,
     URLSearchParams: URLSearchParams,
     navigator: { language: 'es-MX' },
     localStorage: {
@@ -21,7 +23,15 @@ const context = {
         setItem: function (key, value) { storage.set(key, value); }
     },
     document: document,
-    window: { location: { search: '?lang=es' } }
+    window: {
+        location: {
+            search: '?lang=es',
+            href: 'https://example.test/yog1.htm?lang=es&seed=test#play'
+        },
+        history: {
+            replaceState: function (_, __, value) { replacedUrl = value; }
+        }
+    }
 };
 context.window.window = context.window;
 context.window.navigator = context.navigator;
@@ -37,6 +47,8 @@ assert.strictEqual(i18n.t('round.score', { target: 12, score: 8 }), 'Objetivo 12
 assert.strictEqual(i18n.t('missing.key'), 'missing.key', 'missing translations are visible during development');
 i18n.setLocale('en');
 assert.strictEqual(i18n.getLocale(), 'en', 'the selected locale can be changed and persisted');
+assert.strictEqual(replacedUrl, '/yog1.htm?lang=en&seed=test#play',
+    'changing a shared-link language updates its URL so refresh preserves the choice');
 i18n.setLocale('zh');
 assert.strictEqual(i18n.t('action.check'), '检查等式', 'Simplified Chinese controls are available');
 assert.strictEqual(manifestLink.href, 'manifest.zh.webmanifest',
