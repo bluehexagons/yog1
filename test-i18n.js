@@ -180,15 +180,17 @@ assert(i18n.locales.ur['achievement.curated.description'].includes('بنائی �
 const newLocaleGlossary = {
     de: {
         'operation.add': 'Addition', 'operation.power': 'Potenzen',
-        'custom.seed': 'Startwert (optional)'
+        'custom.seed': 'Startwert (optional)',
+        'modeDescription.challenges': 'Zehn eigens entworfene Rätsel mit unterschiedlichen Rechenarten.'
     },
     fr: {
         'operation.add': 'Addition', 'operation.power': 'Puissances',
-        'custom.seed': 'Graine (facultatif)'
+        'custom.seed': 'Graine (facultatif)',
+        'message.curated': 'Problème conçu {round} sur {count}.'
     },
     'zh-Hant': {
         'action.check': '檢查等式', 'custom.operations': '運算',
-        'curated.product': '乘積的位置'
+        'curated.product': '乘積的位置', 'share.challenge': '精選挑戰 {round}'
     },
     pl: {
         'operation.add': 'Dodawanie', 'operation.power': 'Potęgi',
@@ -196,7 +198,7 @@ const newLocaleGlossary = {
     },
     ko: {
         'action.check': '등식 확인', 'custom.operations': '연산',
-        'operation.power': '거듭제곱'
+        'operation.power': '거듭제곱', 'shared.challenge': '공유된 직접 만든 퍼즐'
     }
 };
 for (const locale of Object.keys(newLocaleGlossary)) {
@@ -207,6 +209,23 @@ for (const locale of Object.keys(newLocaleGlossary)) {
     assert.strictEqual(Object.values(i18n.locales[locale]).some(function (value) {
         return value.includes('¼') || value.includes('JOJ1') || /[A-Z]{3}1PH\d+X/.test(value);
     }), false, locale + ' preserves math symbols, branding, and interpolation placeholders');
+}
+assert.strictEqual(i18n.locales.de['feedback.solution'].includes('werden'), true,
+    'German solution feedback describes the resulting value rather than an unchanged value');
+assert.strictEqual(i18n.locales.fr['share.dailySolved'].split('·')[3].trim().startsWith('indices'),
+    true, 'French daily sharing uses one term for hints');
+assert.strictEqual(i18n.locales['zh-Hant']['tutorial.retryBody'].includes('框選'), true,
+    'Traditional Chinese identifies the outlined tutorial number');
+assert.strictEqual(i18n.locales['zh-Hant']['share.dailySolved'].includes('作答次數'), true,
+    'Traditional Chinese distinguishes attempt counts from an instruction to try');
+assert.strictEqual(i18n.locales.ko['tutorial.retryBody'].includes('테두리'), true,
+    'Korean identifies the outlined tutorial number');
+assert.strictEqual(i18n.locales.ko['flip.one'].includes('잔돈'), false,
+    'Korean change-count wording cannot be confused with coins');
+for (const locale of ['en', 'zh', 'zh-Hant', 'ja', 'ko']) {
+    assert.strictEqual(/flip|翻转|翻轉|뒤집|反転/i.test(i18n.locales[locale]['modeDescription.tutorial'] +
+        i18n.locales[locale]['flip.one']), false,
+    locale + ' consistently describes changing a number rather than flipping it');
 }
 for (const key of ['action.copyJson', 'share.jsonCopied', 'share.jsonReady', 'share.jsonPrompt']) {
     assert(Object.prototype.hasOwnProperty.call(i18n.locales.en, key),
@@ -384,6 +403,24 @@ lazyContext.window.Yog1I18n.setLocale('de').then(function () {
         'selecting an unloaded locale activates it after loading its bundle');
     assert.strictEqual(lazyContext.window.Yog1I18n.t('action.check'), 'Gleichung prüfen',
         'the lazy-loaded catalog is used immediately');
+    const pendingScripts = [];
+    lazyDocument.head.appendChild = function (script) {
+        pendingScripts.push(script);
+    };
+    const olderRequest = lazyContext.window.Yog1I18n.setLocale('ko');
+    const latestRequest = lazyContext.window.Yog1I18n.setLocale('fr');
+    for (const locale of ['fr', 'ko']) {
+        const script = pendingScripts.find(function (item) {
+            return item.src === 'translations/' + locale + '.js';
+        });
+        vm.runInNewContext(fs.readFileSync(script.src, 'utf8'), lazyContext,
+            { filename: script.src });
+        script.onload();
+    }
+    return Promise.all([olderRequest, latestRequest]);
+}).then(function () {
+    assert.strictEqual(lazyContext.window.Yog1I18n.getLocale(), 'fr',
+        'an older slow locale request cannot replace the player’s latest choice');
     console.log('Localization tests passed.');
 }).catch(function (error) {
     console.error(error);

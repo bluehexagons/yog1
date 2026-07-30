@@ -83,6 +83,10 @@ for (const id of ['quick_language', 'setting_language']) {
 }
 assert(game.includes('option.lang = locale.tag') && game.includes('option.dir = locale.direction'),
     'language autonyms carry pronunciation and direction metadata');
+assert(game.includes("select.setAttribute('aria-busy', 'true')") &&
+    game.includes('select.disabled = true') &&
+    game.includes('select.removeAttribute(\'aria-busy\')'),
+    'language controls communicate and prevent input while a catalog is loading');
 assert.strictEqual(
     game.includes("document.activeElement === document.body || ui.problem.contains(document.activeElement)"),
     false,
@@ -178,6 +182,9 @@ assert(serviceWorker.includes("key.startsWith(CACHE_PREFIX) && key !== CACHE") &
     serviceWorker.includes('return self.skipWaiting()') &&
     !serviceWorker.includes('caches.match(event.request'),
     'offline installation, cleanup, and lookups stay within their lifecycle and namespace');
+assert(serviceWorker.includes("event.data.type === 'cache-all-locales'") &&
+    game.includes("postMessage({ type: 'cache-all-locales' })"),
+    'explicit offline installation makes every language available without bloating startup');
 assert(html.includes('class="mode-group"') &&
     html.includes('data-i18n="nav.learn"') &&
     html.includes('data-i18n="nav.challenge"'),

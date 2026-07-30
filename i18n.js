@@ -196,7 +196,7 @@
     "timed.result": "Solved {count} in 60 seconds.",
     "meta.description": "Balance integer equations by changing exactly one number into a 1.",
     "action.hintTitle": "Hint (H)",
-    "modeDescription.tutorial": "A guided introduction to the one-flip rule.",
+    "modeDescription.tutorial": "A guided introduction to the one-change rule.",
     "modeDescription.daily": "The same puzzle for everyone, refreshed each day.",
     "modeDescription.timed": "Score as many correct answers as possible in 60 seconds.",
     "modeDescription.endless": "Three chances while difficulty rises every eight rounds.",
@@ -329,6 +329,7 @@
     for (const code of Object.keys(registered)) registerLocale(code, registered[code]);
 
     let locale = initialLocale();
+    let localeRequest = 0;
     if (!messages[locale]) locale = 'en';
 
     function localeSource(code) {
@@ -339,6 +340,9 @@
     function loadLocale(code) {
         if (messages[code]) return Promise.resolve(code);
         if (loading[code]) return loading[code];
+        if (!AVAILABLE_LOCALES.includes(code)) {
+            return Promise.reject(new Error('Unsupported locale ' + code));
+        }
         if (!root.document || typeof root.document.createElement !== 'function') {
             return Promise.reject(new Error('Cannot load locale ' + code));
         }
@@ -347,10 +351,12 @@
             script.src = localeSource(code);
             script.async = true;
             script.onload = function () {
+                if (typeof script.remove === 'function') script.remove();
                 if (messages[code]) resolve(code);
                 else reject(new Error('Locale bundle did not register ' + code));
             };
             script.onerror = function () {
+                if (typeof script.remove === 'function') script.remove();
                 reject(new Error('Could not load locale ' + code));
             };
             root.document.head.appendChild(script);
@@ -419,11 +425,15 @@
     }
 
     function setLocale(nextLocale) {
+        const request = ++localeRequest;
         const next = supported(nextLocale);
-        if (messages[next]) return Promise.resolve(activateLocale(next));
+        if (messages[next]) {
+            return Promise.resolve(request === localeRequest ? activateLocale(next) : locale);
+        }
         return loadLocale(next).then(function () {
-            return activateLocale(next);
+            return request === localeRequest ? activateLocale(next) : locale;
         }).catch(function () {
+            if (request !== localeRequest) return locale;
             apply();
             if (typeof root.CustomEvent === 'function' && root.dispatchEvent) {
                 root.dispatchEvent(new root.CustomEvent('yog1localechange'));

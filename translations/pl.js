@@ -307,6 +307,7 @@
         "message.tutorial": "Zmień jedną liczbę na 1.",
         "message.curated": "Autorska łamigłówka {round} z {count}.",
         "message.standardBody": "Zmień jedną liczbę, a następnie sprawdź.",
+        "modeDescription.tutorial": "Wprowadzenie do zasady zmiany tylko jednej liczby.",
         "curated.product": "Iloczyn na właściwym miejscu",
         "curated.root": "Pierwiastek i reszta",
         "curated.power": "Mała potęga",
@@ -320,11 +321,15 @@
         "shared.seeded": "Udostępniona łamigłówka z ziarnem",
         "shared.seededBody": "Ta łamigłówka została odtworzona z udostępnionego łącza.",
         "share.challenge": "autorskie wyzwanie {round}",
+        "share.dailyDefault": "YOG1 — zadanie dnia {date}",
         "progress.daily": "{grid} · seria {current} · rekord {best}",
         "share.dailyStreak": "seria {streak}",
         "mode.guided": "Ćwiczenie z podpowiedziami",
         "modeDescription.guided": "Ukierunkowane ćwiczenia śledzą postępy i z czasem wracają do poznanych pojęć.",
-        "learning.focus": "Zakres ćwiczeń"
+        "learning.focus": "Zakres ćwiczeń",
+        "hint.number": "Wskazówka: liczba",
+        "hint.compareBody": "Przed ruchem: po lewej {left}, po prawej {right}. Różnica wynosi {gap}.",
+        "hint.directionBody": "Strona {side} musi zmienić się o {delta}, aby osiągnąć {total}."
     });
     root.Yog1LocaleMessages = root.Yog1LocaleMessages || {};
     root.Yog1LocaleMessages["pl"] = catalog;

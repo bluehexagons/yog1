@@ -252,6 +252,31 @@
         }
     }
 
+    function chooseLanguage(nextLocale) {
+        const selects = [ui.setting_language, ui.quick_language];
+        for (const select of selects) {
+            select.disabled = true;
+            select.setAttribute('aria-busy', 'true');
+        }
+        return i18n.setLocale(nextLocale).then(function (activeLocale) {
+            for (const select of selects) {
+                select.value = activeLocale;
+                select.disabled = false;
+                select.removeAttribute('aria-busy');
+            }
+            return activeLocale;
+        });
+    }
+
+    function cacheAllLocalesForOffline() {
+        if (!('serviceWorker' in navigator)) return;
+        navigator.serviceWorker.ready.then(function (registration) {
+            if (registration.active) {
+                registration.active.postMessage({ type: 'cache-all-locales' });
+            }
+        }).catch(function () {});
+    }
+
     function populateCustomForm() {
         for (const key of Object.keys(core.OPERATIONS)) {
             const label = text('label', '', 'check-option');
@@ -1735,10 +1760,10 @@
         });
     }
     ui.setting_language.addEventListener('change', function () {
-        i18n.setLocale(ui.setting_language.value);
+        chooseLanguage(ui.setting_language.value);
     });
     ui.quick_language.addEventListener('change', function () {
-        i18n.setLocale(ui.quick_language.value);
+        chooseLanguage(ui.quick_language.value);
     });
     ui.setting_sidebar_side.addEventListener('change', function () {
         settings.sidebarSide = ui.setting_sidebar_side.value;
@@ -1790,6 +1815,7 @@
     });
     ui.install_app.addEventListener('click', function () {
         if (installPrompt) {
+            cacheAllLocalesForOffline();
             installPrompt.prompt();
             installPrompt = null;
             ui.install_app.hidden = true;
