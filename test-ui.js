@@ -121,6 +121,17 @@ assert(game.includes("'yog1-save-'") &&
 assert(storage.includes('localStorage.removeItem(key)') &&
     storage.includes('Could not restore YOG1 backup'),
     'imports replace the complete save and roll back failed writes');
+assert(game.includes('history = history.filter(function (item)') &&
+    game.includes('Array.isArray(item.custom.operations)'),
+    'corrupt history is ignored and malformed custom entries cannot crash replay');
+assert(game.includes('ui.share.disabled = true') &&
+    game.includes("if (mode === 'custom')"),
+    'the custom builder disables puzzle actions until a game has started');
+const serviceWorker = fs.readFileSync('sw.js', 'utf8');
+assert(serviceWorker.includes("key.startsWith(CACHE_PREFIX) && key !== CACHE") &&
+    serviceWorker.includes('caches.open(CACHE)') &&
+    !serviceWorker.includes('caches.match(event.request'),
+    'offline cleanup and lookups stay inside the YOG1 cache namespace');
 assert(html.includes('class="mode-group"') &&
     html.includes('data-i18n="nav.learn"') &&
     html.includes('data-i18n="nav.challenge"'),

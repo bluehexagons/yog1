@@ -63,7 +63,20 @@
             if (name === 'locale') {
                 if (typeof value !== 'string') throw new Error('Unsupported YOG1 backup');
             } else if (name === 'history') {
-                if (!Array.isArray(value)) throw new Error('Unsupported YOG1 backup');
+                if (!Array.isArray(value) || value.some(function (item) {
+                    return !item || typeof item !== 'object' ||
+                        typeof item.correct !== 'boolean' ||
+                        typeof item.expression !== 'string' ||
+                        typeof item.mode !== 'string' ||
+                        !Number.isSafeInteger(item.round) ||
+                        typeof item.seed !== 'string' ||
+                        typeof item.at !== 'string' ||
+                        (item.custom !== null && item.custom !== undefined &&
+                            (!item.custom || typeof item.custom !== 'object' ||
+                                !Array.isArray(item.custom.operations)));
+                })) {
+                    throw new Error('Unsupported YOG1 backup');
+                }
             } else if (!value || typeof value !== 'object' || Array.isArray(value)) {
                 throw new Error('Unsupported YOG1 backup');
             }

@@ -76,6 +76,15 @@
     let adaptiveState = core.normalizeAdaptiveState(load(KEYS.adaptive, null));
     let learningState = core.normalizeLearningState(load(KEYS.learning, null));
     if (!Array.isArray(history)) history = [];
+    history = history.filter(function (item) {
+        return item && typeof item === 'object' &&
+            typeof item.correct === 'boolean' &&
+            typeof item.expression === 'string' &&
+            typeof item.mode === 'string' &&
+            Number.isSafeInteger(item.round) &&
+            typeof item.seed === 'string' &&
+            typeof item.at === 'string';
+    }).slice(0, HISTORY_LIMIT);
     if (!stats || typeof stats !== 'object' || Array.isArray(stats)) stats = {};
     if (!achievementState || !Array.isArray(achievementState.unlocked)) {
         achievementState = { unlocked: [], operations: [], solved: 0 };
@@ -1127,6 +1136,9 @@
         if (mode === 'custom') {
             currentProblem = null;
             ui.submit.disabled = true;
+            ui.hint.disabled = true;
+            ui.skip.disabled = true;
+            ui.share.disabled = true;
             ui.problem.replaceChildren();
             hideFeedback();
             setCatalogMessage('custom.builder', 'custom.builderBody');
@@ -1467,7 +1479,8 @@
         if (!item) return;
         const modeButton = ui.mode_buttons.querySelector('[data-mode="' + item.mode + '"]');
         if (!modeButton) return;
-        if (item.mode === 'custom' && item.custom) {
+        if (item.mode === 'custom' && item.custom &&
+            Array.isArray(item.custom.operations)) {
             activateMode('custom', modeButton, {
                 seed: item.seed,
                 round: item.round

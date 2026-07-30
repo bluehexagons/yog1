@@ -77,6 +77,30 @@ assert.throws(function () {
         data: { history: {} }
     });
 }, /Unsupported/, 'save entries with invalid shapes are rejected');
+assert.throws(function () {
+    storage.importData({
+        application: 'You Only Get 1s',
+        schemaVersion: storage.SCHEMA_VERSION,
+        data: { history: [null] }
+    });
+}, /Unsupported/, 'malformed history records are rejected before they can break the UI');
+assert.throws(function () {
+    storage.importData({
+        application: 'You Only Get 1s',
+        schemaVersion: storage.SCHEMA_VERSION,
+        data: {
+            history: [{
+                correct: false,
+                expression: '2 = 3',
+                mode: 'custom',
+                round: 1,
+                seed: 'test',
+                at: new Date().toISOString(),
+                custom: {}
+            }]
+        }
+    });
+}, /Unsupported/, 'custom history records require replayable operation settings');
 storage.save(storage.KEYS.stats, { attempts: 7 });
 const beforeFailedImport = new Map(values);
 failNextWriteTo = storage.KEYS.custom;
