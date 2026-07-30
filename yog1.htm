@@ -172,6 +172,7 @@
         .screen-panel h3 { margin: 0 0 10px; font: bold .82rem "Courier New", monospace; text-transform: uppercase; }
         .about-copy { max-width: 68ch; }
         .about-copy p { margin: 0 0 12px; }
+        .app-version { color: var(--muted); font-variant-numeric: tabular-nums; }
         .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
         footer { margin-top: 22px; padding-top: 12px; border-top: 1px solid var(--line); color: var(--muted); font-size: .75rem; text-align: center; }
         [hidden] { display: none !important; }
@@ -398,6 +399,10 @@
                 <h3>You Only Get 1s</h3>
                 <p data-i18n="about.summary">Change one number to 1 to balance an equation.</p>
                 <p data-i18n="about.origin">A refreshed version of bluehexagons’ Ludum Dare 28 game, with generated puzzles, settings, offline play, and local stats.</p>
+                <p class="app-version">
+                    <span data-i18n="about.version">Version</span> <strong id="app_version">0.1.0</strong><span aria-hidden="true"> · </span>
+                    <span data-i18n="about.commitDate">Commit date</span> <time id="app_version_date" datetime="2026-07-30">July 30, 2026</time>
+                </p>
             </section>
             <section class="screen-panel about-copy">
                 <h3 data-i18n="about.translations">Translations</h3>
@@ -419,6 +424,7 @@
 <script src="game-core.js"></script>
 <script src="i18n.js"></script>
 <script src="game-content.js"></script>
+<script src="version.js"></script>
 <script src="game.js"></script>
 </body>
 </html>

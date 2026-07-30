@@ -63,7 +63,7 @@ for (const locale of i18n.localeOptions) {
 
 const files = [
     'yog1.htm', 'locales.js', 'storage.js', 'game-core.js', 'i18n.js',
-    'game-content.js', 'game.js'
+    'game-content.js', 'version.js', 'game.js'
 ].concat(manifests, ['icon.svg', 'icon-192.png', 'icon-512.png']);
 const hash = crypto.createHash('sha256');
 for (const filename of files) hash.update(fs.readFileSync(path.join(root, filename)));

@@ -68,6 +68,7 @@ node test-content.js
 node test-storage.js
 node test-i18n.js
 node test-ui.js
+node test-version.js
 ```
 
 ## Development
@@ -83,3 +84,25 @@ metadata, regenerate localized manifests and the content-hashed offline cache:
 ```sh
 node scripts/update-assets.js
 ```
+
+## Versioning and releases
+
+The About screen reads its version and commit date from `version.js`. The release
+tool can set an exact semantic version or bump the patch, minor, or major part:
+
+```sh
+node scripts/release.js patch
+node scripts/release.js 1.0.0
+```
+
+Those commands only update the metadata and offline cache, leaving the changes
+for review. Add explicit flags to commit, create an annotated tag, and atomically
+push both the current branch and tag:
+
+```sh
+node scripts/release.js minor --commit --tag
+node scripts/release.js 1.0.0 --commit --tag --push
+```
+
+Automated release commits require a clean worktree. Tags use the form `vX.Y.Z`,
+and the recorded date defaults to the local date of the release commit.

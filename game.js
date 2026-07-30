@@ -27,7 +27,8 @@
         'setting_reduced_clutter', 'setting_language', 'quick_language', 'setting_sidebar_side',
         'setting_adaptive_style', 'setting_learning_focus', 'learning_goal',
         'learning_goal_name', 'learning_goal_example', 'learning_recommendation',
-        'learning_rows', 'learning_practice', 'install_app', 'export_data', 'import_data', 'import_file'
+        'learning_rows', 'learning_practice', 'install_app', 'export_data', 'import_data',
+        'import_file', 'app_version', 'app_version_date'
     ]) {
         ui[id] = document.getElementById(id);
     }
@@ -1272,8 +1273,22 @@
         populateLearningFocus();
     }
 
+    function renderVersion() {
+        const release = window.Yog1Version;
+        if (!release || !ui.app_version || !ui.app_version_date) return;
+        ui.app_version.textContent = release.version;
+        ui.app_version_date.dateTime = release.commitDate;
+        const date = new Date(release.commitDate + 'T00:00:00Z');
+        ui.app_version_date.textContent = Number.isNaN(date.getTime())
+            ? release.commitDate
+            : date.toLocaleDateString(i18n.getLanguageTag(), {
+                year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC'
+            });
+    }
+
     function refreshLocalizedUi() {
         i18n.apply();
+        renderVersion();
         applySettings();
         updateModeInfo();
         renderHistory();
@@ -1765,6 +1780,7 @@
     populateLanguageSelectors();
     populateCustomForm();
     i18n.apply();
+    renderVersion();
     applySettings();
     renderHistory();
     renderStats();
