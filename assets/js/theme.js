@@ -2,8 +2,17 @@
     'use strict';
 
     const STORAGE_KEY = 'yog1.v2.settings';
-    const SCHEMES = ['auto', 'light', 'dark'];
-    const media = root.matchMedia('(prefers-color-scheme: dark)');
+    const THEME_COLORS = {
+        light: '#191919',
+        dark: '#090b0d',
+        midnight: '#000000',
+        sunset: '#17100e',
+        pastel: '#c9e9ff'
+    };
+    const SCHEMES = ['auto'].concat(Object.keys(THEME_COLORS));
+    const media = typeof root.matchMedia === 'function'
+        ? root.matchMedia('(prefers-color-scheme: dark)')
+        : { matches: false };
     let preference = readPreference();
 
     function readPreference() {
@@ -29,7 +38,7 @@
         }
         const themeColor = document.querySelector('meta[name="theme-color"]');
         if (themeColor) {
-            themeColor.content = resolvedScheme() === 'dark' ? '#090b0d' : '#191919';
+            themeColor.content = THEME_COLORS[resolvedScheme()];
         }
         return preference;
     }

@@ -13,6 +13,29 @@
     --dark-quiet: #c7ccd0; --dark-selected: #3b464f; --dark-hover: #303941;
     --dark-inset: #282f35; --dark-workspace: #1b2126; --dark-soft: #232a30;
     --dark-hint: #3a3024; --dark-flipped: #273f50; --dark-raised-shadow: #050607;
+    --midnight-ink: #eef3ff; --midnight-bg: #000000; --midnight-menu: #07090f;
+    --midnight-game: #000000; --midnight-paper: #0c111c; --midnight-blue: #7db9ff;
+    --midnight-green: #70e0ad; --midnight-red: #ff8da1; --midnight-muted: #aeb8cc;
+    --midnight-warm: #f4bc7d; --midnight-line: #46526b; --midnight-focus: #7dc4ff;
+    --midnight-quiet: #c1cade; --midnight-selected: #18233a; --midnight-hover: #121a2b;
+    --midnight-inset: #0a0f1a; --midnight-workspace: #03050a; --midnight-soft: #080d16;
+    --midnight-hint: #211a0c; --midnight-flipped: #10233b;
+    --midnight-raised-shadow: #000000;
+    --sunset-ink: #f1d8ba; --sunset-bg: #17100e; --sunset-menu: #32201b;
+    --sunset-game: #241713; --sunset-paper: #3a2620; --sunset-blue: #e5b36a;
+    --sunset-green: #a9cf81; --sunset-red: #f09a8c; --sunset-muted: #c2a58e;
+    --sunset-warm: #ffbd73; --sunset-line: #7b594a; --sunset-focus: #ffd08a;
+    --sunset-quiet: #d8bba2; --sunset-selected: #574032; --sunset-hover: #49342b;
+    --sunset-inset: #3d2922; --sunset-workspace: #2c1d18; --sunset-soft: #35231d;
+    --sunset-hint: #48331f; --sunset-flipped: #513628; --sunset-raised-shadow: #0d0807;
+    --pastel-ink: #342b48; --pastel-bg: #c9e9ff; --pastel-menu: #ffd6e7;
+    --pastel-game: #fff0c9; --pastel-paper: #f8f2ff; --pastel-blue: #285b9b;
+    --pastel-green: #1f755e; --pastel-red: #a23b68; --pastel-muted: #62566f;
+    --pastel-warm: #87511b; --pastel-line: #9d86b3; --pastel-focus: #005fcc;
+    --pastel-quiet: #594866; --pastel-selected: #d9c5f2; --pastel-hover: #e7dcfa;
+    --pastel-inset: #d8f1ea; --pastel-workspace: #fef7ff; --pastel-soft: #e4f4ff;
+    --pastel-hint: #fff0b8; --pastel-flipped: #ffd5e8;
+    --pastel-raised-shadow: #8b72a0; --pastel-hard-shadow: #4c3d5b;
     color-scheme: light;
 }
 :root[data-color-scheme="dark"] {
@@ -26,8 +49,46 @@
     --raised-shadow: var(--dark-raised-shadow); --hard-shadow: var(--dark-raised-shadow);
     color-scheme: dark;
 }
+:root[data-color-scheme="midnight"] {
+    --ink: var(--midnight-ink); --bg: var(--midnight-bg); --menu: var(--midnight-menu);
+    --game: var(--midnight-game); --paper: var(--midnight-paper);
+    --blue: var(--midnight-blue); --green: var(--midnight-green); --red: var(--midnight-red);
+    --muted: var(--midnight-muted); --warm: var(--midnight-warm);
+    --line: var(--midnight-line); --focus: var(--midnight-focus);
+    --quiet: var(--midnight-quiet); --selected: var(--midnight-selected);
+    --hover: var(--midnight-hover); --inset: var(--midnight-inset);
+    --workspace: var(--midnight-workspace); --soft: var(--midnight-soft);
+    --hint: var(--midnight-hint); --flipped: var(--midnight-flipped);
+    --raised-shadow: var(--midnight-raised-shadow);
+    --hard-shadow: var(--midnight-raised-shadow);
+    color-scheme: dark;
+}
+:root[data-color-scheme="sunset"] {
+    --ink: var(--sunset-ink); --bg: var(--sunset-bg); --menu: var(--sunset-menu);
+    --game: var(--sunset-game); --paper: var(--sunset-paper); --blue: var(--sunset-blue);
+    --green: var(--sunset-green); --red: var(--sunset-red); --muted: var(--sunset-muted);
+    --warm: var(--sunset-warm); --line: var(--sunset-line); --focus: var(--sunset-focus);
+    --quiet: var(--sunset-quiet); --selected: var(--sunset-selected);
+    --hover: var(--sunset-hover); --inset: var(--sunset-inset);
+    --workspace: var(--sunset-workspace); --soft: var(--sunset-soft);
+    --hint: var(--sunset-hint); --flipped: var(--sunset-flipped);
+    --raised-shadow: var(--sunset-raised-shadow); --hard-shadow: var(--sunset-raised-shadow);
+    color-scheme: dark;
+}
+:root[data-color-scheme="pastel"] {
+    --ink: var(--pastel-ink); --bg: var(--pastel-bg); --menu: var(--pastel-menu);
+    --game: var(--pastel-game); --paper: var(--pastel-paper); --blue: var(--pastel-blue);
+    --green: var(--pastel-green); --red: var(--pastel-red); --muted: var(--pastel-muted);
+    --warm: var(--pastel-warm); --line: var(--pastel-line); --focus: var(--pastel-focus);
+    --quiet: var(--pastel-quiet); --selected: var(--pastel-selected);
+    --hover: var(--pastel-hover); --inset: var(--pastel-inset);
+    --workspace: var(--pastel-workspace); --soft: var(--pastel-soft);
+    --hint: var(--pastel-hint); --flipped: var(--pastel-flipped);
+    --raised-shadow: var(--pastel-raised-shadow); --hard-shadow: var(--pastel-hard-shadow);
+    color-scheme: light;
+}
 @media (prefers-color-scheme: dark) {
-    :root:not([data-color-scheme="light"]) {
+    :root:not([data-color-scheme]) {
         --ink: var(--dark-ink); --bg: var(--dark-bg); --menu: var(--dark-menu);
         --game: var(--dark-game); --paper: var(--dark-paper); --blue: var(--dark-blue);
         --green: var(--dark-green); --red: var(--dark-red); --muted: var(--dark-muted);
@@ -159,7 +220,10 @@ h1 { margin: 6px 0; font: bold 1.45rem/1 "Courier New", monospace; letter-spacin
 .field-note { margin: 8px 0 0; color: var(--muted); font-size: .7rem; }
 .custom-fields { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
 .custom-fields label { display: grid; gap: 3px; font-size: .75rem; }
-input[type="number"], select { width: 100%; padding: 5px; border: 1px solid var(--ink); background: var(--paper); }
+input[type="number"], input[type="text"], select {
+    width: 100%; padding: 5px; border: 1px solid var(--ink); background: var(--paper);
+}
+input[type="checkbox"], input[type="range"] { accent-color: var(--blue); }
 #history { margin: 0; padding: 0; }
 #history li { list-style: none; padding: 9px 6px; border-bottom: 1px solid var(--line); }
 #history li.correct { color: var(--green); } #history li.incorrect { color: var(--red); }
@@ -186,7 +250,9 @@ body.high-contrast { --game: #fff; --menu: #fff; --paper: #fff; --line: #333; --
 body.high-contrast {
     --workspace: #fff; --soft: #fff; --inset: #fff; --hint: #fff; --flipped: #fff;
 }
-:root[data-color-scheme="dark"] body.high-contrast {
+:root[data-color-scheme="dark"] body.high-contrast,
+:root[data-color-scheme="midnight"] body.high-contrast,
+:root[data-color-scheme="sunset"] body.high-contrast {
     --ink: rgb(255, 255, 255); --bg: rgb(0, 0, 0); --game: rgb(0, 0, 0);
     --menu: rgb(0, 0, 0); --paper: rgb(0, 0, 0); --workspace: rgb(0, 0, 0);
     --soft: rgb(0, 0, 0); --inset: rgb(0, 0, 0); --hint: rgb(0, 0, 0);
@@ -195,7 +261,7 @@ body.high-contrast {
     --raised-shadow: rgb(255, 255, 255); --hard-shadow: rgb(255, 255, 255);
 }
 @media (prefers-color-scheme: dark) {
-    :root:not([data-color-scheme="light"]) body.high-contrast {
+    :root:not([data-color-scheme]) body.high-contrast {
         --ink: rgb(255, 255, 255); --bg: rgb(0, 0, 0); --game: rgb(0, 0, 0);
         --menu: rgb(0, 0, 0); --paper: rgb(0, 0, 0); --workspace: rgb(0, 0, 0);
         --soft: rgb(0, 0, 0); --inset: rgb(0, 0, 0); --hint: rgb(0, 0, 0);

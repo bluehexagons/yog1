@@ -71,11 +71,18 @@ assert(html.includes('@media (prefers-color-scheme: dark)') &&
     html.includes(':root[data-color-scheme="dark"]') &&
     html.includes('id="setting_color_scheme"'),
     'automatic, light, and dark color-scheme controls are available');
+for (const scheme of ['auto', 'light', 'dark', 'midnight', 'sunset', 'pastel']) {
+    assert(html.includes('<option value="' + scheme + '" data-i18n="theme.' + scheme + '">'),
+        scheme + ' is available from the color-scheme selector');
+}
 assert(theme.includes("STORAGE_KEY = 'yog1.v2.settings'") &&
     theme.includes("media.addEventListener('change'") &&
     game.includes('window.Yog1Theme.apply(settings.colorScheme)') &&
     game.includes('settings.colorScheme = ui.setting_color_scheme.value'),
     'the color scheme is restored early, follows browser changes, and persists');
+assert(html.includes('input[type="number"], input[type="text"], select') &&
+    html.includes('accent-color: var(--blue)'),
+    'text fields and native choice controls participate in every theme');
 assert(html.includes('min-height: 44px') && html.includes('@media (max-width: 420px)'),
     'mobile controls have touch-sized targets and a narrow-phone layout');
 assert(html.includes('html.large-text { font-size: 118.75%; }') &&
