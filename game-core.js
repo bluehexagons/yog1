@@ -48,6 +48,7 @@
     // This eight-round wave averages exactly 1.0, whether sampled over 24, 32,
     // or 40 rounds. Warm-ups and challenges recur without long difficulty ramps.
     const ROUND_WAVE = [0.7, 0.9, 1, 1.1, 1.3, 0.8, 1, 1.2];
+    const ADAPTIVE_INITIAL_RATING = 0.35;
 
     function randomInt(random, min, max) {
         return Math.floor(random() * (max - min + 1)) + min;
@@ -66,6 +67,21 @@
             result[index] = value;
         }
         return result;
+    }
+
+    function weightedShuffle(random, values, weights) {
+        if (!weights) return shuffle(random, values);
+        return values.map(function (value) {
+            const weight = Math.max(0.01, Number(weights[value]) || 0.01);
+            return {
+                value: value,
+                key: -Math.log(Math.max(Number.EPSILON, random())) / weight
+            };
+        }).sort(function (left, right) {
+            return left.key - right.key;
+        }).map(function (item) {
+            return item.value;
+        });
     }
 
     function hashSeed(value) {
@@ -287,7 +303,7 @@
         return expression;
     }
 
-    function expand(sides, operations, random, maxNumber) {
+    function expand(sides, operations, random, maxNumber, operationWeights) {
         const sideIndex = randomInt(random, 0, 1);
         let candidates = expandableNodes(sides[sideIndex]);
         if (!candidates.length) {
@@ -298,7 +314,7 @@
         }
         candidates = shuffle(random, candidates);
         for (const target of candidates) {
-            const shuffled = shuffle(random, operations);
+            const shuffled = weightedShuffle(random, operations, operationWeights);
             for (const operation of shuffled) {
                 const hasNonAddIdentity = operations.some(function (candidate) {
                     return ['subtract', 'multiply', 'divide', 'power'].includes(candidate);
@@ -325,12 +341,12 @@
         return false;
     }
 
-    function addSolution(sides, operations, random) {
-        const identities = shuffle(random, operations.filter(function (operation) {
+    function addSolution(sides, operations, random, operationWeights) {
+        const identities = weightedShuffle(random, operations.filter(function (operation) {
             // A disguised exponent can explode far beyond JavaScript's safe
             // integer range, so the power identity uses a fixed decoy exponent.
             return ['add', 'subtract', 'multiply', 'divide', 'power'].includes(operation);
-        }));
+        }), operationWeights);
         for (const operation of identities) {
             const sideOrder = random() < 0.5 ? [0, 1] : [1, 0];
             for (const sideIndex of sideOrder) {
@@ -383,6 +399,65 @@
         };
     }
 
+    function clampRating(value) {
+        return Math.max(0, Math.min(1, Number(value) || 0));
+    }
+
+    function normalizeAdaptiveState(state) {
+        state = state && typeof state === 'object' ? state : {};
+        const operations = {};
+        for (const operation of Object.keys(OPERATIONS)) {
+            const value = state.operations && state.operations[operation];
+            operations[operation] = Number.isFinite(value) ? clampRating(value) : 0.5;
+        }
+        return {
+            rating: Number.isFinite(state.rating)
+                ? clampRating(state.rating) : ADAPTIVE_INITIAL_RATING,
+            operations: operations
+        };
+    }
+
+    function adaptiveProfile(state) {
+        const rating = normalizeAdaptiveState(state).rating;
+        if (rating < 0.2) return DIFFICULTIES.easy;
+        if (rating < 0.4) return DIFFICULTIES.normal;
+        if (rating < 0.6) return DIFFICULTIES.hard;
+        if (rating < 0.8) return DIFFICULTIES.expert;
+        return DIFFICULTIES.extreme;
+    }
+
+    function adaptiveOperationWeights(state, profile) {
+        const normalized = normalizeAdaptiveState(state);
+        const selectedProfile = profile || adaptiveProfile(normalized);
+        const result = {};
+        for (const operation of selectedProfile.operations) {
+            // Retain a small exploration chance while making low-comfort
+            // operations substantially less likely to be selected.
+            result[operation] = 0.1 + Math.pow(normalized.operations[operation], 2) * 0.9;
+        }
+        return result;
+    }
+
+    function updateAdaptiveState(state, event, operations) {
+        const normalized = normalizeAdaptiveState(state);
+        const deltas = {
+            correct: [0.06, 0.07],
+            wrong: [-0.08, -0.1],
+            hint: [-0.025, -0.035],
+            skip: [-0.15, -0.18]
+        };
+        const delta = deltas[event];
+        if (!delta) return normalized;
+        normalized.rating = clampRating(normalized.rating + delta[0]);
+        for (const operation of new Set(operations || [])) {
+            if (Object.prototype.hasOwnProperty.call(normalized.operations, operation)) {
+                normalized.operations[operation] =
+                    clampRating(normalized.operations[operation] + delta[1]);
+            }
+        }
+        return normalized;
+    }
+
     function normalizeOptions(options) {
         const profile = options.profile || DIFFICULTIES.normal;
         const round = options.round || 1;
@@ -403,6 +478,7 @@
             operations: (options.operations || profile.operations).filter(function (op) {
                 return Object.prototype.hasOwnProperty.call(OPERATIONS, op);
             }),
+            operationWeights: options.operationWeights || null,
             maxNumber: options.maxNumber || profile.maxNumber,
             // Targets measure arithmetic complexity; they should not also make
             // every high-level expression longer.  A one-operation identity
@@ -433,20 +509,28 @@
             : randomInt(settings.random, 4, Math.max(6, Math.min(settings.maxNumber, 30)));
         const sides = [number(targetValue), number(targetValue)];
         let guard = settings.operationCount * 4;
+        const signatureOperations = settings.operationCount === 1
+            ? settings.operations.filter(function (operation) {
+                return ['add', 'subtract', 'multiply', 'divide', 'power'].includes(operation);
+            })
+            : settings.operations;
+        const signature = settings.operationWeights
+            ? weightedShuffle(settings.random, signatureOperations, settings.operationWeights)[0]
+            : signatureOperations[signatureOperations.length - 1];
         // The newest operation in a standard profile is its signature feature.
         // Put it in every generated puzzle instead of leaving its appearance to luck.
         // For three-number rounds, the one-flip identity itself carries that
         // operation, so no preliminary expansion is needed.
         if (settings.operationCount > 1) {
-            expand(sides, [settings.operations[settings.operations.length - 1]], settings.random, settings.maxNumber);
+            expand(sides, [signature], settings.random, settings.maxNumber, settings.operationWeights);
         }
         // Reserve one operation for the identity that supplies the solution.
         while (countOperations(sides[0]) + countOperations(sides[1]) < settings.operationCount - 1 && guard-- > 0) {
-            expand(sides, settings.operations, settings.random, settings.maxNumber);
+            expand(sides, settings.operations, settings.random, settings.maxNumber, settings.operationWeights);
         }
         addSolution(sides, settings.operationCount === 1
-            ? [settings.operations[settings.operations.length - 1]]
-            : settings.operations, settings.random);
+            ? [signature]
+            : settings.operations, settings.random, settings.operationWeights);
         disguiseOnes(sides, settings.random, settings.maxNumber);
         if (evaluate(sides[0]) === evaluate(sides[1]) && (options._attempt || 0) < 30) {
             return generateProblem(Object.assign({}, options, { _attempt: (options._attempt || 0) + 1 }));
@@ -510,6 +594,7 @@
         OPERATIONS: OPERATIONS,
         DIFFICULTIES: DIFFICULTIES,
         ROUND_WAVE: ROUND_WAVE,
+        ADAPTIVE_INITIAL_RATING: ADAPTIVE_INITIAL_RATING,
         hashSeed: hashSeed,
         createSeededRandom: createSeededRandom,
         clone: clone,
@@ -518,6 +603,10 @@
         countOperations: countOperations,
         difficultyScore: difficultyScore,
         roundTarget: roundTarget,
+        normalizeAdaptiveState: normalizeAdaptiveState,
+        adaptiveProfile: adaptiveProfile,
+        adaptiveOperationWeights: adaptiveOperationWeights,
+        updateAdaptiveState: updateAdaptiveState,
         generateProblem: generateProblem,
         serialize: serialize,
         solutionDetails: solutionDetails

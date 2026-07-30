@@ -10,11 +10,13 @@ addition through roots, recurring warm-up and challenge rounds, and a custom gam
 builder. Problem history and per-difficulty stats are stored locally in the
 browser and can be cleared from the page.
 
-Additional modes include a shared Daily puzzle, a 60-second Timed sprint, a
-three-life Endless run, and five handcrafted Challenges. Every generated puzzle
-has a reproducible share link. Incorrect answers can be retried, hints reveal the
-relevant side and then the intended number, and completed puzzles explain both
-side totals.
+Additional modes include Adaptive difficulty, a shared Daily puzzle, a 60-second
+Timed sprint, a three-life Endless run, and five handcrafted Challenges. Adaptive
+mode responds to correct and incorrect answers, applies rating penalties for
+hints and skipped questions, and shows less-comfortable operators less often.
+Every generated puzzle has a reproducible share link. Incorrect answers can be
+retried, hints reveal the relevant side and then the intended number, and
+completed puzzles explain both side totals.
 
 The game also tracks achievements and session summaries. Accessibility options
 provide larger text, higher contrast, and reduced clutter. Simple synthesized

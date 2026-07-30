@@ -10,7 +10,8 @@
         custom: 'yog1.customSettings.v2',
         achievements: 'yog1.achievements.v1',
         settings: 'yog1.accessibility.v1',
-        daily: 'yog1.dailyResults.v1'
+        daily: 'yog1.dailyResults.v1',
+        adaptive: 'yog1.adaptiveModel.v1'
     };
     const HISTORY_LIMIT = 100;
     const PAGE_SIZE = 10;
@@ -111,6 +112,7 @@
     };
     let settings = load(KEYS.settings, defaultSettings);
     let dailyResults = load(KEYS.daily, {});
+    let adaptiveState = core.normalizeAdaptiveState(load(KEYS.adaptive, null));
     if (!Array.isArray(history)) history = [];
     let historyMigrated = false;
     for (const item of history) {
@@ -161,6 +163,7 @@
     let currentMessage = null;
     let currentFeedback = null;
     let currentAchievementId = null;
+    let adaptiveProblemState = null;
 
     function newSession() {
         session = {
@@ -236,6 +239,7 @@
     }
 
     function modeProfile() {
+        if (mode === 'adaptive') return core.adaptiveProfile(adaptiveState);
         if (mode === 'timed') return core.DIFFICULTIES.hard;
         if (mode === 'endless') {
             const choices = Object.values(core.DIFFICULTIES);
@@ -264,12 +268,19 @@
     function generateCurrentProblem() {
         if (mode === 'tutorial') return tutorialProblem();
         if (mode === 'challenges') return curatedProblem(round - 1);
-        const selectedProfile = modeProfile();
+        const adaptiveModel = adaptiveProblemState || adaptiveState;
+        const selectedProfile = mode === 'adaptive'
+            ? core.adaptiveProfile(adaptiveModel) : modeProfile();
         const options = {
             profile: selectedProfile,
             round: mode === 'daily' ? (core.hashSeed(utcDate()) % 40) + 1 : round,
             random: core.createSeededRandom(currentSeed)
         };
+        if (mode === 'adaptive') {
+            options.target = Math.round(9 + adaptiveModel.rating * 43);
+            options.operationWeights =
+                core.adaptiveOperationWeights(adaptiveModel, selectedProfile);
+        }
         if (mode === 'custom') {
             Object.assign(options, {
                 operations: activeCustomSettings.operations,
@@ -409,12 +420,15 @@
         attemptsOnPuzzle = 0;
         awaitingAdvance = false;
         currentSeed = problemSeed();
+        adaptiveProblemState = mode === 'adaptive'
+            ? core.normalizeAdaptiveState(adaptiveState) : null;
         currentProblem = generateCurrentProblem();
         session.puzzleStartedAt = Date.now();
         renderSubmitLabel();
         ui.submit.disabled = session.finished;
         ui.hint.disabled = mode === 'tutorial' || session.finished;
         ui.skip.disabled = mode === 'tutorial' || session.finished;
+        ui.skip.textContent = t(mode === 'adaptive' ? 'action.skip' : 'action.reveal');
         ui.share.disabled = mode === 'tutorial';
         hideFeedback();
         drawProblem();
@@ -427,6 +441,8 @@
             setCatalogMessage('message.timed', 'message.timedBody');
         } else if (mode === 'endless') {
             setCatalogMessage('message.endless', 'message.endlessBody');
+        } else if (mode === 'adaptive') {
+            setCatalogMessage('mode.adaptive', 'modeDescription.adaptive');
         } else if (mode === 'challenges') {
             setCatalogMessage(currentProblem.titleKey, 'message.curated', {
                 round: round, count: CURATED.length
@@ -501,6 +517,21 @@
         return t('mode.' + mode);
     }
 
+    function adaptiveOperations() {
+        return currentProblem
+            ? core.solutionDetails(currentProblem.sides, {}).operations : [];
+    }
+
+    function adapt(event) {
+        if (mode !== 'adaptive') return;
+        adaptiveState = core.updateAdaptiveState(
+            adaptiveState, event, adaptiveOperations()
+        );
+        save(KEYS.adaptive, adaptiveState);
+        updateModeInfo();
+        renderSession();
+    }
+
     function recordAttempt(correct) {
         attemptsOnPuzzle++;
         session.attempts++;
@@ -557,6 +588,7 @@
     }
 
     function correctAnswer() {
+        adapt('correct');
         recordAttempt(true);
         updateAchievements();
         playSound('correct');
@@ -601,6 +633,7 @@
 
     function incorrectAnswer() {
         const attemptedValues = currentValues;
+        adapt('wrong');
         recordAttempt(false);
         playSound('incorrect');
         showExplanation(false, attemptedValues);
@@ -647,7 +680,7 @@
     }
 
     function updateProgress() {
-        ui.custom_progress.hidden = !['custom', 'endless'].includes(mode);
+        ui.custom_progress.hidden = !['custom', 'endless', 'adaptive'].includes(mode);
         if (mode === 'custom') {
             if (!activeCustomSettings) {
                 ui.custom_progress.hidden = true;
@@ -662,6 +695,11 @@
         } else if (mode === 'endless') {
             ui.custom_progress.textContent = t('progress.chances', {
                 chances: '●'.repeat(session.lives) + '○'.repeat(3 - session.lives)
+            });
+        } else if (mode === 'adaptive') {
+            ui.custom_progress.textContent = t('progress.adaptive', {
+                level: t('mode.' + core.adaptiveProfile(adaptiveState).id),
+                skill: Math.round(adaptiveState.rating * 100)
             });
         }
     }
@@ -718,6 +756,7 @@
         const modes = Object.values(core.DIFFICULTIES).map(function (item) {
             return { id: item.id, name: t('mode.' + item.id) };
         }).concat([
+            { id: 'adaptive', name: t('mode.adaptive') },
             { id: 'custom', name: t('mode.custom') }, { id: 'daily', name: t('mode.daily') },
             { id: 'timed', name: t('mode.timed') }, { id: 'endless', name: t('mode.endless') },
             { id: 'challenges', name: t('mode.challenges') }
@@ -757,7 +796,17 @@
     }
 
     function updateModeInfo() {
-        if (core.DIFFICULTIES[mode]) {
+        if (mode === 'adaptive') {
+            const item = core.adaptiveProfile(adaptiveState);
+            ui.mode_info.replaceChildren(
+                text('strong', t('mode.adaptive')),
+                text('span', t('modeDescription.adaptive')),
+                text('span', t('progress.adaptive', {
+                    level: t('mode.' + item.id),
+                    skill: Math.round(adaptiveState.rating * 100)
+                }))
+            );
+        } else if (core.DIFFICULTIES[mode]) {
             const item = core.DIFFICULTIES[mode];
             ui.mode_info.replaceChildren(
                 text('strong', t('mode.' + item.id)), text('span', t('difficulty.' + item.id)),
@@ -835,6 +884,9 @@
         forcedSeed = options.seed || null;
         forcedRound = options.round || null;
         dailyDateOverride = options.date || null;
+        if (mode === 'adaptive' && options.adaptiveState) {
+            adaptiveState = core.normalizeAdaptiveState(options.adaptiveState);
+        }
         activeCustomSettings = null;
         customRun = { attempts: 0, correct: 0, won: false };
         for (const candidate of ui.mode_buttons.querySelectorAll('button')) {
@@ -880,7 +932,14 @@
             shareText += ' · ' + t('share.challenge', { round: round });
         } else {
             url.searchParams.set('seed', currentSeed);
-            if (mode === 'custom') {
+            if (mode === 'adaptive') {
+                const sharedModel = adaptiveProblemState || adaptiveState;
+                url.searchParams.set('difficulty', 'adaptive');
+                url.searchParams.set('rating', String(sharedModel.rating));
+                url.searchParams.set('comfort', Object.keys(core.OPERATIONS).map(function (operation) {
+                    return sharedModel.operations[operation];
+                }).join(','));
+            } else if (mode === 'custom') {
                 url.searchParams.set('difficulty', 'custom');
                 url.searchParams.set('ops', activeCustomSettings.operations.join(','));
                 url.searchParams.set('length', String(activeCustomSettings.length));
@@ -963,6 +1022,7 @@
         renderAchievements();
         renderSession();
         if (currentProblem) drawProblem();
+        ui.skip.textContent = t(mode === 'adaptive' ? 'action.skip' : 'action.reveal');
         renderExplanation();
         renderAchievementNotice();
         if (timerId) ui.timer_label.textContent = t('timer.seconds', { seconds: timeRemaining });
@@ -1017,6 +1077,7 @@
         if (!currentProblem || awaitingAdvance || session.finished || hintLevel >= 2) return;
         hintLevel = Math.min(2, hintLevel + 1);
         session.hints++;
+        adapt('hint');
         ui.hint.disabled = hintLevel >= 2;
         drawProblem();
         setCatalogMessage(hintLevel === 1 ? 'hint.side' : 'hint.number',
@@ -1025,6 +1086,7 @@
 
     ui.skip.addEventListener('click', function () {
         if (!currentProblem || awaitingAdvance || session.finished) return;
+        adapt('skip');
         recordAttempt(false);
         showExplanation(true);
         awaitingAdvance = true;
@@ -1050,7 +1112,8 @@
                 }
             }
         }
-        setCatalogMessage('result.solution', 'result.solutionBody');
+        setCatalogMessage(mode === 'adaptive' ? 'adaptive.skipped' : 'result.solution',
+            mode === 'adaptive' ? 'adaptive.skippedBody' : 'result.solutionBody');
     });
 
     ui.share.addEventListener('click', sharePuzzle);
@@ -1205,6 +1268,24 @@
         if (seed) {
             const safeSeed = seed.slice(0, 160);
             const requested = params.get('difficulty');
+            if (requested === 'adaptive') {
+                const operations = {};
+                const comfort = (params.get('comfort') || '').split(',');
+                Object.keys(core.OPERATIONS).forEach(function (operation, index) {
+                    operations[operation] = Number(comfort[index]);
+                });
+                const button = ui.mode_buttons.querySelector('[data-mode="adaptive"]');
+                activateMode('adaptive', button, {
+                    seed: safeSeed,
+                    round: Math.max(1, Number(params.get('round')) || 1),
+                    adaptiveState: {
+                        rating: Number(params.get('rating')),
+                        operations: operations
+                    }
+                });
+                setCatalogMessage('shared.seeded', 'shared.seededBody');
+                return;
+            }
             if (requested === 'custom') {
                 const button = ui.mode_buttons.querySelector('[data-mode="custom"]');
                 activateMode('custom', button, {

@@ -1179,6 +1179,106 @@
     };
     for (const code of AVAILABLE_LOCALES) Object.assign(messages[code], finalMessages[code]);
 
+    const adaptiveMessages = {
+        en: {
+            'mode.adaptive': 'Adaptive',
+            'modeDescription.adaptive': 'Difficulty follows your answers. Hints and skips lower your rating; less comfortable operators appear less often.',
+            'action.skip': 'Skip question',
+            'progress.adaptive': 'Level: {level} · skill: {skill}%',
+            'adaptive.skipped': 'Question skipped',
+            'adaptive.skippedBody': 'The solution is shown and your Adaptive rating was lowered.'
+        },
+        es: {
+            'mode.adaptive': 'Adaptativo',
+            'modeDescription.adaptive': 'La dificultad sigue tus respuestas. Las pistas y los saltos bajan tu nivel; los operadores que dominas menos aparecen con menor frecuencia.',
+            'action.skip': 'Saltar pregunta',
+            'progress.adaptive': 'Nivel: {level} · habilidad: {skill} %',
+            'adaptive.skipped': 'Pregunta saltada',
+            'adaptive.skippedBody': 'Se muestra la solución y tu nivel adaptativo ha bajado.'
+        },
+        zh: {
+            'mode.adaptive': '自适应',
+            'modeDescription.adaptive': '难度会根据答题表现调整。提示和跳题会降低评级；不熟悉的运算符会较少出现。',
+            'action.skip': '跳过题目',
+            'progress.adaptive': '等级：{level} · 技能：{skill}%',
+            'adaptive.skipped': '已跳过题目',
+            'adaptive.skippedBody': '已显示解法，你的自适应评级已降低。'
+        },
+        ar: {
+            'mode.adaptive': 'متكيف',
+            'modeDescription.adaptive': 'تتبع الصعوبة إجاباتك. تخفض التلميحات والتخطي تقييمك، وتظهر العمليات الأقل إتقانًا بوتيرة أقل.',
+            'action.skip': 'تخطي السؤال',
+            'progress.adaptive': 'المستوى: {level} · المهارة: {skill}٪',
+            'adaptive.skipped': 'تم تخطي السؤال',
+            'adaptive.skippedBody': 'ظهر الحل وانخفض تقييمك في النمط المتكيف.'
+        },
+        bn: {
+            'mode.adaptive': 'অভিযোজিত',
+            'modeDescription.adaptive': 'আপনার উত্তরের সঙ্গে কঠিনতা বদলায়। ইঙ্গিত ও প্রশ্ন এড়ালে রেটিং কমে; কম স্বচ্ছন্দ ক্রিয়া কম আসে।',
+            'action.skip': 'প্রশ্ন এড়িয়ে যান',
+            'progress.adaptive': 'স্তর: {level} · দক্ষতা: {skill}%',
+            'adaptive.skipped': 'প্রশ্ন এড়ানো হয়েছে',
+            'adaptive.skippedBody': 'সমাধান দেখানো হয়েছে এবং আপনার অভিযোজিত রেটিং কমেছে।'
+        },
+        ja: {
+            'mode.adaptive': '適応',
+            'modeDescription.adaptive': '正誤に応じて難易度が変わります。ヒントとスキップで評価が下がり、苦手な演算子の出題頻度も下がります。',
+            'action.skip': '問題をスキップ',
+            'progress.adaptive': 'レベル：{level} · スキル：{skill}%',
+            'adaptive.skipped': '問題をスキップしました',
+            'adaptive.skippedBody': '解答を表示し、適応評価を下げました。'
+        },
+        hi: {
+            'mode.adaptive': 'अनुकूली',
+            'modeDescription.adaptive': 'कठिनाई आपके उत्तरों के अनुसार बदलती है। संकेत और छोड़ने से रेटिंग घटती है; कम सहज संक्रियाएँ कम आती हैं।',
+            'action.skip': 'प्रश्न छोड़ें',
+            'progress.adaptive': 'स्तर: {level} · कौशल: {skill}%',
+            'adaptive.skipped': 'प्रश्न छोड़ा गया',
+            'adaptive.skippedBody': 'हल दिखाया गया है और आपकी अनुकूली रेटिंग घट गई है।'
+        },
+        pt: {
+            'mode.adaptive': 'Adaptativo',
+            'modeDescription.adaptive': 'A dificuldade acompanha suas respostas. Dicas e pulos reduzem sua nota; operadores menos confortáveis aparecem com menor frequência.',
+            'action.skip': 'Pular pergunta',
+            'progress.adaptive': 'Nível: {level} · habilidade: {skill}%',
+            'adaptive.skipped': 'Pergunta pulada',
+            'adaptive.skippedBody': 'A solução foi mostrada e sua nota adaptativa diminuiu.'
+        },
+        ru: {
+            'mode.adaptive': 'Адаптивный',
+            'modeDescription.adaptive': 'Сложность меняется по вашим ответам. Подсказки и пропуски снижают рейтинг; менее знакомые операции встречаются реже.',
+            'action.skip': 'Пропустить задачу',
+            'progress.adaptive': 'Уровень: {level} · навык: {skill}%',
+            'adaptive.skipped': 'Задача пропущена',
+            'adaptive.skippedBody': 'Решение показано, а ваш адаптивный рейтинг снижен.'
+        },
+        vi: {
+            'mode.adaptive': 'Thích ứng',
+            'modeDescription.adaptive': 'Độ khó thay đổi theo câu trả lời. Gợi ý và bỏ qua làm giảm xếp hạng; phép toán chưa quen xuất hiện ít hơn.',
+            'action.skip': 'Bỏ qua câu hỏi',
+            'progress.adaptive': 'Cấp: {level} · kỹ năng: {skill}%',
+            'adaptive.skipped': 'Đã bỏ qua câu hỏi',
+            'adaptive.skippedBody': 'Lời giải được hiện và xếp hạng Thích ứng của bạn đã giảm.'
+        },
+        tr: {
+            'mode.adaptive': 'Uyarlamalı',
+            'modeDescription.adaptive': 'Zorluk yanıtlarınıza göre değişir. İpuçları ve atlamalar puanı düşürür; daha az rahat olduğunuz işlemler daha seyrek görünür.',
+            'action.skip': 'Soruyu atla',
+            'progress.adaptive': 'Seviye: {level} · beceri: %{skill}',
+            'adaptive.skipped': 'Soru atlandı',
+            'adaptive.skippedBody': 'Çözüm gösterildi ve Uyarlamalı puanınız düşürüldü.'
+        },
+        ur: {
+            'mode.adaptive': 'موافق',
+            'modeDescription.adaptive': 'مشکل آپ کے جوابوں کے مطابق بدلتی ہے۔ اشارے اور چھوڑنا ریٹنگ گھٹاتے ہیں؛ کم مانوس عمل کم آتے ہیں۔',
+            'action.skip': 'سوال چھوڑیں',
+            'progress.adaptive': 'سطح: {level} · مہارت: {skill}٪',
+            'adaptive.skipped': 'سوال چھوڑ دیا گیا',
+            'adaptive.skippedBody': 'حل دکھا دیا گیا اور آپ کی موافق ریٹنگ گھٹا دی گئی۔'
+        }
+    };
+    for (const code of AVAILABLE_LOCALES) Object.assign(messages[code], adaptiveMessages[code]);
+
     function translate(value) {
         if (typeof value !== 'string') return value;
         return (sourceTexts[locale] && sourceTexts[locale][value]) || value;

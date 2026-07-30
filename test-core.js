@@ -206,4 +206,57 @@ for (const operation of Object.values(core.OPERATIONS)) {
     assert(allOperations.has(operation.symbol), 'generated ' + operation.label);
 }
 
+const initialAdaptive = core.normalizeAdaptiveState(null);
+assert.strictEqual(initialAdaptive.rating, core.ADAPTIVE_INITIAL_RATING);
+assert.strictEqual(core.adaptiveProfile(initialAdaptive).id, 'normal',
+    'Adaptive mode starts at Normal');
+const correctAdaptive = core.updateAdaptiveState(initialAdaptive, 'correct', ['add']);
+assert(correctAdaptive.rating > initialAdaptive.rating, 'a correct answer raises Adaptive difficulty');
+assert(correctAdaptive.operations.add > initialAdaptive.operations.add,
+    'a correct answer raises comfort for operators in the question');
+const wrongAdaptive = core.updateAdaptiveState(correctAdaptive, 'wrong', ['add']);
+assert(wrongAdaptive.rating < correctAdaptive.rating, 'a wrong answer lowers Adaptive difficulty');
+const hintedAdaptive = core.updateAdaptiveState(correctAdaptive, 'hint', ['add']);
+assert(hintedAdaptive.rating < correctAdaptive.rating, 'a hint applies an Adaptive penalty');
+const skippedAdaptive = core.updateAdaptiveState(correctAdaptive, 'skip', ['add']);
+assert(skippedAdaptive.rating < hintedAdaptive.rating, 'skipping applies a larger Adaptive penalty');
+
+const comfortable = core.normalizeAdaptiveState({
+    rating: 0.55,
+    operations: { add: 0.95, subtract: 0.05, multiply: 0.05, divide: 0.05 }
+});
+const adaptiveProfile = core.adaptiveProfile(comfortable);
+const adaptiveWeights = core.adaptiveOperationWeights(comfortable, adaptiveProfile);
+let addQuestions = 0;
+let subtractQuestions = 0;
+for (let seed = 1; seed <= 200; seed++) {
+    const problem = core.generateProblem({
+        profile: adaptiveProfile,
+        operationWeights: adaptiveWeights,
+        round: seed,
+        random: seededRandom(seed * 997)
+    });
+    const operations = core.solutionDetails(problem.sides, {}).operations;
+    if (operations.includes('add')) addQuestions++;
+    if (operations.includes('subtract')) subtractQuestions++;
+}
+assert(addQuestions > subtractQuestions * 1.5,
+    'operators with lower comfort appear substantially less often');
+
+for (const rating of [0, 0.2, 0.4, 0.6, 0.8, 1]) {
+    const model = core.normalizeAdaptiveState({ rating: rating });
+    const profile = core.adaptiveProfile(model);
+    for (let seed = 1; seed <= 40; seed++) {
+        const problem = core.generateProblem({
+            profile: profile,
+            operationWeights: core.adaptiveOperationWeights(model, profile),
+            round: seed,
+            random: seededRandom(seed * 1237 + rating * 100)
+        });
+        const solution = core.solutionDetails(problem.sides, {});
+        assert.strictEqual(solution.solvedTotals[0], solution.solvedTotals[1],
+            'Adaptive rating ' + rating + ' produces a solvable question');
+    }
+}
+
 console.log('Core tests passed for 200 standard puzzles and all operation types.');
