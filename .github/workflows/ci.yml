@@ -3,6 +3,7 @@ name: CI
 on:
   push:
     branches: [main]
+    tags: ['v*.*.*']
   pull_request:
   workflow_dispatch:
 
@@ -36,9 +37,11 @@ jobs:
           npm run package
           node scripts/check-site.js dist
       - name: Create itch.io distributable
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
         working-directory: dist
         run: zip -9 -r "${RUNNER_TEMP}/you-only-get-1s.zip" .
       - name: Upload itch.io distributable
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: itch-io-distributable
