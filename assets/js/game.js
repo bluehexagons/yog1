@@ -16,20 +16,21 @@
     for (const id of [
         'mode_buttons', 'mode_info', 'view_buttons', 'sidebar_toggle', 'sidebar_toggle_play',
         'round_label', 'round_kind', 'score_label', 'timer_label',
-        'problem', 'flip_count', 'flip_text', 'submit', 'hint', 'skip', 'share',
+        'workspace', 'problem', 'flip_count', 'flip_text', 'submit', 'hint', 'skip', 'share',
         'message', 'message_title', 'message_text', 'feedback', 'custom_panel', 'custom_form',
         'custom_operations', 'custom_length', 'custom_length_value', 'custom_min',
         'custom_max', 'custom_correct', 'custom_rate', 'custom_seed', 'custom_progress',
         'history', 'history_page', 'history_prev', 'history_next', 'history_clear',
         'practice_missed',
-        'stats_rows', 'stats_reset_all', 'session_summary', 'achievement_list',
+        'stats_rows', 'stats_reset_all', 'session_summary', 'session_summary_values', 'achievement_list',
         'achievement_notice', 'setting_sound', 'setting_large_text', 'setting_contrast',
-        'setting_reduced_clutter', 'setting_language', 'quick_language',
+        'setting_reduced_clutter', 'setting_text_spacing', 'setting_underline_links',
+        'setting_motion', 'setting_language', 'quick_language',
         'setting_color_scheme', 'quick_color_scheme', 'setting_sidebar_side',
         'setting_adaptive_style', 'setting_learning_focus', 'learning_goal',
         'learning_goal_name', 'learning_goal_example', 'learning_recommendation',
         'learning_rows', 'learning_practice', 'install_app', 'export_data', 'import_data',
-        'import_file', 'app_version', 'app_version_date'
+        'import_file', 'app_version', 'app_version_date', 'app_status'
     ]) {
         ui[id] = document.getElementById(id);
     }
@@ -75,7 +76,8 @@
     let achievementState = load(KEYS.achievements, { unlocked: [], operations: [], solved: 0 });
     const defaultSettings = {
         sound: false, largeText: false, contrast: false, reducedClutter: false,
-        colorScheme: 'auto', sidebarSide: 'auto', adaptiveStyle: 'flow',
+        colorScheme: 'auto', motion: 'auto', sidebarSide: 'auto', adaptiveStyle: 'flow',
+        textSpacing: false, underlineLinks: false,
         learningFocus: 'recommended',
         lastView: 'play', sidebarCollapsed: false, historyPage: 0
     };
@@ -156,6 +158,14 @@
     let adaptiveProblemState = null;
     let currentLearningConcept = 'balance';
     let forcedLearningConcept = null;
+    let lastTimerAnnouncement = null;
+
+    function announce(value) {
+        ui.app_status.textContent = '';
+        window.setTimeout(function () {
+            ui.app_status.textContent = value;
+        }, 0);
+    }
 
     function newSession() {
         session = {
@@ -679,6 +689,10 @@
         renderLearningGoal();
     }
 
+    function announceProblem() {
+        announce(ui.round_label.textContent + '. ' + ui.problem.getAttribute('aria-label'));
+    }
+
     function renderLearningGoal() {
         ui.learning_goal.hidden = mode !== 'guided' || !currentProblem;
         if (ui.learning_goal.hidden) return;
@@ -711,12 +725,14 @@
         currentMessage = { titleKey: titleKey, messageKey: messageKey, values: values || {} };
         currentPersistentMessage = currentMessage;
         renderCatalogMessage();
+        announce(ui.message_title.textContent + '. ' + ui.message_text.textContent);
         restartAnimation(ui.message, 'is-updating');
     }
 
     function setTransientCatalogMessage(titleKey, messageKey, values) {
         currentMessage = { titleKey: titleKey, messageKey: messageKey, values: values || {} };
         renderCatalogMessage();
+        announce(ui.message_title.textContent + '. ' + ui.message_text.textContent);
         restartAnimation(ui.message, 'is-updating');
     }
 
@@ -846,6 +862,7 @@
                     kind: { catalogKey: 'round.' + currentProblem.roundKind }
                 });
         }
+        announceProblem();
         persistResume();
     }
 
@@ -1125,7 +1142,7 @@
             });
         } else if (mode === 'endless') {
             ui.custom_progress.textContent = t('progress.chances', {
-                chances: '●'.repeat(session.lives) + '○'.repeat(3 - session.lives)
+                chances: session.lives + ' / 3'
             });
         } else if (mode === 'adaptive') {
             ui.custom_progress.textContent = t('progress.adaptive', {
@@ -1137,12 +1154,17 @@
             ui.custom_progress.textContent = t('progress.daily', {
                 current: progress.current, best: progress.best, grid: progress.grid
             });
+            ui.custom_progress.setAttribute('aria-label', t('progress.daily', {
+                current: progress.current, best: progress.best,
+                grid: progress.solved + ' ' + t('history.correct')
+            }));
         } else if (mode === 'guided') {
             const entry = learningState.concepts[currentLearningConcept];
             ui.custom_progress.textContent = t('learning.progressValue', {
                 progress: core.conceptProgress(entry)
             });
         }
+        if (mode !== 'daily') ui.custom_progress.removeAttribute('aria-label');
     }
 
     function renderSession() {
@@ -1160,7 +1182,7 @@
             );
             return group;
         }
-        ui.session_summary.replaceChildren(
+        ui.session_summary_values.replaceChildren(
             sessionStat(t('session.solved'), String(session.solved)),
             sessionStat(t('session.accuracy'), accuracy + '%'),
             sessionStat(t('session.average'),
@@ -1361,6 +1383,9 @@
             if (heading) {
                 heading.tabIndex = -1;
                 heading.focus();
+            } else if (currentProblem) {
+                ui.problem.focus();
+                announceProblem();
             }
         }
     }
@@ -1369,6 +1394,7 @@
         if (timerId) window.clearInterval(timerId);
         timerId = null;
         timerDeadline = 0;
+        lastTimerAnnouncement = null;
         ui.timer_label.hidden = true;
     }
 
@@ -1378,9 +1404,17 @@
         timeRemaining = Math.max(0, Math.ceil((timerDeadline - Date.now()) / 1000));
         ui.timer_label.hidden = false;
         ui.timer_label.textContent = t('timer.seconds', { seconds: timeRemaining });
+        ui.timer_label.setAttribute('aria-label', t('mode.timed') + ': ' +
+            t('timer.seconds', { seconds: timeRemaining }));
         function updateTimer() {
             timeRemaining = Math.max(0, Math.ceil((timerDeadline - Date.now()) / 1000));
             ui.timer_label.textContent = t('timer.seconds', { seconds: timeRemaining });
+            ui.timer_label.setAttribute('aria-label', t('mode.timed') + ': ' +
+                t('timer.seconds', { seconds: timeRemaining }));
+            if ([30, 10, 5].includes(timeRemaining) && lastTimerAnnouncement !== timeRemaining) {
+                lastTimerAnnouncement = timeRemaining;
+                announce(ui.timer_label.getAttribute('aria-label'));
+            }
             if (timeRemaining <= 0) {
                 finishSession('timed.complete', 'timed.result', { count: session.solved });
                 playSound('finish');
@@ -1396,6 +1430,7 @@
 
     function activateMode(nextMode, button, options) {
         options = options || {};
+        const moveFocus = !!button && document.activeElement === button;
         clearTimer();
         mode = nextMode;
         if (core.DIFFICULTIES[mode]) profile = core.DIFFICULTIES[mode];
@@ -1435,6 +1470,9 @@
         } else {
             startRound();
             if (mode === 'timed') startTimer();
+        }
+        if (moveFocus) {
+            (mode === 'custom' ? ui.custom_operations.querySelector('input') : ui.problem).focus();
         }
     }
 
@@ -1530,8 +1568,12 @@
         document.documentElement.classList.toggle('large-text', !!settings.largeText);
         document.body.classList.toggle('high-contrast', !!settings.contrast);
         document.body.classList.toggle('reduced-clutter', !!settings.reducedClutter);
+        document.body.classList.toggle('increased-text-spacing', !!settings.textSpacing);
+        document.body.classList.toggle('underline-links', !!settings.underlineLinks);
         const colorScheme = window.Yog1Theme.apply(settings.colorScheme);
+        const motion = window.Yog1Theme.applyMotion(settings.motion);
         settings.colorScheme = colorScheme;
+        settings.motion = motion;
         const requestedSide = ['auto', 'left', 'right'].includes(settings.sidebarSide) ? settings.sidebarSide : 'auto';
         const sidebarSide = requestedSide === 'auto'
             ? (i18n.getDirection() === 'rtl' ? 'right' : 'left') : requestedSide;
@@ -1541,6 +1583,9 @@
         ui.setting_large_text.checked = !!settings.largeText;
         ui.setting_contrast.checked = !!settings.contrast;
         ui.setting_reduced_clutter.checked = !!settings.reducedClutter;
+        ui.setting_text_spacing.checked = !!settings.textSpacing;
+        ui.setting_underline_links.checked = !!settings.underlineLinks;
+        ui.setting_motion.value = motion;
         ui.setting_language.value = i18n.getLocale();
         ui.quick_language.value = i18n.getLocale();
         ui.setting_color_scheme.value = colorScheme;
@@ -1637,6 +1682,8 @@
                 const easyButton = ui.mode_buttons.querySelector('[data-mode="easy"]');
                 activateMode('easy', easyButton);
                 setCatalogMessage('tutorial.complete', 'tutorial.completeBody');
+                announce(ui.message_title.textContent + '. ' + ui.message_text.textContent + ' ' +
+                    ui.round_label.textContent + '. ' + ui.problem.getAttribute('aria-label'));
                 persistResume();
             } else {
                 correctAnswer();
@@ -1739,9 +1786,12 @@
         const chosen = customSettings();
         for (const input of ui.custom_form.querySelectorAll('[aria-invalid="true"]')) {
             input.removeAttribute('aria-invalid');
+            input.removeAttribute('aria-describedby');
         }
+        ui.custom_form.querySelector('fieldset').setAttribute('aria-describedby', 'custom_note');
         if (!chosen.operations.length) {
             setCatalogMessage('custom.chooseOperation', 'custom.chooseOperationBody');
+            ui.custom_form.querySelector('fieldset').setAttribute('aria-describedby', 'custom_note message');
             const firstOperation = ui.custom_operations.querySelector('input');
             if (firstOperation) firstOperation.focus();
             return;
@@ -1750,6 +1800,7 @@
             return ['add', 'subtract', 'multiply', 'divide', 'power'].includes(operation);
         })) {
             setCatalogMessage('custom.chooseIdentity', 'custom.chooseIdentityBody');
+            ui.custom_form.querySelector('fieldset').setAttribute('aria-describedby', 'custom_note message');
             const firstIdentity = Array.from(ui.custom_operations.querySelectorAll('input')).find(function (input) {
                 return ['add', 'subtract', 'multiply', 'divide', 'power'].includes(input.value);
             });
@@ -1760,6 +1811,8 @@
             setCatalogMessage('custom.checkTargets', 'custom.checkTargetsBody');
             ui.custom_min.setAttribute('aria-invalid', 'true');
             ui.custom_max.setAttribute('aria-invalid', 'true');
+            ui.custom_min.setAttribute('aria-describedby', 'message');
+            ui.custom_max.setAttribute('aria-describedby', 'message');
             ui.custom_min.focus();
             return;
         }
@@ -1776,6 +1829,10 @@
         ui.custom_length_value.textContent = ui.custom_length.value;
     });
     ui.custom_form.addEventListener('input', function () {
+        for (const input of ui.custom_form.querySelectorAll('[aria-invalid="true"]')) {
+            input.removeAttribute('aria-invalid');
+            input.removeAttribute('aria-describedby');
+        }
         if (ui.custom_form.checkValidity()) {
             save(KEYS.custom, customSettings());
         }
@@ -1858,13 +1915,16 @@
         }
     });
 
-    for (const input of [ui.setting_sound, ui.setting_large_text, ui.setting_contrast, ui.setting_reduced_clutter]) {
+    for (const input of [ui.setting_sound, ui.setting_large_text, ui.setting_contrast,
+        ui.setting_reduced_clutter, ui.setting_text_spacing, ui.setting_underline_links]) {
         input.addEventListener('change', function () {
             settings = Object.assign({}, settings, {
                 sound: ui.setting_sound.checked,
                 largeText: ui.setting_large_text.checked,
                 contrast: ui.setting_contrast.checked,
                 reducedClutter: ui.setting_reduced_clutter.checked,
+                textSpacing: ui.setting_text_spacing.checked,
+                underlineLinks: ui.setting_underline_links.checked,
                 sidebarSide: ui.setting_sidebar_side.value,
                 adaptiveStyle: ui.setting_adaptive_style.value,
                 learningFocus: ui.setting_learning_focus.value
@@ -1886,6 +1946,11 @@
             applySettings();
         });
     }
+    ui.setting_motion.addEventListener('change', function () {
+        settings.motion = ui.setting_motion.value;
+        save(KEYS.settings, settings);
+        applySettings();
+    });
     ui.setting_sidebar_side.addEventListener('change', function () {
         settings.sidebarSide = ui.setting_sidebar_side.value;
         save(KEYS.settings, settings);
@@ -1909,18 +1974,21 @@
 
     document.addEventListener('keydown', function (event) {
         if (event.target.matches('input, select, textarea')) return;
+        if (document.getElementById('play_screen').hidden) return;
         const numbers = Array.from(ui.problem.querySelectorAll('.number'));
-        if ((event.key === 'ArrowLeft' || event.key === 'ArrowRight') && numbers.length) {
+        const inPuzzle = event.target === document.body || ui.workspace.contains(event.target);
+        if ((event.key === 'ArrowLeft' || event.key === 'ArrowRight') && numbers.length &&
+            (event.target === ui.problem || event.target.closest('.number'))) {
             event.preventDefault();
             let index = numbers.indexOf(document.activeElement);
             index += event.key === 'ArrowRight' ? 1 : -1;
             if (index < 0) index = numbers.length - 1;
             if (index >= numbers.length) index = 0;
             numbers[index].focus();
-        } else if (event.key.toLowerCase() === 'h' && !ui.hint.disabled) {
+        } else if (event.key.toLowerCase() === 'h' && inPuzzle && !ui.hint.disabled) {
             event.preventDefault();
             ui.hint.click();
-        } else if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) {
+        } else if (event.key === 'Enter' && inPuzzle && (event.ctrlKey || event.metaKey)) {
             event.preventDefault();
             ui.submit.click();
         } else if (event.key === 'Enter' && document.activeElement === document.body) {

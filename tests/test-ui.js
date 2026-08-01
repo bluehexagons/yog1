@@ -77,6 +77,23 @@ assert(html.includes('@media (prefers-reduced-motion: reduce)') &&
     html.includes('animation: none !important') &&
     html.includes('transition: none !important'),
     'motion and transitions honor the reduced-motion preference');
+assert(html.includes('id="setting_motion"') &&
+    html.includes(':root[data-motion="reduce"]') &&
+    html.includes(':root:not([data-motion="full"])') &&
+    theme.includes('applyMotion(savedSettings.motion)') &&
+    game.includes('window.Yog1Theme.applyMotion(settings.motion)'),
+    'motion can follow the device, be reduced, or be explicitly enabled without startup flashes');
+assert(game.includes("motion: 'auto'") &&
+    game.includes("settings.motion = ui.setting_motion.value") &&
+    game.includes('ui.setting_motion.value = motion'),
+    'the motion preference defaults safely, persists, and stays synchronized with its control');
+assert(html.includes('id="setting_text_spacing"') &&
+    html.includes('id="setting_underline_links"') &&
+    html.includes('body.increased-text-spacing') &&
+    html.includes('body.underline-links a') &&
+    game.includes('textSpacing: ui.setting_text_spacing.checked') &&
+    game.includes('underlineLinks: ui.setting_underline_links.checked'),
+    'readability settings support and persist increased spacing and link recognition');
 assert(html.includes('@media (prefers-color-scheme: dark)') &&
     html.includes(':root[data-color-scheme="dark"]') &&
     html.includes('id="setting_color_scheme"'),
@@ -135,12 +152,41 @@ assert(html.includes('html.large-text { font-size: 118.75%; }') &&
     html.includes('font: 1rem/1.45') &&
     game.includes("document.documentElement.classList.toggle('large-text'"),
     'larger text scales rem-based controls from the root element');
-assert(html.includes('<dl id="session_summary"') &&
+assert(html.includes('<div id="session_summary" role="group" aria-labelledby="session_summary_label"') &&
+    html.includes('<dl id="session_summary_values">') &&
     game.includes("text('dt', label") && game.includes("text('dd', value"),
     'session statistics use description-list semantics');
-assert(html.includes('<div id="problem" role="group" dir="ltr">') &&
+assert(html.includes('<div id="problem" role="group" dir="ltr" tabindex="-1">') &&
     game.includes("ui.problem.setAttribute('aria-label'"),
     'the interactive equation has a stable direction and generated accessible name');
+assert(html.includes('id="app_status"') && html.includes('aria-atomic="true"') &&
+    game.includes('function announceProblem()') &&
+    game.includes("announce(ui.message_title.textContent + '. ' + ui.message_text.textContent)"),
+    'one atomic app status announces puzzle and result changes without making detailed feedback live');
+assert(html.includes('<div id="feedback" hidden></div>') &&
+    !html.includes('<div id="feedback" role="status"'),
+    'interactive solution details do not compete with concise status announcements');
+assert(html.includes('id="timer_label" role="timer"') &&
+    game.includes('[30, 10, 5].includes(timeRemaining)'),
+    'the timer has semantics and announces only useful countdown milestones');
+assert(game.includes("session.lives + ' / 3'") &&
+    game.includes("ui.custom_progress.setAttribute('aria-label'"),
+    'lives and Daily progress have meaningful text alternatives instead of unexplained symbols');
+assert(html.includes('role="group" aria-labelledby="mode_group_learn"') &&
+    html.includes('role="group" aria-labelledby="mode_group_classic"') &&
+    html.includes('role="group" aria-labelledby="mode_group_challenge"'),
+    'mode categories are exposed as named groups');
+assert(html.includes('id="import_file" class="sr-only"') && html.includes('tabindex="-1"') &&
+    html.includes('tabindex="-1" aria-hidden="true"') &&
+    !html.includes('aria-haspopup="listbox"'),
+    'hidden and popup controls do not expose misleading keyboard or popup semantics');
+assert(game.includes("document.getElementById('play_screen').hidden") &&
+    game.includes("event.target.closest('.number')") &&
+    game.includes('ui.workspace.contains(event.target)'),
+    'game shortcuts are scoped to visible puzzle controls');
+assert(game.includes("ui.custom_min.setAttribute('aria-describedby', 'message')") &&
+    game.includes("setAttribute('aria-describedby', 'custom_note message')"),
+    'custom validation associates the explanation with invalid controls');
 for (const id of ['quick_language', 'setting_language']) {
     assert(new RegExp('<select id="' + id + '"[^>]*>\\s*</select>').test(html),
         id + ' gets its options from the locale metadata source of truth');

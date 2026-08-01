@@ -215,6 +215,14 @@ assert(details.solvedSteps.some(function (side) { return side.length > 0; }),
     'solution details include step-by-step arithmetic');
 assert(core.describe(seededA.sides[0], {}, { add: 'plus' }).length > 0,
     'expressions have a natural-language description');
+const groupedDescription = core.describe({
+    type: 'binary', operation: 'multiply',
+    left: { type: 'binary', operation: 'add', left: { type: 'number', value: 2, id: 'a' },
+        right: { type: 'number', value: 3, id: 'b' } },
+    right: { type: 'number', value: 4, id: 'c' }
+}, {}, { add: 'addition', multiply: 'multiplication' });
+assert.strictEqual(groupedDescription, 'multiplication: addition: 2; 3; 4',
+    'spoken expressions preserve nested grouping without relying on spoken punctuation');
 const learning = core.learningAnalysis(seededA.sides, details.solutionId);
 assert(Object.prototype.hasOwnProperty.call(core.LEARNING_CONCEPTS, learning.concept),
     'puzzles resolve to a stable learning concept');

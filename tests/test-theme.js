@@ -17,7 +17,7 @@ const documentElement = {
 };
 const settings = new Map([[
     'yog1.v2.settings',
-    JSON.stringify({ colorScheme: 'dark' })
+    JSON.stringify({ colorScheme: 'dark', motion: 'reduce' })
 ]]);
 const context = {
     document: {
@@ -53,6 +53,15 @@ assert.deepStrictEqual(Array.from(theme.schemes),
     'every supported scheme is exposed from one validated list');
 assert.strictEqual(documentElement.dataset.colorScheme, 'dark',
     'the saved dark scheme is applied before the main UI loads');
+assert.strictEqual(documentElement.dataset.motion, 'reduce',
+    'saved reduced motion is applied before the main UI loads');
+assert.deepStrictEqual(Array.from(theme.motions), ['auto', 'reduce', 'full'],
+    'every motion preference is exposed from one validated list');
+assert.strictEqual(theme.applyMotion('full'), 'full');
+assert.strictEqual(documentElement.dataset.motion, 'full',
+    'full motion can explicitly override the browser preference');
+assert.strictEqual(theme.applyMotion('invalid'), 'auto',
+    'invalid motion preferences safely fall back to automatic');
 assert.strictEqual(themeColor.content, '#090b0d',
     'dark mode updates the browser theme color');
 assert.strictEqual(theme.apply('light'), 'light');

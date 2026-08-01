@@ -32,69 +32,69 @@
             <button id="sidebar_toggle" class="secondary" type="button" aria-controls="menu" aria-expanded="true" title="Collapse game menu" data-i18n="menu.collapse" data-i18n-title="menu.collapseTitle">Collapse</button>
         </div>
         <div class="section-label" data-i18n="nav.view">View</div>
-        <div id="view_buttons" role="navigation" aria-label="Game sections" data-i18n-aria-label="aria.sections">
+        <nav id="view_buttons" aria-label="Game sections" data-i18n-aria-label="aria.sections">
             <button type="button" data-view="play" class="active" aria-current="page" data-i18n="nav.play">Play</button>
             <button type="button" data-view="options" data-i18n="nav.options">Options</button>
             <button type="button" data-view="stats" data-i18n="nav.stats">Stats</button>
             <button type="button" data-view="about" data-i18n="nav.about">About</button>
-        </div>
+        </nav>
         <div class="section-label" data-i18n="nav.mode">Mode</div>
-        <div id="mode_buttons" role="group" aria-label="Game mode" data-i18n-aria-label="aria.mode">
-            <div class="mode-group">
-                <span class="mode-group-label" data-i18n="nav.learn">Learn</span>
+        <nav id="mode_buttons" aria-label="Game mode" data-i18n-aria-label="aria.mode">
+            <div class="mode-group" role="group" aria-labelledby="mode_group_learn">
+                <span id="mode_group_learn" class="mode-group-label" data-i18n="nav.learn">Learn</span>
                 <button type="button" data-mode="tutorial" class="active" aria-pressed="true" data-i18n="mode.tutorial">Tutorial</button>
                 <button type="button" data-mode="adaptive" aria-pressed="false" data-i18n="mode.adaptive">Adaptive</button>
                 <button type="button" data-mode="guided" aria-pressed="false" data-i18n="mode.guided">Guided Practice</button>
             </div>
-            <div class="mode-group">
-                <span class="mode-group-label" data-i18n="nav.classic">Classic</span>
+            <div class="mode-group" role="group" aria-labelledby="mode_group_classic">
+                <span id="mode_group_classic" class="mode-group-label" data-i18n="nav.classic">Classic</span>
                 <button type="button" data-mode="easy" aria-pressed="false" data-i18n="mode.easy">Easy</button>
                 <button type="button" data-mode="normal" aria-pressed="false" data-i18n="mode.normal">Normal</button>
                 <button type="button" data-mode="hard" aria-pressed="false" data-i18n="mode.hard">Hard</button>
                 <button type="button" data-mode="expert" aria-pressed="false" data-i18n="mode.expert">Expert</button>
                 <button type="button" data-mode="extreme" aria-pressed="false" data-i18n="mode.extreme">Extreme</button>
             </div>
-            <div class="mode-group">
-                <span class="mode-group-label" data-i18n="nav.challenge">Challenge</span>
+            <div class="mode-group" role="group" aria-labelledby="mode_group_challenge">
+                <span id="mode_group_challenge" class="mode-group-label" data-i18n="nav.challenge">Challenge</span>
                 <button type="button" data-mode="daily" aria-pressed="false" data-i18n="mode.daily">Daily</button>
                 <button type="button" data-mode="timed" aria-pressed="false" data-i18n="mode.timed">Timed</button>
                 <button type="button" data-mode="endless" aria-pressed="false" data-i18n="mode.endless">Endless</button>
                 <button type="button" data-mode="challenges" aria-pressed="false" data-i18n="mode.challenges">Challenges</button>
                 <button type="button" data-mode="custom" aria-pressed="false" data-i18n="mode.custom">Custom</button>
             </div>
-        </div>
-        <div id="mode_info" aria-live="polite"></div>
+        </nav>
+        <div id="mode_info"></div>
     </aside>
     <main id="game">
         <div id="game_toolbar">
             <div class="toolbar-controls">
                 <button id="sidebar_toggle_play" class="secondary" type="button" aria-controls="menu" aria-expanded="true" data-i18n="action.menu">Menu</button>
                 <div class="compact-input" data-compact-input>
-                    <button class="compact-input-toggle secondary" type="button" aria-expanded="false" aria-controls="quick_language_panel" aria-haspopup="listbox" title="Language" data-i18n-title="language.label"><span class="compact-input-icon" aria-hidden="true">文</span><span class="sr-only" data-i18n="language.label">Language</span></button>
+                    <button class="compact-input-toggle secondary" type="button" aria-expanded="false" aria-controls="quick_language_panel" title="Language" data-i18n-title="language.label"><span class="compact-input-icon" aria-hidden="true">文</span><span class="sr-only" data-i18n="language.label">Language</span></button>
                     <div id="quick_language_panel" class="compact-input-panel" hidden>
                         <label class="compact-input-label" for="quick_language" data-i18n="language.label">Language</label>
-                        <select id="quick_language" aria-label="Language" data-i18n-aria-label="language.label"></select>
+                        <select id="quick_language"></select>
                     </div>
                 </div>
                 <div class="compact-input" data-compact-input>
-                    <button class="compact-input-toggle secondary" type="button" aria-expanded="false" aria-controls="quick_color_scheme_panel" aria-haspopup="listbox" title="Color scheme" data-i18n-title="theme.label"><span class="compact-input-icon" aria-hidden="true">◐</span><span class="sr-only" data-i18n="theme.label">Color scheme</span></button>
+                    <button class="compact-input-toggle secondary" type="button" aria-expanded="false" aria-controls="quick_color_scheme_panel" title="Color scheme" data-i18n-title="theme.label"><span class="compact-input-icon" aria-hidden="true">◐</span><span class="sr-only" data-i18n="theme.label">Color scheme</span></button>
                     <div id="quick_color_scheme_panel" class="compact-input-panel" hidden>
                         <label class="compact-input-label" for="quick_color_scheme" data-i18n="theme.label">Color scheme</label>
-                        <select id="quick_color_scheme" aria-label="Color scheme" data-i18n-aria-label="theme.label"></select>
+                        <select id="quick_color_scheme"></select>
                     </div>
                 </div>
             </div>
         </div>
         <section id="play_screen" class="screen" data-screen="play" aria-label="Play" data-i18n-aria-label="aria.play">
-        <div id="message" role="status" aria-live="polite">
+        <div id="message">
             <strong id="message_title" data-i18n="message.howToPlay">How to play</strong>
             <span id="message_text"></span>
         </div>
         <div id="achievement_notice" role="status" aria-live="polite"></div>
-        <aside id="learning_goal" aria-live="polite" hidden>
+        <div id="learning_goal" hidden>
             <strong data-i18n="learning.goal">Learning goal</strong>
             <span><span id="learning_goal_name"></span> · <code id="learning_goal_example"></code></span>
-        </aside>
+        </div>
 
         <section id="custom_panel" hidden>
             <form id="custom_form">
@@ -121,12 +121,15 @@
             <span id="round_label">Tutorial</span>
             <span id="round_kind" class="round-kind">Guided</span>
             <span id="score_label"></span>
-            <span id="timer_label" hidden>60s</span>
-            <dl id="session_summary" aria-label="Current session statistics" data-i18n-aria-label="aria.session"></dl>
+            <span id="timer_label" role="timer" hidden>60s</span>
+            <span id="session_summary_label" class="sr-only" data-i18n="aria.session">Current session statistics</span>
+            <div id="session_summary" role="group" aria-labelledby="session_summary_label">
+                <dl id="session_summary_values"></dl>
+            </div>
         </div>
         <section id="workspace" aria-label="Current puzzle" data-i18n-aria-label="aria.puzzle">
             <div id="flips"><strong data-i18n="action.yourMove">Your move</strong><span class="flip-allowance"><span id="flip_count">1</span> <span id="flip_text">change remaining</span></span></div>
-            <div id="problem" role="group" dir="ltr"></div>
+            <div id="problem" role="group" dir="ltr" tabindex="-1"></div>
             <div id="actions">
                 <span id="custom_progress" hidden></span>
                 <button id="hint" class="secondary" type="button" title="Hint (H)" data-i18n="action.hint" data-i18n-title="action.hintTitle">Hint</button>
@@ -134,7 +137,7 @@
                 <button id="share" class="secondary" type="button" data-i18n="action.share">Share</button>
                 <button id="submit" class="primary" type="button" data-i18n="action.check">Check equation</button>
             </div>
-            <div id="feedback" role="status" aria-live="polite" hidden></div>
+            <div id="feedback" hidden></div>
         </section>
 
         </section>
@@ -160,12 +163,15 @@
                     <label><span data-i18n="language.label">Language</span><select id="setting_language" aria-label="Language" data-i18n-aria-label="language.label"></select></label>
                     <label><span data-i18n="theme.label">Color scheme</span><select id="setting_color_scheme"></select></label>
                     <label><span data-i18n="sidebar.label">Sidebar side</span><select id="setting_sidebar_side"><option value="auto" data-i18n="sidebar.auto">Automatic (follow language)</option><option value="left" data-i18n="sidebar.left">Left</option><option value="right" data-i18n="sidebar.right">Right</option></select></label>
+                    <label><span data-i18n="motion.label">Motion</span><select id="setting_motion"><option value="auto" data-i18n="motion.auto">Automatic (follow device)</option><option value="reduce" data-i18n="motion.reduce">Reduce motion</option><option value="full" data-i18n="motion.full">Full motion</option></select></label>
                     <label><span data-i18n="adaptive.style">Adaptive style</span><select id="setting_adaptive_style"><option value="flow" data-i18n="adaptive.flow">Flow · follow your pace</option><option value="coach" data-i18n="adaptive.coach">Coach · build confidence</option></select></label>
                     <label><span data-i18n="learning.focus">Practice focus</span><select id="setting_learning_focus"></select></label>
                     <label><input id="setting_sound" type="checkbox"><span data-i18n="setting.sound">Sound effects</span></label>
                     <label><input id="setting_large_text" type="checkbox"><span data-i18n="setting.largeText">Larger text</span></label>
                     <label><input id="setting_contrast" type="checkbox"><span data-i18n="setting.contrast">Higher contrast</span></label>
                     <label><input id="setting_reduced_clutter" type="checkbox"><span data-i18n="setting.clutter">Reduced clutter</span></label>
+                    <label><input id="setting_text_spacing" type="checkbox"><span data-i18n="setting.textSpacing">Increased text spacing</span></label>
+                    <label><input id="setting_underline_links" type="checkbox"><span data-i18n="setting.underlineLinks">Always underline links</span></label>
                 </div>
                 <p class="wave-note" data-i18n="options.keyboard">Keys: ←/→ select · Space changes or restores · Enter checks · H opens a hint.</p>
                 <button id="install_app" class="secondary" type="button" data-i18n="action.install" hidden>Install offline app</button>
@@ -177,7 +183,7 @@
                 <div class="history-controls">
                     <button id="export_data" class="secondary" type="button" data-i18n="data.export">Download backup</button>
                     <button id="import_data" class="secondary" type="button" data-i18n="data.import">Restore backup</button>
-                    <input id="import_file" class="sr-only" type="file" accept=".json,application/json" aria-labelledby="import_data">
+                    <input id="import_file" class="sr-only" type="file" accept=".json,application/json" aria-labelledby="import_data" tabindex="-1" aria-hidden="true">
                 </div>
             </section>
             </div>
@@ -196,7 +202,7 @@
                 <h3 data-i18n="page.problemHistory">Problem history</h3>
                 <ul id="history"></ul>
                 <div class="history-controls">
-                    <span id="history_page"></span>
+                    <span id="history_page" role="status" aria-live="polite" aria-atomic="true"></span>
                     <button id="history_prev" class="secondary" type="button" data-i18n="stats.previous">Previous</button>
                     <button id="history_next" class="secondary" type="button" data-i18n="stats.next">Next</button>
                     <button id="practice_missed" class="secondary" type="button">Replay · Incorrect</button>
@@ -269,6 +275,7 @@
         </footer>
     </main>
 </div>
+<div id="app_status" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
 <script src="assets/js/locales.js"></script>
 <script src="assets/js/locale-loader.js"></script>
 <script src="assets/js/storage.js"></script>

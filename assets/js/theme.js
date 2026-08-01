@@ -10,18 +10,20 @@
         pastel: '#c9e9ff'
     };
     const SCHEMES = ['auto'].concat(Object.keys(THEME_COLORS));
+    const MOTIONS = ['auto', 'reduce', 'full'];
     const media = typeof root.matchMedia === 'function'
         ? root.matchMedia('(prefers-color-scheme: dark)')
         : { matches: false };
-    let preference = readPreference();
+    const savedSettings = readSettings();
+    let preference = SCHEMES.includes(savedSettings.colorScheme)
+        ? savedSettings.colorScheme : 'auto';
 
-    function readPreference() {
+    function readSettings() {
         try {
             const settings = JSON.parse(root.localStorage.getItem(STORAGE_KEY));
-            return settings && SCHEMES.includes(settings.colorScheme)
-                ? settings.colorScheme : 'auto';
+            return settings && typeof settings === 'object' ? settings : {};
         } catch (error) {
-            return 'auto';
+            return {};
         }
     }
 
@@ -43,6 +45,12 @@
         return preference;
     }
 
+    function applyMotion(nextPreference) {
+        const motion = MOTIONS.includes(nextPreference) ? nextPreference : 'auto';
+        document.documentElement.dataset.motion = motion;
+        return motion;
+    }
+
     function systemSchemeChanged() {
         if (preference === 'auto') apply(preference);
     }
@@ -54,10 +62,13 @@
     }
 
     apply(preference);
+    applyMotion(savedSettings.motion);
     root.Yog1Theme = {
         apply: apply,
+        applyMotion: applyMotion,
         getPreference: function () { return preference; },
         getResolvedScheme: resolvedScheme,
-        schemes: SCHEMES.slice()
+        schemes: SCHEMES.slice(),
+        motions: MOTIONS.slice()
     };
 }(window));

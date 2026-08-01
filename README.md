@@ -40,11 +40,12 @@ solution effect, and evaluation trace for lesson authoring or LLM experiments.
 The game also tracks achievements and session summaries. The **Options → Save
 data** section can download or restore local progress as a versioned JSON backup.
 Accessibility options provide larger text, higher contrast, reduced clutter,
-natural-language equation labels, and logical left-to-right math inside
-right-to-left layouts. Simple synthesized waveform sound effects are available
-but disabled by default. The saved color-scheme setting defaults to the browser
-preference and also offers Light, Dark, OLED-black Midnight, low-blue Sunset,
-and colorful Pastel themes.
+increased text spacing, persistent link underlines, natural-language equation
+labels, and logical left-to-right math inside right-to-left layouts. Motion can
+follow the device preference, be reduced manually, or be explicitly enabled.
+Simple synthesized waveform sound effects are available but disabled by default.
+The saved color-scheme setting defaults to the browser preference and also offers
+Light, Dark, OLED-black Midnight, low-blue Sunset, and colorful Pastel themes.
 
 Keyboard controls:
 

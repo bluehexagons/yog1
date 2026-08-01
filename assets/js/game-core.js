@@ -704,8 +704,9 @@
             return (operationLabels.root || 'square root of') + ' ' +
                 describe(expression.value, values, operationLabels);
         }
-        return describe(expression.left, values, operationLabels) + ' ' +
-            (operationLabels[expression.operation] || OPERATIONS[expression.operation].label) + ' ' +
+        // Prefix notation preserves the expression tree when punctuation is not spoken.
+        return (operationLabels[expression.operation] || OPERATIONS[expression.operation].label) + ': ' +
+            describe(expression.left, values, operationLabels) + '; ' +
             describe(expression.right, values, operationLabels);
     }
 
