@@ -103,11 +103,15 @@ assert(html.includes('input[type="number"], input[type="text"], select') &&
 assert(html.includes('min-height: 44px') && html.includes('@media (max-width: 420px)'),
     'mobile controls have touch-sized targets and a narrow-phone layout');
 assert(html.includes('@media (max-width: 960px)') &&
+    html.includes('@media (min-width: 641px) and (max-width: 960px)') &&
+    html.includes('@media (max-width: 640px)') &&
     html.includes('@media (max-height: 600px)') &&
     html.includes('#problem .number { min-width: 44px; min-height: 44px;') &&
-    html.includes('.panel-body th:first-child, .panel-body td:first-child'),
-    'tablet and short-viewport layouts preserve game targets and table context');
-assert(game.includes("window.matchMedia('(max-width: 960px)')") &&
+    html.includes('.panel-body th:first-child, .panel-body td:first-child') &&
+    html.includes('width: clamp(240px, 32vw, 300px)') &&
+    html.includes('overflow-y: auto; overscroll-behavior: contain;'),
+    'tablet and short-viewport layouts preserve targets, context, and independent scrolling');
+assert(game.includes("window.matchMedia('(max-width: 640px)')") &&
     game.includes("stackedLayout.addEventListener('change'") &&
     game.includes("? !!settings.sidebarCollapsed : stackedLayout.matches, false") &&
     game.includes("mode !== 'custom' || stackedLayout.matches") &&

@@ -333,16 +333,6 @@ body.reduced-clutter .options-extras, body.reduced-clutter #achievement_list { d
 footer { margin-top: 22px; padding-top: 12px; border-top: 1px solid var(--line); color: var(--muted); font-size: .75rem; text-align: center; }
 [hidden] { display: none !important; }
 @media (max-width: 960px) {
-    #wrapper {
-        width: auto; max-width: none; min-height: calc(100svh - 20px);
-        flex-direction: column; margin: 10px;
-    }
-    body.sidebar-right #wrapper, body.sidebar-left #wrapper, html[dir="rtl"] #wrapper { flex-direction: column; }
-    #menu { width: 100%; border-right: 0; border-bottom: 2px solid var(--ink); }
-    body.sidebar-right #menu, html[dir="rtl"] #menu { border-left: 0; border-bottom: 2px solid var(--ink); }
-    #view_buttons { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-    #mode_buttons { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-    .mode-group { grid-template-columns: repeat(2, 1fr); }
     #game { padding: 16px 13px; }
     .difficulty-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     #score_label { display: none; }
@@ -369,14 +359,34 @@ footer { margin-top: 22px; padding-top: 12px; border-top: 1px solid var(--line);
         box-shadow: 1px 0 var(--line);
     }
     .panel-body th:first-child { z-index: 2; }
-    #wrapper.sidebar-collapsed #menu { width: 100%; padding: 8px; }
-    #wrapper.sidebar-collapsed #menu .menu-heading > div { display: block; }
-    #wrapper.sidebar-collapsed #menu > :not(.menu-heading) { display: none; }
 }
-@media (max-width: 600px) {
+@media (min-width: 641px) and (max-width: 960px) {
+    #wrapper {
+        width: auto; max-width: none;
+        height: calc(100svh - 20px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+        min-height: 0; margin: 10px;
+    }
+    #menu {
+        width: clamp(240px, 32vw, 300px); min-height: 0; overflow-y: auto;
+        overscroll-behavior: contain; scrollbar-gutter: stable;
+    }
+    #game { min-height: 0; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; }
+    #wrapper.sidebar-collapsed #menu { overflow-y: hidden; scrollbar-gutter: auto; }
+}
+@media (max-width: 640px) {
+    #wrapper {
+        width: auto; max-width: none; min-height: calc(100svh - 20px);
+        flex-direction: column; margin: 10px;
+    }
+    body.sidebar-right #wrapper, body.sidebar-left #wrapper, html[dir="rtl"] #wrapper { flex-direction: column; }
+    #menu { width: 100%; border-right: 0; border-bottom: 2px solid var(--ink); }
+    body.sidebar-right #menu, html[dir="rtl"] #menu { border-left: 0; border-bottom: 2px solid var(--ink); }
     #view_buttons { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     #mode_buttons { grid-template-columns: 1fr; }
     .difficulty-grid { grid-template-columns: 1fr; }
+    #wrapper.sidebar-collapsed #menu { width: 100%; padding: 8px; }
+    #wrapper.sidebar-collapsed #menu .menu-heading > div { display: block; }
+    #wrapper.sidebar-collapsed #menu > :not(.menu-heading) { display: none; }
 }
 @media (max-width: 420px) {
     #view_buttons, .mode-group, #custom_operations, .custom-fields { grid-template-columns: 1fr; }
@@ -384,7 +394,7 @@ footer { margin-top: 22px; padding-top: 12px; border-top: 1px solid var(--line);
     .toolbar-controls { width: 100%; }
 }
 @media (max-height: 600px) {
-    #wrapper { max-width: calc(100% - 16px); min-height: calc(100svh - 16px); margin-block: 8px; }
+    #wrapper { max-width: calc(100% - 16px); min-height: 0; margin-block: 8px; }
     #menu { padding-block: 10px; }
     .tagline { margin-bottom: 10px; }
     #view_buttons { margin-bottom: 10px; }

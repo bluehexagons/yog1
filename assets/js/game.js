@@ -78,7 +78,7 @@
         !Array.isArray(loadedSettings)
         ? Object.assign({}, defaultSettings, loadedSettings)
         : Object.assign({}, defaultSettings);
-    const stackedLayout = window.matchMedia('(max-width: 960px)');
+    const stackedLayout = window.matchMedia('(max-width: 640px)');
     let dailyResults = load(KEYS.daily, {});
     let adaptiveState = core.normalizeAdaptiveState(load(KEYS.adaptive, null));
     let learningState = core.normalizeLearningState(load(KEYS.learning, null));
