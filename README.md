@@ -102,6 +102,10 @@ npm run build
 `npm run package` creates the exact Pages artifact in `dist/`. Pull requests run
 the same checks in CI. Pushes to `main` are validated, packaged, and deployed
 through the pinned GitHub Pages workflow; only runtime files are published.
+Every CI run also uploads an `itch-io-distributable` artifact containing
+`you-only-get-1s.zip`. Extract the downloaded GitHub artifact once, then upload
+that inner ZIP as an HTML5 game on itch.io; its `index.html` is at the archive
+root, so no repackaging is needed.
 GitHub Actions updates are grouped into weekly Dependabot pull requests.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for repository conventions and the
