@@ -67,6 +67,16 @@ assert(html.includes('viewport-fit=cover') && html.includes('env(safe-area-inset
     'mobile layout accounts for standalone safe areas');
 assert(html.includes(':focus-visible') && html.includes('@media (forced-colors: active)'),
     'keyboard focus and forced-colors states are explicit');
+assert(html.includes('@keyframes screen-enter') &&
+    html.includes('@keyframes equation-enter') &&
+    html.includes('@keyframes feedback-enter') &&
+    game.includes("restartAnimation(ui.problem, 'is-new-round')") &&
+    game.includes("restartAnimation(ui.feedback, 'is-updating')"),
+    'screen, round, and feedback state changes use purposeful motion');
+assert(html.includes('@media (prefers-reduced-motion: reduce)') &&
+    html.includes('animation: none !important') &&
+    html.includes('transition: none !important'),
+    'motion and transitions honor the reduced-motion preference');
 assert(html.includes('@media (prefers-color-scheme: dark)') &&
     html.includes(':root[data-color-scheme="dark"]') &&
     html.includes('id="setting_color_scheme"'),

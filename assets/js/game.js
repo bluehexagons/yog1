@@ -17,7 +17,7 @@
         'mode_buttons', 'mode_info', 'view_buttons', 'sidebar_toggle', 'sidebar_toggle_play',
         'round_label', 'round_kind', 'score_label', 'timer_label',
         'problem', 'flip_count', 'flip_text', 'submit', 'hint', 'skip', 'share',
-        'message_title', 'message_text', 'feedback', 'custom_panel', 'custom_form',
+        'message', 'message_title', 'message_text', 'feedback', 'custom_panel', 'custom_form',
         'custom_operations', 'custom_length', 'custom_length_value', 'custom_min',
         'custom_max', 'custom_correct', 'custom_rate', 'custom_seed', 'custom_progress',
         'history', 'history_page', 'history_prev', 'history_next', 'history_clear',
@@ -41,6 +41,12 @@
             element.className = className;
         }
         return element;
+    }
+
+    function restartAnimation(element, className) {
+        element.classList.remove(className);
+        void element.offsetWidth;
+        element.classList.add(className);
     }
 
     function number(value, id, solution) {
@@ -705,11 +711,13 @@
         currentMessage = { titleKey: titleKey, messageKey: messageKey, values: values || {} };
         currentPersistentMessage = currentMessage;
         renderCatalogMessage();
+        restartAnimation(ui.message, 'is-updating');
     }
 
     function setTransientCatalogMessage(titleKey, messageKey, values) {
         currentMessage = { titleKey: titleKey, messageKey: messageKey, values: values || {} };
         renderCatalogMessage();
+        restartAnimation(ui.message, 'is-updating');
     }
 
     function hideFeedback() {
@@ -790,6 +798,7 @@
             moveId: moveId || null
         };
         renderExplanation();
+        restartAnimation(ui.feedback, 'is-updating');
     }
 
     function startRound() {
@@ -812,6 +821,7 @@
         ui.share.disabled = mode === 'tutorial';
         hideFeedback();
         drawProblem();
+        restartAnimation(ui.problem, 'is-new-round');
         updateProgress();
         if (mode === 'tutorial') {
             setCatalogMessage('message.howToPlay', 'message.tutorial');
@@ -961,6 +971,7 @@
         currentAchievementId = id;
         renderAchievementNotice();
         ui.achievement_notice.hidden = false;
+        restartAnimation(ui.achievement_notice, 'is-updating');
         playSound('achievement');
         renderAchievements();
     }
