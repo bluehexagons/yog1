@@ -102,6 +102,17 @@ assert(html.includes('input[type="number"], input[type="text"], select') &&
     'text fields and native choice controls participate in every theme');
 assert(html.includes('min-height: 44px') && html.includes('@media (max-width: 420px)'),
     'mobile controls have touch-sized targets and a narrow-phone layout');
+assert(html.includes('@media (max-width: 960px)') &&
+    html.includes('@media (max-height: 600px)') &&
+    html.includes('#problem .number { min-width: 44px; min-height: 44px;') &&
+    html.includes('.panel-body th:first-child, .panel-body td:first-child'),
+    'tablet and short-viewport layouts preserve game targets and table context');
+assert(game.includes("window.matchMedia('(max-width: 960px)')") &&
+    game.includes("stackedLayout.addEventListener('change'") &&
+    game.includes("? !!settings.sidebarCollapsed : stackedLayout.matches, false") &&
+    game.includes("mode !== 'custom' || stackedLayout.matches") &&
+    game.includes('visibleTarget.offsetLeft'),
+    'stacked layouts dismiss navigation and keep active equation terms visible');
 assert(html.includes('class="flip-allowance"') && html.includes('.flip-allowance { white-space: nowrap; }'),
     'the move count and its label cannot split across lines');
 assert(html.includes('<dl class="app-version">') && html.includes('.app-version div { display: flex; flex-wrap: nowrap;'),
@@ -209,7 +220,7 @@ assert(game.includes("lastView: 'play', sidebarCollapsed: false") &&
     game.includes('settings.sidebarCollapsed = !!collapsed') &&
     game.includes('settings.historyPage = historyPage') &&
     game.includes("if (preferredView !== 'play') {\n            setSidebarCollapsed(preferredCollapsed);") &&
-    game.includes('? !!settings.sidebarCollapsed : false, false'),
+    game.includes('? !!settings.sidebarCollapsed : stackedLayout.matches, false'),
     'screen, history page, and sidebar convenience preferences persist');
 assert(game.includes('achievementIds.has(id)') &&
     game.includes('hasOwnProperty.call(core.OPERATIONS, operation)') &&

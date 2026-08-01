@@ -78,6 +78,7 @@
         !Array.isArray(loadedSettings)
         ? Object.assign({}, defaultSettings, loadedSettings)
         : Object.assign({}, defaultSettings);
+    const stackedLayout = window.matchMedia('(max-width: 960px)');
     let dailyResults = load(KEYS.daily, {});
     let adaptiveState = core.normalizeAdaptiveState(load(KEYS.adaptive, null));
     let learningState = core.normalizeLearningState(load(KEYS.learning, null));
@@ -655,6 +656,13 @@
             }
             return core.describe(side, currentValues, labels);
         }).join(' ' + t('aria.equals') + ' '));
+        const visibleTarget = ui.problem.querySelector(selectedId
+            ? '[data-number-id="' + selectedId + '"]'
+            : '.hint-target, .hint-side');
+        if (visibleTarget) {
+            ui.problem.scrollLeft = Math.max(0, visibleTarget.offsetLeft -
+                (ui.problem.clientWidth - visibleTarget.offsetWidth) / 2);
+        }
         ui.flip_count.textContent = selectedId ? '0' : '1';
         ui.flip_text.textContent = t(selectedId ? 'flip.many' : 'flip.one');
         ui.round_label.textContent = mode === 'tutorial' ? t('round.tutorial') :
@@ -1336,7 +1344,7 @@
             else button.removeAttribute('aria-current');
         }
         setSidebarCollapsed(selected.dataset.screen === 'play'
-            ? !!settings.sidebarCollapsed : false, false);
+            ? !!settings.sidebarCollapsed : stackedLayout.matches, false);
         if (focusHeading) {
             const heading = selected.querySelector('h2');
             if (heading) {
@@ -1401,7 +1409,7 @@
         }
         ui.custom_panel.hidden = mode !== 'custom';
         showView('play');
-        setSidebarCollapsed(mode !== 'custom');
+        setSidebarCollapsed(mode !== 'custom' || stackedLayout.matches);
         newSession();
         updateModeInfo();
         if (mode === 'custom') {
@@ -1566,6 +1574,10 @@
         setSidebarCollapsed(document.getElementById('wrapper').classList.contains('sidebar-collapsed'));
     }
     window.addEventListener('yog1localechange', refreshLocalizedUi);
+    stackedLayout.addEventListener('change', function (event) {
+        setSidebarCollapsed(event.matches ? true :
+            (settings.lastView === 'play' ? !!settings.sidebarCollapsed : false), false);
+    });
 
     ui.problem.addEventListener('click', function (event) {
         const button = event.target.closest('[data-number-id]');
