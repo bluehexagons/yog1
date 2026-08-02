@@ -6,6 +6,7 @@ const fs = require('fs');
 const html = fs.readFileSync('index.html', 'utf8') + '\n' +
     fs.readFileSync('assets/css/game.css', 'utf8');
 const game = fs.readFileSync('assets/js/game.js', 'utf8');
+const gamepad = fs.readFileSync('assets/js/gamepad.js', 'utf8');
 const storage = fs.readFileSync('assets/js/storage.js', 'utf8');
 const theme = fs.readFileSync('assets/js/theme.js', 'utf8');
 
@@ -251,14 +252,24 @@ assert(game.includes("drawProblem('.hint-target, .hint-side')") &&
     game.includes("event.animationName === 'equation-enter'") &&
     game.includes('if (event.repeat) return;'),
     'hints remain visible and one-shot interactions do not repeat or replay round motion');
+assert(game.includes("session.phase === 'finished' ? 'action.finished'") &&
+    game.includes('selectedId = null;\n        currentValues = {};\n        gamepadFocusId = null;') &&
+    html.includes('data-i18n="action.replayIncorrect"'),
+    'finished and revealed states expose accurate labels and clear stale moves');
 assert(html.includes('data-i18n="options.gamepad"') &&
     html.indexOf('assets/js/gamepad.js') < html.indexOf('assets/js/game.js') &&
     game.includes('function setupGamepad()') &&
+    game.includes('!ui.game.inert') &&
+    game.includes('ui.workspace.contains(active)') &&
     game.includes("document.addEventListener('visibilitychange', updateGamepadPolling)") &&
     game.includes("window.addEventListener('blur', updateGamepadPolling)") &&
     game.includes("window.addEventListener('gamepadconnected'") &&
     html.includes('#problem .number.gamepad-focus'),
     'gamepad support is documented, loaded in order, lifecycle-aware, and visibly focused');
+assert(gamepad.includes("(active.id || '') === activeId") &&
+    gamepad.includes('activeIndex = null') && gamepad.includes('activeId = null') &&
+    gamepad.includes('axis * direction > 0'),
+    'gamepad reconnects re-arm safely and stick hysteresis handles reversals');
 assert(game.includes("ui.custom_min.setAttribute('aria-invalid', 'true')") &&
     game.includes('ui.custom_min.focus()'),
     'custom target validation identifies and focuses invalid fields');

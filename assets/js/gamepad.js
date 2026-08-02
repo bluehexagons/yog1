@@ -16,6 +16,7 @@
         let frameId = null;
         let timerId = null;
         let activeIndex = null;
+        let activeId = null;
         let armed = false;
         let previous = { activate: false, hint: false, submit: false };
         let direction = 0;
@@ -31,9 +32,9 @@
             const right = button(pad, 15);
             if (left !== right) return left ? -1 : 1;
             const axis = pad.axes && Number.isFinite(pad.axes[0]) ? pad.axes[0] : 0;
-            if (direction && Math.abs(axis) > 0.35) return direction;
             if (axis <= -0.65) return -1;
             if (axis >= 0.65) return 1;
+            if (direction && axis * direction > 0 && Math.abs(axis) > 0.35) return direction;
             return 0;
         }
 
@@ -50,14 +51,17 @@
             let lostActive = false;
             if (activeIndex !== null) {
                 const active = available[activeIndex];
-                if (active && active.connected !== false && active.mapping === 'standard') return active;
+                if (active && active.connected !== false && active.mapping === 'standard' &&
+                    (active.id || '') === activeId) return active;
                 activeIndex = null;
+                activeId = null;
                 armed = false;
                 lostActive = true;
             }
             for (const pad of available) {
                 if (pad && pad.connected !== false && pad.mapping === 'standard') {
                     activeIndex = pad.index;
+                    activeId = pad.id || '';
                     armed = false;
                     previous = { activate: false, hint: false, submit: false };
                     direction = 0;
@@ -137,6 +141,9 @@
         function refresh() {
             if (!running) return;
             cancelScheduled();
+            activeIndex = null;
+            activeId = null;
+            armed = false;
             poll();
         }
 

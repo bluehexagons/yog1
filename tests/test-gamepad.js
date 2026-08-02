@@ -56,12 +56,18 @@ const controller = gamepad.create({
 
 controller.start();
 assert.strictEqual(timers.size, 1, 'disconnected discovery uses a low-frequency timer');
-pads = [sample([], 0)];
+// A controller that connects with a held action must wait for neutral input.
+pads = [sample([0], 0)];
 const discovery = Array.from(timers.values())[0];
 timers.clear();
 discovery();
 assert.deepStrictEqual(events, ['connected'], 'a standard gamepad connects without firing an action');
 
+pads = [sample([0], 0)];
+tick();
+assert.deepStrictEqual(events.slice(-1), ['connected'], 'a held input is ignored until the controller is neutral');
+pads = [sample([], 0)];
+tick();
 pads = [sample([0], 0)];
 tick();
 assert.deepStrictEqual(events.slice(-1), ['activate'], 'the bottom face button activates once');
@@ -92,6 +98,14 @@ time = 400;
 tick();
 assert.strictEqual(events.filter(function (event) { return event === 'move:1'; }).length, 2,
     'held navigation repeats at a controlled rate');
+time = 500;
+pads = [sample([], -0.4)];
+tick();
+assert.strictEqual(events.filter(function (event) { return event === 'move:1'; }).length, 2,
+    'partial stick reversal releases the old direction before re-engaging');
+pads = [sample([], -0.8)];
+tick();
+assert.strictEqual(events.at(-1), 'move:-1', 'a reversed stick direction navigates the other way');
 
 enabled = false;
 tick();

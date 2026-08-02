@@ -671,8 +671,9 @@
     function renderSubmitLabel() {
         const replayingChallenges = mode === 'challenges' &&
             round === CURATED.length && session.phase === 'review';
-        ui.submit.textContent = t(replayingChallenges ? 'action.again' :
-            (session.phase === 'review' ? 'action.next' : 'action.check'));
+        ui.submit.textContent = t(session.phase === 'finished' ? 'action.finished' :
+            (replayingChallenges ? 'action.again' :
+            (session.phase === 'review' ? 'action.next' : 'action.check')));
     }
 
     function hintTargetDetail() {
@@ -1027,6 +1028,7 @@
         playSound('correct');
         showExplanation(true, undefined, alternate, selectedId);
         session.phase = 'review';
+        gamepadFocusId = null;
         ui.submit.disabled = false;
         drawProblem();
         persistResume(null);
@@ -1115,6 +1117,7 @@
     function finishSession(titleKey, messageKey, values) {
         session.phase = 'finished';
         clearTimer();
+        renderSubmitLabel();
         ui.submit.disabled = true;
         ui.hint.disabled = true;
         ui.skip.disabled = true;
@@ -1749,6 +1752,9 @@
         const intendedId = core.solutionDetails(currentProblem.sides, {}).solutionId;
         showExplanation(true, {}, false, intendedId);
         session.phase = 'review';
+        selectedId = null;
+        currentValues = {};
+        gamepadFocusId = null;
         ui.submit.disabled = false;
         drawProblem();
         persistResume(null);
@@ -2052,7 +2058,8 @@
         function canControlPuzzle() {
             const active = document.activeElement;
             return pageIsActive() && !document.getElementById('play_screen').hidden &&
-                currentProblem && session && !ui.workspace.hidden &&
+                !ui.game.inert && currentProblem && session && !ui.workspace.hidden &&
+                (active === document.body || ui.workspace.contains(active)) &&
                 !(active && active.matches('input, select, textarea'));
         }
         gamepadController = window.Yog1Gamepad.create({
@@ -2239,6 +2246,8 @@
             if (session.phase === 'finished' || mode === 'daily' ||
                 (mode === 'custom' && customRun.won)) {
                 ui.submit.disabled = true;
+            } else {
+                ui.submit.disabled = false;
             }
         } else {
             ui.hint.disabled = mode === 'tutorial' || hintLevel >= 4;
