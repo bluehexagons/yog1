@@ -86,14 +86,29 @@
             </div>
         </div>
         <section id="play_screen" class="screen" data-screen="play" aria-label="Play" data-i18n-aria-label="aria.play">
-        <div id="message">
-            <strong id="message_title" data-i18n="message.howToPlay">How to play</strong>
-            <span id="message_text"></span>
-        </div>
-        <div id="achievement_notice" role="status" aria-live="polite"></div>
-        <div id="learning_goal" hidden>
-            <strong data-i18n="learning.goal">Learning goal</strong>
-            <span><span id="learning_goal_name"></span> · <code id="learning_goal_example"></code></span>
+        <div id="play_hud">
+            <div id="play_notices">
+                <div id="message">
+                    <strong id="message_title" data-i18n="message.howToPlay">How to play</strong>
+                    <span id="message_text"></span>
+                </div>
+                <div id="achievement_notice" role="status" aria-live="polite"></div>
+                <div id="learning_goal" hidden>
+                    <strong data-i18n="learning.goal">Learning goal</strong>
+                    <span><span id="learning_goal_name"></span> · <code id="learning_goal_example"></code></span>
+                </div>
+            </div>
+
+            <div id="round_bar">
+                <span id="round_label">Tutorial</span>
+                <span id="round_kind" class="round-kind">Guided</span>
+                <span id="score_label"></span>
+                <span id="timer_label" role="timer" hidden>60s</span>
+                <span id="session_summary_label" class="sr-only" data-i18n="aria.session">Current session statistics</span>
+                <div id="session_summary" role="group" aria-labelledby="session_summary_label">
+                    <dl id="session_summary_values"></dl>
+                </div>
+            </div>
         </div>
 
         <section id="custom_panel" hidden>
@@ -117,16 +132,6 @@
             </form>
         </section>
 
-        <div id="round_bar">
-            <span id="round_label">Tutorial</span>
-            <span id="round_kind" class="round-kind">Guided</span>
-            <span id="score_label"></span>
-            <span id="timer_label" role="timer" hidden>60s</span>
-            <span id="session_summary_label" class="sr-only" data-i18n="aria.session">Current session statistics</span>
-            <div id="session_summary" role="group" aria-labelledby="session_summary_label">
-                <dl id="session_summary_values"></dl>
-            </div>
-        </div>
         <section id="workspace" aria-label="Current puzzle" data-i18n-aria-label="aria.puzzle">
             <div id="flips"><strong data-i18n="action.yourMove">Your move</strong><span class="flip-allowance"><span id="flip_count">1</span> <span id="flip_text">change remaining</span></span></div>
             <div id="problem" role="group" dir="ltr" tabindex="-1"></div>

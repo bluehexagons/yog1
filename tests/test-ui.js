@@ -138,9 +138,24 @@ assert(html.includes('@media (max-width: 960px)') &&
     html.includes('width: clamp(240px, 32vw, 300px)') &&
     html.includes('overflow-y: auto; overscroll-behavior: contain;'),
     'tablet and short-viewport layouts preserve targets, context, and independent scrolling');
+assert(html.includes('id="play_hud"') &&
+    html.includes('container: game / inline-size;') &&
+    html.includes('@container game (max-width: 660px)') &&
+    html.includes('grid-template-columns: minmax(0, 1.45fr) minmax(250px, .75fr)') &&
+    html.includes('#session_summary_values { display: grid; grid-template-columns: repeat(4'),
+    'the play HUD responds to available game-panel width and keeps session context compact');
+assert(html.includes('height: calc(100svh - 48px') &&
+    html.includes('min-height: 600px;') &&
+    html.includes('position: absolute; z-index: 30; inset: 0;') &&
+    html.includes('height: 58px; padding: 7px 10px;') &&
+    html.includes('.mode-group { grid-template-columns: repeat(3, minmax(0, 1fr)); }'),
+    'the viewport-bounded shell uses a compact mobile bar and an overlay navigation drawer');
 assert(game.includes("window.matchMedia('(max-width: 640px)')") &&
     game.includes("stackedLayout.addEventListener('change'") &&
-    game.includes("? !!settings.sidebarCollapsed : stackedLayout.matches, false") &&
+    game.includes("setSidebarCollapsed(stackedLayout.matches || (selected.dataset.screen === 'play'") &&
+    game.includes('const restoreCollapsed = stackedLayout.matches || preferredCollapsed;') &&
+    game.includes('ui.game.inert = stackedLayout.matches && !collapsed;') &&
+    game.includes("event.key === 'Escape' && stackedLayout.matches") &&
     game.includes("mode !== 'custom' || stackedLayout.matches") &&
     game.includes('visibleTarget.offsetLeft'),
     'stacked layouts dismiss navigation and keep active equation terms visible');
@@ -279,8 +294,9 @@ assert(game.includes("lastView: 'play', sidebarCollapsed: false") &&
     game.includes('settings.lastView = selected.dataset.screen') &&
     game.includes('settings.sidebarCollapsed = !!collapsed') &&
     game.includes('settings.historyPage = historyPage') &&
-    game.includes("if (preferredView !== 'play') {\n            setSidebarCollapsed(preferredCollapsed);") &&
-    game.includes('? !!settings.sidebarCollapsed : stackedLayout.matches, false'),
+    game.includes("if (preferredView !== 'play') {\n            setSidebarCollapsed(restoreCollapsed, false);") &&
+    game.includes("setSidebarCollapsed(mode !== 'custom' || stackedLayout.matches, !stackedLayout.matches)") &&
+    game.includes('const restoreCollapsed = stackedLayout.matches || preferredCollapsed;'),
     'screen, history page, and sidebar convenience preferences persist');
 assert(game.includes('achievementIds.has(id)') &&
     game.includes('hasOwnProperty.call(core.OPERATIONS, operation)') &&

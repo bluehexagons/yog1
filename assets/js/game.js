@@ -14,7 +14,7 @@
 
     const ui = {};
     for (const id of [
-        'mode_buttons', 'mode_info', 'view_buttons', 'sidebar_toggle', 'sidebar_toggle_play',
+        'game', 'mode_buttons', 'mode_info', 'view_buttons', 'sidebar_toggle', 'sidebar_toggle_play',
         'round_label', 'round_kind', 'score_label', 'timer_label',
         'workspace', 'problem', 'flip_count', 'flip_text', 'submit', 'hint', 'skip', 'share',
         'message', 'message_title', 'message_text', 'feedback', 'custom_panel', 'custom_form',
@@ -1352,6 +1352,7 @@
     function setSidebarCollapsed(collapsed, remember) {
         const wrapper = document.getElementById('wrapper');
         wrapper.classList.toggle('sidebar-collapsed', collapsed);
+        ui.game.inert = stackedLayout.matches && !collapsed;
         if (remember !== false) {
             settings.sidebarCollapsed = !!collapsed;
             save(KEYS.settings, settings);
@@ -1376,8 +1377,8 @@
             if (active) button.setAttribute('aria-current', 'page');
             else button.removeAttribute('aria-current');
         }
-        setSidebarCollapsed(selected.dataset.screen === 'play'
-            ? !!settings.sidebarCollapsed : stackedLayout.matches, false);
+        setSidebarCollapsed(stackedLayout.matches || (selected.dataset.screen === 'play'
+            ? !!settings.sidebarCollapsed : false), false);
         if (focusHeading) {
             const heading = selected.querySelector('h2');
             if (heading) {
@@ -1455,7 +1456,7 @@
         }
         ui.custom_panel.hidden = mode !== 'custom';
         showView('play');
-        setSidebarCollapsed(mode !== 'custom' || stackedLayout.matches);
+        setSidebarCollapsed(mode !== 'custom' || stackedLayout.matches, !stackedLayout.matches);
         newSession();
         updateModeInfo();
         if (mode === 'custom') {
@@ -1627,7 +1628,7 @@
         if (timerId) ui.timer_label.textContent = t('timer.seconds', { seconds: timeRemaining });
         renderSubmitLabel();
         renderCatalogMessage();
-        setSidebarCollapsed(document.getElementById('wrapper').classList.contains('sidebar-collapsed'));
+        setSidebarCollapsed(document.getElementById('wrapper').classList.contains('sidebar-collapsed'), false);
     }
     window.addEventListener('yog1localechange', refreshLocalizedUi);
     stackedLayout.addEventListener('change', function (event) {
@@ -1767,10 +1768,12 @@
 
     ui.share.addEventListener('click', sharePuzzle);
     ui.sidebar_toggle.addEventListener('click', function () {
-        setSidebarCollapsed(!document.getElementById('wrapper').classList.contains('sidebar-collapsed'));
+        setSidebarCollapsed(!document.getElementById('wrapper').classList.contains('sidebar-collapsed'),
+            !stackedLayout.matches);
     });
     ui.sidebar_toggle_play.addEventListener('click', function () {
-        setSidebarCollapsed(!document.getElementById('wrapper').classList.contains('sidebar-collapsed'));
+        setSidebarCollapsed(!document.getElementById('wrapper').classList.contains('sidebar-collapsed'),
+            !stackedLayout.matches);
     });
     ui.view_buttons.addEventListener('click', function (event) {
         const button = event.target.closest('[data-view]');
@@ -1973,6 +1976,13 @@
     });
 
     document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape' && stackedLayout.matches &&
+            !document.getElementById('wrapper').classList.contains('sidebar-collapsed')) {
+            event.preventDefault();
+            setSidebarCollapsed(true, false);
+            ui.sidebar_toggle.focus();
+            return;
+        }
         if (event.target.matches('input, select, textarea')) return;
         if (document.getElementById('play_screen').hidden) return;
         const numbers = Array.from(ui.problem.querySelectorAll('.number'));
@@ -2055,6 +2065,7 @@
         const preferredView = ['play', 'options', 'stats', 'about'].includes(settings.lastView)
             ? settings.lastView : 'play';
         const preferredCollapsed = !!settings.sidebarCollapsed;
+        const restoreCollapsed = stackedLayout.matches || preferredCollapsed;
         const button = ui.mode_buttons.querySelector('[data-mode="' + saved.mode + '"]');
         if (!button) return false;
         const latestAdaptiveState = adaptiveState;
@@ -2154,10 +2165,10 @@
         }
 
         if (preferredView !== 'play') {
-            setSidebarCollapsed(preferredCollapsed);
+            setSidebarCollapsed(restoreCollapsed, false);
             showView(preferredView);
         } else {
-            setSidebarCollapsed(preferredCollapsed);
+            setSidebarCollapsed(restoreCollapsed, false);
         }
         return true;
     }
