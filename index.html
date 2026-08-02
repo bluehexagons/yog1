@@ -26,8 +26,7 @@
 <div id="wrapper">
     <aside id="menu" aria-label="Game navigation" data-i18n-aria-label="aria.navigation">
         <div class="menu-heading">
-            <div><div class="jam-label">LD28 / 2013</div>
-            <h1>You Only Get 1s</h1>
+            <div><h1>You Only Get 1s</h1>
             <p class="tagline" data-i18n="tagline">One move. Make it count.</p></div>
             <button id="sidebar_toggle" class="secondary" type="button" aria-controls="menu" aria-expanded="true" title="Collapse game menu" data-i18n="menu.collapse" data-i18n-title="menu.collapseTitle">Collapse</button>
         </div>
@@ -69,20 +68,16 @@
         <div id="game_toolbar">
             <div class="toolbar-controls">
                 <button id="sidebar_toggle_play" class="secondary" type="button" aria-controls="menu" aria-expanded="true" data-i18n="action.menu">Menu</button>
-                <div class="compact-input" data-compact-input>
-                    <button class="compact-input-toggle secondary" type="button" aria-expanded="false" aria-controls="quick_language_panel" title="Language" data-i18n-title="language.label"><span class="compact-input-icon" aria-hidden="true">文</span><span class="sr-only" data-i18n="language.label">Language</span></button>
-                    <div id="quick_language_panel" class="compact-input-panel" hidden>
-                        <label class="compact-input-label" for="quick_language" data-i18n="language.label">Language</label>
-                        <select id="quick_language"></select>
-                    </div>
-                </div>
-                <div class="compact-input" data-compact-input>
-                    <button class="compact-input-toggle secondary" type="button" aria-expanded="false" aria-controls="quick_color_scheme_panel" title="Color scheme" data-i18n-title="theme.label"><span class="compact-input-icon" aria-hidden="true">◐</span><span class="sr-only" data-i18n="theme.label">Color scheme</span></button>
-                    <div id="quick_color_scheme_panel" class="compact-input-panel" hidden>
-                        <label class="compact-input-label" for="quick_color_scheme" data-i18n="theme.label">Color scheme</label>
-                        <select id="quick_color_scheme"></select>
-                    </div>
-                </div>
+                <label class="quick-select quick-language">
+                    <span class="quick-select-icon" aria-hidden="true">文</span>
+                    <span class="sr-only" data-i18n="language.label">Language</span>
+                    <select id="quick_language" aria-label="Language" data-i18n-aria-label="language.label"></select>
+                </label>
+                <label class="quick-select quick-theme">
+                    <span class="quick-select-icon" aria-hidden="true">◐</span>
+                    <span class="sr-only" data-i18n="theme.label">Color scheme</span>
+                    <select id="quick_color_scheme" aria-label="Color scheme" data-i18n-aria-label="theme.label"></select>
+                </label>
             </div>
         </div>
         <section id="play_screen" class="screen" data-screen="play" aria-label="Play" data-i18n-aria-label="aria.play">
@@ -275,7 +270,6 @@
         </section>
 
         <footer id="app_footer" hidden>
-            <p data-i18n="footer.made">Made by bluehexagons for Ludum Dare 28.</p>
             <p><a href="https://github.com/bluehexagons/yog1" data-i18n="footer.source">View the source on GitHub.</a></p>
             <p data-i18n="footer.local">History and stats stay in this browser.</p>
         </footer>

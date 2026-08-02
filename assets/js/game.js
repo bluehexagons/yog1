@@ -289,90 +289,18 @@
         }
     }
 
-    function refreshCompactInputLabels() {
-        for (const input of document.querySelectorAll('[data-compact-input]')) {
-            const button = input.querySelector('.compact-input-toggle');
-            const label = input.querySelector('label');
-            const select = input.querySelector('select');
-            const option = select.options[select.selectedIndex];
-            if (!option) continue;
-            const description = label.textContent.trim() + ': ' + option.textContent.trim();
-            button.setAttribute('aria-label', description);
-            button.title = description;
-        }
-    }
-
-    function setupCompactInputs() {
-        const inputs = Array.from(document.querySelectorAll('[data-compact-input]'));
-
-        function setExpanded(input, expanded, moveFocus) {
-            const button = input.querySelector('.compact-input-toggle');
-            const panel = input.querySelector('.compact-input-panel');
-            button.setAttribute('aria-expanded', String(expanded));
-            panel.hidden = !expanded;
-            if (moveFocus) {
-                (expanded ? panel.querySelector('select') : button).focus();
-            }
-        }
-
-        for (const input of inputs) {
-            const button = input.querySelector('.compact-input-toggle');
-            button.addEventListener('click', function () {
-                if (button.getAttribute('aria-busy') === 'true') return;
-                const expanded = button.getAttribute('aria-expanded') !== 'true';
-                for (const other of inputs) setExpanded(other, false, false);
-                setExpanded(input, expanded, expanded);
-            });
-            input.addEventListener('change', function () {
-                refreshCompactInputLabels();
-                setExpanded(input, false, true);
-            });
-            input.addEventListener('keydown', function (event) {
-                if (event.key !== 'Escape') return;
-                event.preventDefault();
-                event.stopPropagation();
-                setExpanded(input, false, true);
-            });
-            input.addEventListener('focusout', function (event) {
-                if (event.relatedTarget && input.contains(event.relatedTarget)) return;
-                window.setTimeout(function () {
-                    if (!input.contains(document.activeElement)) {
-                        setExpanded(input, false, false);
-                    }
-                }, 0);
-            });
-        }
-
-        document.addEventListener('click', function (event) {
-            for (const input of inputs) {
-                if (!input.contains(event.target)) setExpanded(input, false, false);
-            }
-        });
-    }
-
     function chooseLanguage(nextLocale) {
         const selects = [ui.setting_language, ui.quick_language];
         for (const select of selects) {
             select.disabled = true;
             select.setAttribute('aria-busy', 'true');
-            const compactInput = select.closest('[data-compact-input]');
-            if (compactInput) {
-                compactInput.querySelector('.compact-input-toggle')
-                    .setAttribute('aria-busy', 'true');
-            }
         }
         return i18n.setLocale(nextLocale).then(function (activeLocale) {
             for (const select of selects) {
                 select.value = activeLocale;
                 select.disabled = false;
                 select.removeAttribute('aria-busy');
-                const compactInput = select.closest('[data-compact-input]');
-                if (compactInput) {
-                    compactInput.querySelector('.compact-input-toggle')
-                        .removeAttribute('aria-busy');
-                }
             }
-            refreshCompactInputLabels();
             return activeLocale;
         });
     }
@@ -1646,7 +1574,6 @@
         ui.quick_language.value = i18n.getLocale();
         ui.setting_color_scheme.value = colorScheme;
         ui.quick_color_scheme.value = colorScheme;
-        refreshCompactInputLabels();
         ui.setting_sidebar_side.value = requestedSide;
         ui.setting_adaptive_style.value =
             ['flow', 'coach'].includes(settings.adaptiveStyle) ? settings.adaptiveStyle : 'flow';
@@ -2334,7 +2261,6 @@
 
     populateLanguageSelectors();
     populateThemeSelectors();
-    setupCompactInputs();
     populateCustomForm();
     i18n.apply();
     renderVersion();

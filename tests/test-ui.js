@@ -121,21 +121,22 @@ for (const id of ['quick_color_scheme', 'setting_color_scheme']) {
     assert(new RegExp('<select id="' + id + '"[^>]*>\\s*</select>').test(html),
         id + ' gets its options from the validated runtime theme list');
 }
-assert.strictEqual((html.match(/data-compact-input/g) || []).length, 2,
-    'language and theme use the reusable compact input');
-assert(html.includes('aria-controls="quick_language_panel"') &&
-    html.includes('aria-controls="quick_color_scheme_panel"') &&
-    html.includes('aria-expanded="false"') &&
-    game.includes('function setupCompactInputs()') &&
-    game.includes('function refreshCompactInputLabels()') &&
-    game.includes("button.setAttribute('aria-label', description)") &&
-    game.includes("event.key !== 'Escape'") &&
-    game.includes("panel.querySelector('select')"),
-    'compact inputs expose accessible expansion state and keyboard focus behavior');
-assert(html.includes('.compact-input-toggle[aria-expanded="true"]') &&
-    html.includes('.compact-input-label') &&
-    html.includes('.compact-input-toggle { min-width: 44px; }'),
-    'compact inputs show their label and open state and retain mobile touch targets');
+assert(html.includes('class="quick-select quick-language"') &&
+    html.includes('class="quick-select quick-theme"') &&
+    html.includes('id="quick_language" aria-label="Language"') &&
+    html.includes('id="quick_color_scheme" aria-label="Color scheme"') &&
+    !html.includes('data-compact-input') &&
+    !html.includes('compact-input-panel') &&
+    !game.includes('function setupCompactInputs()'),
+    'toolbar language and theme controls open their native choice lists directly');
+assert(html.includes('.quick-select select {') &&
+    html.includes(".quick-select::after") &&
+    html.includes('.quick-select select { min-width: 44px; }'),
+    'quick selects retain the toolbar button treatment and mobile touch targets');
+assert(!html.includes('LD28 / 2013') &&
+    (html.match(/Ludum Dare 28/g) || []).length === 1 &&
+    html.includes('data-i18n="about.origin"'),
+    'the original jam is credited only in the About screen');
 assert(html.includes('input[type="number"], input[type="text"], select') &&
     html.includes('accent-color: var(--blue)'),
     'text fields and native choice controls participate in every theme');
