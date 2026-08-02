@@ -71,6 +71,8 @@
     "custom.start": "Bắt đầu trò chơi tùy chỉnh",
     "options.wave": "Mỗi chế độ lặp lại một chuỗi tám vòng: khởi động, vòng thường và thử thách nhẹ nhàng hơn.",
     "options.keyboard": "Phím: ←/→ chọn · Space thay đổi · Ctrl/⌘+Enter kiểm tra · H gợi ý.",
+    "options.gamepad": "Tay cầm (câu đố hiện tại): dùng D-pad hoặc cần trái để chọn · nút dưới cùng trong cụm nút mặt để thay đổi hoặc khôi phục · nút trên cùng để xem gợi ý · nút Start/Menu để kiểm tra hoặc tiếp tục.",
+    "gamepad.disconnected": "Tay cầm đã ngắt kết nối.",
     "action.hint": "Gợi ý",
     "action.reveal": "Xem lời giải",
     "action.share": "Chia sẻ",

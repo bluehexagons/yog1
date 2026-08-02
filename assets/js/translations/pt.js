@@ -71,6 +71,8 @@
     "custom.start": "Iniciar jogo personalizado",
     "options.wave": "Cada modo repete uma sequência de oito rodadas: aquecimentos, rodadas normais e desafios mais leves.",
     "options.keyboard": "Teclas: ←/→ selecionam · Espaço altera · Ctrl/⌘+Enter verifica · H dá uma dica.",
+    "options.gamepad": "Controle (quebra-cabeça atual): o direcional ou analógico esquerdo seleciona · o botão frontal inferior altera ou restaura · o botão frontal superior dá dicas · Start/Menu verifica ou continua.",
+    "gamepad.disconnected": "Controle desconectado.",
     "action.hint": "Dica",
     "action.reveal": "Mostrar solução",
     "action.share": "Compartilhar",

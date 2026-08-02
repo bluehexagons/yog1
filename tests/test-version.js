@@ -59,8 +59,9 @@ assert(html.indexOf('<script src="assets/js/version.js">') <
     'version metadata loads before the UI renders it');
 assert(game.includes("date.toLocaleDateString(i18n.getLanguageTag()"),
     'the commit date follows the selected display language');
-assert(updater.includes("'assets/js/game-content.js', 'assets/js/version.js', 'assets/js/game.js'"),
-    'version metadata is included in the offline cache');
+assert(updater.includes("'assets/js/version.js'") && updater.includes("'assets/js/gamepad.js'") &&
+    updater.includes("'assets/js/game.js'"),
+    'version metadata and runtime input scripts are included in the offline cache');
 assert(legacyEntry.includes("window.location.replace('./' + window.location.search + window.location.hash)"),
     'the former entry point preserves old links while redirecting to the Pages root');
 assert(updater.includes("hash.update(filename).update('\\0')") &&

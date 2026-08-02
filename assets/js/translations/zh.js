@@ -71,6 +71,8 @@
     "custom.start": "开始自定义游戏",
     "options.wave": "每种模式都会循环八轮：热身、标准轮和较温和的挑战轮。",
     "options.keyboard": "按键：←/→ 选择 · 空格改变 · Ctrl/⌘+Enter 检查 · H 提示。",
+    "options.gamepad": "手柄（当前谜题）：使用方向键或左摇杆选择 · 按下方动作键更改或还原 · 按上方动作键获取提示 · 按 Start/Menu 键检查或继续。",
+    "gamepad.disconnected": "手柄连接已断开。",
     "action.hint": "提示",
     "action.reveal": "显示解法",
     "action.share": "分享",

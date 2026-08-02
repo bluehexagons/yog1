@@ -71,6 +71,8 @@
     "custom.start": "Özel oyunu başlat",
     "options.wave": "Her mod sekiz turluk bir dalgayı tekrarlar: ısınma, standart turlar ve daha yumuşak meydan okumalar.",
     "options.keyboard": "Tuşlar: ←/→ seçer · Boşluk değiştirir · Ctrl/⌘+Enter kontrol eder · H ipucu verir.",
+    "options.gamepad": "Oyun kumandası (mevcut bulmaca): Yön tuşları veya sol çubukla seç · alttaki ön yüz düğmesiyle değiştir veya eski haline getir · üstteki ön yüz düğmesiyle ipucu al · Start/Menu düğmesiyle kontrol et veya devam et.",
+    "gamepad.disconnected": "Oyun kumandasının bağlantısı kesildi.",
     "action.hint": "İpucu",
     "action.reveal": "Çözümü göster",
     "action.share": "Paylaş",

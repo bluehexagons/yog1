@@ -274,6 +274,7 @@ h1 { margin: 4px 0; font: bold 1.45rem/1 "Courier New", monospace; letter-spacin
 #problem.is-new-round .equals { animation: equation-enter var(--motion-slow) 60ms var(--motion-ease) both; }
 #problem .number.hint-target { outline: 2px dashed var(--warm); outline-offset: 3px; }
 #problem .number.hint-target:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+#problem .number.gamepad-focus { outline: 3px solid var(--focus); outline-offset: 3px; }
 .equation-side.hint-side { background: var(--hint); outline: 2px dashed var(--warm); outline-offset: 4px; }
 .operator, .equals { font-weight: bold; }
 #actions { display: flex; flex-wrap: wrap; align-items: center; gap: 9px; border-top: 1px solid var(--line); padding-top: 13px; }
@@ -570,7 +571,7 @@ footer { margin-top: 22px; padding-top: 12px; border-top: 1px solid var(--line);
     }
 }
 @media (forced-colors: active) {
-    :focus-visible, #problem .number.hint-target, .equation-side.hint-side {
+    :focus-visible, #problem .number.hint-target, #problem .number.gamepad-focus, .equation-side.hint-side {
         outline: 3px solid CanvasText;
     }
     #view_buttons button.active, #mode_buttons button.active, #problem .number.flipped {

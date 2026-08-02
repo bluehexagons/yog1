@@ -71,6 +71,8 @@
     "custom.start": "Rozpocznij grę niestandardową",
     "options.wave": "Każdy tryb powtarza ośmiorundową falę rozgrzewek, rund standardowych i łagodniejszych wyzwań.",
     "options.keyboard": "Klawisze: ←/→ wybierz · Spacja zmienia lub przywraca · Ctrl/⌘+Enter sprawdza · H otwiera podpowiedź.",
+    "options.gamepad": "Pad (bieżąca łamigłówka): krzyżak lub lewa gałka wybiera · dolny przycisk przedni zmienia lub przywraca · górny przycisk przedni podpowiada · Start/Menu sprawdza lub kontynuuje.",
+    "gamepad.disconnected": "Pad odłączony.",
     "action.hint": "Wskazówka",
     "action.reveal": "Pokaż rozwiązanie",
     "action.share": "Udostępnij",

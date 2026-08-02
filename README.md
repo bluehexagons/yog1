@@ -55,6 +55,15 @@ Keyboard controls:
 - Ctrl/Command+Enter: check from anywhere in the puzzle
 - H: request a hint
 
+Gamepad controls for the current puzzle:
+
+- D-pad or left stick: move between numbers
+- Bottom face button: change or restore the focused number
+- Top face button: request a hint
+- Start/Menu: check the equation or continue
+
+Menus, settings, and custom-game fields still use keyboard, pointer, or touch input.
+
 It remains a dependency-free static site. Open `index.html` in a browser to play.
 When served over HTTPS or localhost, its web app manifest and service worker make
 it installable and available offline.

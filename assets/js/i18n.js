@@ -80,6 +80,8 @@
     "custom.start": "Start custom game",
     "options.wave": "Each mode repeats an eight-round wave of warm-ups, standard rounds, and gentler challenges.",
     "options.keyboard": "Keys: ←/→ select · Space changes or restores · Ctrl/Command+Enter checks · H opens a hint.",
+    "options.gamepad": "Gamepad (current puzzle): D-pad or left stick selects · bottom face button changes or restores · top face button hints · Start/Menu checks or continues.",
+    "gamepad.disconnected": "Gamepad disconnected.",
     "action.hint": "Hint",
     "action.reveal": "Show solution",
     "action.share": "Share",

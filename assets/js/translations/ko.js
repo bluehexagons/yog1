@@ -71,6 +71,8 @@
     "custom.start": "맞춤 게임 시작",
     "options.wave": "각 모드는 8라운드의 워밍업, 표준 라운드, 보다 가벼운 챌린지를 반복합니다.",
     "options.keyboard": "키: ←/→ 선택 · Space 변경 또는 복원 · Ctrl/⌘+Enter 확인 · H는 힌트를 엽니다.",
+    "options.gamepad": "게임패드(현재 퍼즐): 방향 패드 또는 왼쪽 스틱으로 선택 · 아래쪽 페이스 버튼으로 변경 또는 복원 · 위쪽 페이스 버튼으로 힌트 보기 · 시작/메뉴 버튼으로 확인 또는 계속.",
+    "gamepad.disconnected": "게임패드 연결이 끊어졌습니다.",
     "action.hint": "힌트",
     "action.reveal": "솔루션 표시",
     "action.share": "공유",

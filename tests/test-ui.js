@@ -251,6 +251,14 @@ assert(game.includes("drawProblem('.hint-target, .hint-side')") &&
     game.includes("event.animationName === 'equation-enter'") &&
     game.includes('if (event.repeat) return;'),
     'hints remain visible and one-shot interactions do not repeat or replay round motion');
+assert(html.includes('data-i18n="options.gamepad"') &&
+    html.indexOf('assets/js/gamepad.js') < html.indexOf('assets/js/game.js') &&
+    game.includes('function setupGamepad()') &&
+    game.includes("document.addEventListener('visibilitychange', updateGamepadPolling)") &&
+    game.includes("window.addEventListener('blur', updateGamepadPolling)") &&
+    game.includes("window.addEventListener('gamepadconnected'") &&
+    html.includes('#problem .number.gamepad-focus'),
+    'gamepad support is documented, loaded in order, lifecycle-aware, and visibly focused');
 assert(game.includes("ui.custom_min.setAttribute('aria-invalid', 'true')") &&
     game.includes('ui.custom_min.focus()'),
     'custom target validation identifies and focuses invalid fields');

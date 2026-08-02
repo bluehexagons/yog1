@@ -162,6 +162,8 @@
     let announcementTimer = null;
     let pendingAchievementAnnouncements = [];
     let problemResizeObserver = null;
+    let gamepadController = null;
+    let gamepadFocusId = null;
 
     function announce(value) {
         if (announcementTimer) window.clearTimeout(announcementTimer);
@@ -625,9 +627,11 @@
             return core.describe(side, currentValues, labels);
         }).join(' ' + t('aria.equals') + ' '));
         const numbers = Array.from(ui.problem.querySelectorAll('.number'));
-        const activeId = focusedNumber || selectedId || (numbers[0] && numbers[0].dataset.numberId);
+        const activeId = focusedNumber || gamepadFocusId || selectedId ||
+            (numbers[0] && numbers[0].dataset.numberId);
         for (const button of numbers) {
             button.tabIndex = button.dataset.numberId === activeId ? 0 : -1;
+            button.classList.toggle('gamepad-focus', button.dataset.numberId === gamepadFocusId);
         }
         const replacement = focusedNumber && ui.problem.querySelector(
             '[data-number-id="' + focusedNumber + '"]');
@@ -808,6 +812,7 @@
 
     function startRound() {
         selectedId = null;
+        gamepadFocusId = null;
         currentValues = {};
         hintLevel = 0;
         hintsOnPuzzle = 0;
@@ -1641,6 +1646,7 @@
     ui.problem.addEventListener('click', function (event) {
         const button = event.target.closest('[data-number-id]');
         if (!button || session.phase !== 'playing' || !currentProblem) return;
+        if (event.detail > 0) gamepadFocusId = null;
         const id = button.dataset.numberId;
         selectedId = selectedId === id ? null : id;
         currentValues = valuesWithFlip(selectedId);
@@ -1983,6 +1989,30 @@
         activateMode('guided', button);
     });
 
+    function moveNumberFocus(direction, fromGamepad) {
+        const numbers = Array.from(ui.problem.querySelectorAll('.number'));
+        if (!numbers.length) return;
+        let index = numbers.findIndex(function (button) {
+            return button.dataset.numberId === gamepadFocusId;
+        });
+        if (index < 0) index = numbers.indexOf(document.activeElement);
+        index += direction;
+        if (index < 0) index = numbers.length - 1;
+        if (index >= numbers.length) index = 0;
+        for (const number of numbers) {
+            number.tabIndex = -1;
+            number.classList.remove('gamepad-focus');
+        }
+        if (fromGamepad) {
+            gamepadFocusId = numbers[index].dataset.numberId;
+            numbers[index].classList.add('gamepad-focus');
+        } else {
+            gamepadFocusId = null;
+        }
+        numbers[index].tabIndex = 0;
+        numbers[index].focus();
+    }
+
     document.addEventListener('keydown', function (event) {
         if (event.key === 'Escape' && stackedLayout.matches &&
             !document.getElementById('wrapper').classList.contains('sidebar-collapsed')) {
@@ -1998,13 +2028,7 @@
         if ((event.key === 'ArrowLeft' || event.key === 'ArrowRight') && numbers.length &&
             (event.target === ui.problem || event.target.closest('.number'))) {
             event.preventDefault();
-            let index = numbers.indexOf(document.activeElement);
-            index += event.key === 'ArrowRight' ? 1 : -1;
-            if (index < 0) index = numbers.length - 1;
-            if (index >= numbers.length) index = 0;
-            for (const number of numbers) number.tabIndex = -1;
-            numbers[index].tabIndex = 0;
-            numbers[index].focus();
+            moveNumberFocus(event.key === 'ArrowRight' ? 1 : -1, false);
         } else if (event.key.toLowerCase() === 'h' && inPuzzle && !ui.hint.disabled) {
             if (event.repeat) return;
             event.preventDefault();
@@ -2019,6 +2043,58 @@
             ui.submit.click();
         }
     });
+
+    function setupGamepad() {
+        if (!window.Yog1Gamepad || typeof navigator.getGamepads !== 'function') return;
+        function pageIsActive() {
+            return document.visibilityState === 'visible' && document.hasFocus();
+        }
+        function canControlPuzzle() {
+            const active = document.activeElement;
+            return pageIsActive() && !document.getElementById('play_screen').hidden &&
+                currentProblem && session && !ui.workspace.hidden &&
+                !(active && active.matches('input, select, textarea'));
+        }
+        gamepadController = window.Yog1Gamepad.create({
+            getGamepads: navigator.getGamepads.bind(navigator),
+            requestFrame: window.requestAnimationFrame.bind(window),
+            cancelFrame: window.cancelAnimationFrame.bind(window),
+            setTimer: window.setTimeout.bind(window),
+            clearTimer: window.clearTimeout.bind(window),
+            now: function () { return window.performance.now(); },
+            isEnabled: canControlPuzzle,
+            onDisconnected: function () {
+                gamepadFocusId = null;
+                for (const button of ui.problem.querySelectorAll('.gamepad-focus')) {
+                    button.classList.remove('gamepad-focus');
+                }
+                announce(t('gamepad.disconnected'));
+            },
+            onMove: function (direction) { moveNumberFocus(direction, true); },
+            onActivate: function () {
+                const target = ui.problem.querySelector('[data-number-id="' + gamepadFocusId + '"]') ||
+                    ui.problem.querySelector('.number');
+                if (target) {
+                    gamepadFocusId = target.dataset.numberId;
+                    target.classList.add('gamepad-focus');
+                    target.focus();
+                    target.click();
+                }
+            },
+            onHint: function () { ui.hint.click(); },
+            onSubmit: function () { ui.submit.click(); }
+        });
+        function updateGamepadPolling() {
+            if (pageIsActive()) gamepadController.resume();
+            else gamepadController.pause();
+        }
+        document.addEventListener('visibilitychange', updateGamepadPolling);
+        window.addEventListener('focus', updateGamepadPolling);
+        window.addEventListener('blur', updateGamepadPolling);
+        window.addEventListener('gamepadconnected', function () { gamepadController.refresh(); });
+        window.addEventListener('gamepaddisconnected', function () { gamepadController.refresh(); });
+        updateGamepadPolling();
+    }
 
     window.addEventListener('beforeinstallprompt', function (event) {
         event.preventDefault();
@@ -2309,4 +2385,5 @@
         }).catch(function () {});
     }
     bootFromUrl();
+    setupGamepad();
 }());

@@ -71,6 +71,8 @@
     "custom.start": "開始自訂遊戲",
     "options.wave": "每種模式都會重複八輪熱身、標準輪次和較溫和的挑戰。",
     "options.keyboard": "按鍵： ←/→ 選擇 · 空格變更或恢復 · Ctrl/⌘+Enter 檢查 · H 開啟提示。",
+    "options.gamepad": "控制器（目前謎題）：使用十字鍵或左搖桿選擇 · 按下方動作鍵變更或還原 · 按上方動作鍵取得提示 · 按 Start/Menu 鍵檢查或繼續。",
+    "gamepad.disconnected": "控制器連線已中斷。",
     "action.hint": "提示",
     "action.reveal": "顯示解決方案",
     "action.share": "分享",

@@ -71,6 +71,8 @@
     "custom.start": "Benutzerdefiniertes Spiel starten",
     "options.wave": "Jeder Modus wiederholt eine Abfolge von acht Runden: Aufwärmrunden, normale Runden und leichte Herausforderungen.",
     "options.keyboard": "Tasten: ←/→ auswählen · Leerzeichen ändern · Ctrl/⌘+Eingabe prüft · H gibt einen Hinweis.",
+    "options.gamepad": "Controller (aktuelles Rätsel): Steuerkreuz oder linker Stick wählt aus · die untere Aktionstaste ändert oder stellt wieder her · die obere Aktionstaste gibt Hinweise · Start/Menu prüft oder fährt fort.",
+    "gamepad.disconnected": "Controller getrennt.",
     "action.hint": "Verfolgen",
     "action.reveal": "Lösung anzeigen",
     "action.share": "Teilen",

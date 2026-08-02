@@ -71,6 +71,8 @@
     "custom.start": "Iniciar juego personalizado",
     "options.wave": "Cada modo repite una secuencia de ocho rondas: calentamientos, rondas normales y desafíos suaves.",
     "options.keyboard": "Teclas: ←/→ seleccionan · Espacio cambia · Ctrl/⌘+Intro comprueba · H da una pista.",
+    "options.gamepad": "Mando (puzle actual): la cruceta o el stick izquierdo seleccionan · el botón frontal inferior cambia o restaura · el botón frontal superior da pistas · Start/Menu comprueba o continúa.",
+    "gamepad.disconnected": "Mando desconectado.",
     "action.hint": "Pista",
     "action.reveal": "Mostrar solución",
     "action.share": "Compartir",

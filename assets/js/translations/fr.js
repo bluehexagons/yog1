@@ -71,6 +71,8 @@
     "custom.start": "Démarrer un jeu personnalisé",
     "options.wave": "Chaque mode répète une séquence de huit tours : échauffements, tours normaux et défis légers.",
     "options.keyboard": "Touches : ←/→ sélectionner · Espace modifier · Ctrl/⌘+Entrée vérifier · H donne un indice.",
+    "options.gamepad": "Manette (problème actuel) : la croix directionnelle ou le stick gauche sélectionne · le bouton de façade inférieur modifie ou restaure · le bouton de façade supérieur donne un indice · Start/Menu vérifie ou continue.",
+    "gamepad.disconnected": "Manette déconnectée.",
     "action.hint": "Suivre",
     "action.reveal": "Afficher la solution",
     "action.share": "Partager",
