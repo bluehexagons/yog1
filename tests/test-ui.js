@@ -241,6 +241,16 @@ assert(game.includes('if (replacement) replacement.focus();') &&
     !game.includes("event.key === 'Enter' && event.target.closest('.number')") &&
     !game.includes('ui.submit.focus();'),
     'number buttons retain native keyboard activation and puzzle checking has a separate shortcut');
+assert(game.includes("button.setAttribute('aria-disabled', 'true')") &&
+    game.includes("button.tabIndex = button.dataset.numberId === activeId ? 0 : -1") &&
+    game.includes('if (replacement) replacement.focus();') &&
+    game.includes("if (session.phase === 'playing') ui.submit.disabled = !selectedId;") &&
+    html.includes('#problem .number[aria-disabled="true"]'),
+    'puzzle controls retain focus, use one tab stop, require a move, and become inert during review');
+assert(game.includes("drawProblem('.hint-target, .hint-side')") &&
+    game.includes("event.animationName === 'equation-enter'") &&
+    game.includes('if (event.repeat) return;'),
+    'hints remain visible and one-shot interactions do not repeat or replay round motion');
 assert(game.includes("ui.custom_min.setAttribute('aria-invalid', 'true')") &&
     game.includes('ui.custom_min.focus()'),
     'custom target validation identifies and focuses invalid fields');

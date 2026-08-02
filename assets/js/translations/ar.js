@@ -157,7 +157,7 @@
     "result.retry": "غير متوازن",
     "result.retryBody": "جرّب المسألة نفسها مجددًا عندما تكون مستعدًا.",
     "result.solution": "تم إظهار الحل",
-    "result.solutionBody": "لن تؤثر هذه المسألة في نتيجتك. راجعها ثم تابع.",
+    "result.solutionBody": "تم تسجيل حل هذا اللغز على أنه غير صحيح. راجع الحل، ثم تابع.",
     "aria.changeNumber": "غيّر {number} إلى 1",
     "aria.restoreNumber": "استعد {number}",
     "feedback.totals": "المجموعان: {left} و{right}.",

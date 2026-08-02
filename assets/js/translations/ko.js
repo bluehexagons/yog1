@@ -157,7 +157,7 @@
     "result.retry": "균형이 맞지 않음",
     "result.retryBody": "준비가 되면 같은 퍼즐을 다시 시도해 보세요.",
     "result.solution": "표시된 솔루션",
-    "result.solutionBody": "이 퍼즐은 점수에 영향을 미치지 않습니다. 검토한 후 계속하세요.",
+    "result.solutionBody": "이 문제는 오답으로 기록되었습니다. 풀이를 확인한 후 계속하세요.",
     "aria.changeNumber": "{number}를 1로 변경",
     "aria.restoreNumber": "{number} 복원",
     "feedback.totals": "총계: {left} 및 {right}.",

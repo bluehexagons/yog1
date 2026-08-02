@@ -157,7 +157,7 @@
     "result.retry": "Niezrównoważony",
     "result.retryBody": "Spróbuj ponownie wykonać tę samą łamigłówkę, gdy będziesz gotowy.",
     "result.solution": "Pokazano rozwiązanie",
-    "result.solutionBody": "Ta łamigłówka nie będzie miała wpływu na Twój wynik. Przejrzyj go, a następnie kontynuuj.",
+    "result.solutionBody": "Ta łamigłówka została oznaczona jako rozwiązana nieprawidłowo. Sprawdź rozwiązanie, a następnie kontynuuj.",
     "aria.changeNumber": "Zmień {number} na 1",
     "aria.restoreNumber": "Przywróć {number}",
     "feedback.totals": "Twoje sumy: {left} i {right}.",

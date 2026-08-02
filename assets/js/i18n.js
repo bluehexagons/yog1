@@ -166,7 +166,7 @@
     "result.retry": "Not balanced",
     "result.retryBody": "Try the same puzzle again when you’re ready.",
     "result.solution": "Solution shown",
-    "result.solutionBody": "This puzzle won’t affect your score. Review it, then continue.",
+    "result.solutionBody": "This puzzle was recorded as incorrect. Review the solution, then continue.",
     "aria.changeNumber": "Change {number} to 1",
     "aria.restoreNumber": "Restore {number}",
     "feedback.totals": "Your totals: {left} and {right}.",

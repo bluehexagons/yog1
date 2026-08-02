@@ -157,7 +157,7 @@
     "result.retry": "ابھی برابر نہیں",
     "result.retryBody": "تیار ہونے پر یہی پہیلی دوبارہ آزمائیں۔",
     "result.solution": "حل دکھا دیا گیا",
-    "result.solutionBody": "یہ پہیلی آپ کے اسکور کو متاثر نہیں کرے گی۔ اسے دیکھیں، پھر آگے بڑھیں۔",
+    "result.solutionBody": "اس پہیلی کا حل غلط ریکارڈ کیا گیا تھا۔ حل کا جائزہ لیں، پھر آگے بڑھیں۔",
     "aria.changeNumber": "{number} کو 1 میں بدلیں",
     "aria.restoreNumber": "{number} بحال کریں",
     "feedback.totals": "آپ کے کل: {left} اور {right}۔",

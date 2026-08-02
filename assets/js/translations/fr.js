@@ -157,7 +157,7 @@
     "result.retry": "Ce n'est pas encore équilibré",
     "result.retryBody": "Réessayez le même problème quand vous le souhaitez.",
     "result.solution": "Solution affichée",
-    "result.solutionBody": "Ce problème n'affectera pas votre score. Examinez-le et continuez.",
+    "result.solutionBody": "Ce puzzle a été marqué comme incorrect. Consultez la solution, puis continuez.",
     "aria.changeNumber": "Remplacez {number} par 1",
     "aria.restoreNumber": "Restaurer {number}",
     "feedback.totals": "Vos totaux : {left} et {right}.",

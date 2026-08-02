@@ -157,7 +157,7 @@
     "result.retry": "अभी संतुलित नहीं",
     "result.retryBody": "तैयार होने पर इसी पहेली को फिर आज़माएँ।",
     "result.solution": "हल दिखाया गया",
-    "result.solutionBody": "यह पहेली आपके स्कोर को प्रभावित नहीं करेगी। इसे देखें, फिर आगे बढ़ें।",
+    "result.solutionBody": "इस पहेली का हल गलत दर्ज किया गया था। हल की समीक्षा करें, फिर आगे बढ़ें।",
     "aria.changeNumber": "{number} को 1 में बदलें",
     "aria.restoreNumber": "{number} वापस करें",
     "feedback.totals": "आपके कुल: {left} और {right}।",

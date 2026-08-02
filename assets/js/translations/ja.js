@@ -157,7 +157,7 @@
     "result.retry": "まだつり合っていません",
     "result.retryBody": "準備ができたら、同じ問題をもう一度試してみましょう。",
     "result.solution": "答えを表示しました",
-    "result.solutionBody": "この問題はスコアに影響しません。解き方を確認して続けます。",
+    "result.solutionBody": "この問題は不正解として記録されました。解答を確認してから、続けてください。",
     "aria.changeNumber": "{number}を1に変える",
     "aria.restoreNumber": "{number}に戻す",
     "feedback.totals": "現在の値：{left} と {right}。",

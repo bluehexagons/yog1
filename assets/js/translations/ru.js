@@ -157,7 +157,7 @@
     "result.retry": "Пока не равно",
     "result.retryBody": "Когда будете готовы, попробуйте эту задачу ещё раз.",
     "result.solution": "Решение показано",
-    "result.solutionBody": "Эта задача не повлияет на ваш счёт. Посмотрите решение и продолжайте.",
+    "result.solutionBody": "Эта головоломка была отмечена как решённая неверно. Проверьте решение, а затем продолжите.",
     "aria.changeNumber": "Изменить {number} на 1",
     "aria.restoreNumber": "Вернуть {number}",
     "feedback.totals": "Ваши суммы: {left} и {right}.",

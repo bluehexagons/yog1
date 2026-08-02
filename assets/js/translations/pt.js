@@ -157,7 +157,7 @@
     "result.retry": "Ainda não está equilibrado",
     "result.retryBody": "Tente o mesmo problema novamente quando quiser.",
     "result.solution": "Solução mostrada",
-    "result.solutionBody": "Este problema não afetará sua pontuação. Confira e continue.",
+    "result.solutionBody": "Este quebra-cabeça foi marcado como incorreto. Revise a solução e depois continue.",
     "aria.changeNumber": "Mudar {number} para 1",
     "aria.restoreNumber": "Restaurar {number}",
     "feedback.totals": "Seus totais: {left} e {right}.",

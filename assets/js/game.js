@@ -551,9 +551,14 @@
             button.type = 'button';
             button.dataset.numberId = expression.id;
             button.setAttribute('aria-pressed', selectedId === expression.id ? 'true' : 'false');
-            button.setAttribute('aria-label', selectedId === expression.id
-                ? t('aria.restoreNumber', { number: expression.value })
-                : t('aria.changeNumber', { number: expression.value }));
+            if (session && session.phase !== 'playing') {
+                button.setAttribute('aria-disabled', 'true');
+                button.setAttribute('aria-label', String(value));
+            } else {
+                button.setAttribute('aria-label', selectedId === expression.id
+                    ? t('aria.restoreNumber', { number: expression.value })
+                    : t('aria.changeNumber', { number: expression.value }));
+            }
             if (selectedId === expression.id) button.classList.add('flipped');
             if ((mode === 'tutorial' || hintLevel >= 4) && expression.solution) {
                 button.classList.add('hint-target');
@@ -594,7 +599,9 @@
             ui.problem.scrollLeft + ui.problem.clientWidth >= ui.problem.scrollWidth - 1);
     }
 
-    function drawProblem() {
+    function drawProblem(preferredTarget) {
+        const focusedNumber = document.activeElement && document.activeElement.dataset
+            ? document.activeElement.dataset.numberId : null;
         ui.problem.replaceChildren();
         currentProblem.sides.forEach(function (side, index) {
             const wrapper = document.createElement('span');
@@ -617,15 +624,24 @@
             }
             return core.describe(side, currentValues, labels);
         }).join(' ' + t('aria.equals') + ' '));
-        const visibleTarget = ui.problem.querySelector(selectedId
+        const numbers = Array.from(ui.problem.querySelectorAll('.number'));
+        const activeId = focusedNumber || selectedId || (numbers[0] && numbers[0].dataset.numberId);
+        for (const button of numbers) {
+            button.tabIndex = button.dataset.numberId === activeId ? 0 : -1;
+        }
+        const replacement = focusedNumber && ui.problem.querySelector(
+            '[data-number-id="' + focusedNumber + '"]');
+        if (replacement) replacement.focus();
+        const visibleTarget = ui.problem.querySelector(preferredTarget || (selectedId
             ? '[data-number-id="' + selectedId + '"]'
-            : '.hint-target, .hint-side');
+            : '.hint-target, .hint-side'));
         if (visibleTarget) {
             ui.problem.scrollLeft = Math.max(0, visibleTarget.offsetLeft -
                 (ui.problem.clientWidth - visibleTarget.offsetWidth) / 2);
         }
         ui.flip_count.textContent = selectedId ? '0' : '1';
         ui.flip_text.textContent = t(selectedId ? 'flip.many' : 'flip.one');
+        if (session.phase === 'playing') ui.submit.disabled = !selectedId;
         ui.round_label.textContent = mode === 'tutorial' ? t('round.tutorial') :
             (mode === 'daily' ? utcDate() : t('round.number', { round: round }));
         ui.round_kind.textContent = t('round.' + currentProblem.roundKind);
@@ -1006,6 +1022,8 @@
         playSound('correct');
         showExplanation(true, undefined, alternate, selectedId);
         session.phase = 'review';
+        ui.submit.disabled = false;
+        drawProblem();
         persistResume(null);
         renderSubmitLabel();
         ui.hint.disabled = true;
@@ -1095,6 +1113,7 @@
         ui.submit.disabled = true;
         ui.hint.disabled = true;
         ui.skip.disabled = true;
+        if (currentProblem) drawProblem();
         const stat = getStat(mode);
         stat.bestScore = Math.max(stat.bestScore || 0, session.solved);
         save(KEYS.stats, stats);
@@ -1627,13 +1646,14 @@
         currentValues = valuesWithFlip(selectedId);
         playSound('flip');
         drawProblem();
-        const replacement = ui.problem.querySelector('[data-number-id="' + id + '"]');
-        if (replacement) replacement.focus();
         if (mode === 'tutorial') {
             setCatalogMessage(isSolved() ? 'tutorial.good' : 'tutorial.restore',
                 isSolved() ? 'tutorial.goodBody' : 'tutorial.restoreBody');
         }
         persistResume();
+    });
+    ui.problem.addEventListener('animationend', function (event) {
+        if (event.animationName === 'equation-enter') ui.problem.classList.remove('is-new-round');
     });
     ui.problem.addEventListener('scroll', updateProblemOverflow);
     if ('ResizeObserver' in window) {
@@ -1693,7 +1713,7 @@
         hintsOnPuzzle++;
         if (hintLevel === 1) adapt('hint');
         ui.hint.disabled = hintLevel >= 4;
-        drawProblem();
+        drawProblem('.hint-target, .hint-side');
         const learning = core.learningAnalysis(currentProblem.sides);
         if (hintLevel === 1) {
             setCatalogMessage('hint.compare', 'hint.compareBody', {
@@ -1723,6 +1743,8 @@
         const intendedId = core.solutionDetails(currentProblem.sides, {}).solutionId;
         showExplanation(true, {}, false, intendedId);
         session.phase = 'review';
+        ui.submit.disabled = false;
+        drawProblem();
         persistResume(null);
         renderSubmitLabel();
         ui.hint.disabled = true;
@@ -1980,14 +2002,19 @@
             index += event.key === 'ArrowRight' ? 1 : -1;
             if (index < 0) index = numbers.length - 1;
             if (index >= numbers.length) index = 0;
+            for (const number of numbers) number.tabIndex = -1;
+            numbers[index].tabIndex = 0;
             numbers[index].focus();
         } else if (event.key.toLowerCase() === 'h' && inPuzzle && !ui.hint.disabled) {
+            if (event.repeat) return;
             event.preventDefault();
             ui.hint.click();
         } else if (event.key === 'Enter' && inPuzzle && (event.ctrlKey || event.metaKey)) {
+            if (event.repeat) return;
             event.preventDefault();
             ui.submit.click();
         } else if (event.key === 'Enter' && document.activeElement === document.body) {
+            if (event.repeat) return;
             event.preventDefault();
             ui.submit.click();
         }

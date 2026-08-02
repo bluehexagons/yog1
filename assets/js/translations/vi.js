@@ -157,7 +157,7 @@
     "result.retry": "Chưa cân bằng",
     "result.retryBody": "Hãy thử lại câu đố này khi bạn sẵn sàng.",
     "result.solution": "Đã hiện lời giải",
-    "result.solutionBody": "Câu đố này không ảnh hưởng đến điểm. Xem lại rồi tiếp tục.",
+    "result.solutionBody": "Câu đố này đã được ghi nhận là trả lời sai. Hãy xem lại lời giải rồi tiếp tục.",
     "aria.changeNumber": "Đổi {number} thành 1",
     "aria.restoreNumber": "Khôi phục {number}",
     "feedback.totals": "Tổng hiện tại: {left} và {right}.",

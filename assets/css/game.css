@@ -257,18 +257,23 @@ h1 { margin: 4px 0; font: bold 1.45rem/1 "Courier New", monospace; letter-spacin
 #problem.can-scroll:not(.at-scroll-end) { box-shadow: inset -12px 0 9px -12px var(--ink); }
 #problem, #feedback code, #history code { direction: ltr; text-align: left; unicode-bidi: isolate; }
 #problem .number {
-    padding: 1px 6px; border: 1px solid var(--ink); background: var(--paper); color: var(--blue);
-    box-shadow: 2px 2px var(--ink); font: 1.65rem var(--math-font);
+    min-width: 2.4rem; min-height: 2.4rem; padding: 1px 6px; border: 1px solid var(--ink);
+    background: var(--paper); color: var(--blue); box-shadow: 2px 2px var(--ink);
+    font: 1.65rem var(--math-font); font-variant-numeric: tabular-nums;
     touch-action: manipulation;
     transition: transform var(--motion-fast) var(--motion-ease), box-shadow var(--motion-fast) var(--motion-ease),
         background-color var(--motion-base) var(--motion-ease), color var(--motion-base) var(--motion-ease);
 }
-#problem .number:hover { transform: translateY(-2px); box-shadow: 2px 4px var(--ink); }
-#problem .number:active { transform: translate(1px, 1px); box-shadow: 1px 1px var(--ink); }
+@media (hover: hover) and (pointer: fine) {
+    #problem .number:not([aria-disabled="true"]):hover { transform: translateY(-2px); box-shadow: 2px 4px var(--ink); }
+}
+#problem .number:not([aria-disabled="true"]):active { transform: translate(1px, 1px); box-shadow: 1px 1px var(--ink); }
 #problem .number.flipped { color: var(--blue); background: var(--flipped); animation: number-flip var(--motion-base) var(--motion-spring); }
+#problem .number[aria-disabled="true"] { cursor: default; opacity: .75; }
 #problem.is-new-round .equation-side { animation: equation-enter var(--motion-slow) var(--motion-ease) both; }
 #problem.is-new-round .equals { animation: equation-enter var(--motion-slow) 60ms var(--motion-ease) both; }
 #problem .number.hint-target { outline: 2px dashed var(--warm); outline-offset: 3px; }
+#problem .number.hint-target:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
 .equation-side.hint-side { background: var(--hint); outline: 2px dashed var(--warm); outline-offset: 4px; }
 .operator, .equals { font-weight: bold; }
 #actions { display: flex; flex-wrap: wrap; align-items: center; gap: 9px; border-top: 1px solid var(--line); padding-top: 13px; }

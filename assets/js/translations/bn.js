@@ -157,7 +157,7 @@
     "result.retry": "এখনও সমান নয়",
     "result.retryBody": "প্রস্তুত হলে একই ধাঁধাটি আবার চেষ্টা করুন।",
     "result.solution": "সমাধান দেখানো হয়েছে",
-    "result.solutionBody": "এই ধাঁধাটি আপনার স্কোরে প্রভাব ফেলবে না। দেখে নিয়ে এগিয়ে যান।",
+    "result.solutionBody": "এই ধাঁধার সমাধানটি ভুল হিসেবে নথিভুক্ত হয়েছে। সমাধানটি পর্যালোচনা করে তারপর এগিয়ে যান।",
     "aria.changeNumber": "{number} কে 1 করুন",
     "aria.restoreNumber": "{number} ফিরিয়ে আনুন",
     "feedback.totals": "আপনার যোগফল: {left} ও {right}।",

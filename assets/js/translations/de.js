@@ -157,7 +157,7 @@
     "result.retry": "Es ist noch nicht ausgeglichen",
     "result.retryBody": "Versuchen Sie das gleiche Problem jederzeit erneut.",
     "result.solution": "Lösung gezeigt",
-    "result.solutionBody": "Dieses Problem hat keinen Einfluss auf Ihre Punktzahl. Überprüfen Sie es und fahren Sie fort.",
+    "result.solutionBody": "Dieses Rätsel wurde als falsch gewertet. Sieh dir die Lösung an und fahre dann fort.",
     "aria.changeNumber": "Ändern Sie {number} auf 1",
     "aria.restoreNumber": "{number} wiederherstellen",
     "feedback.totals": "Ihre Summen: {left} und {right}.",

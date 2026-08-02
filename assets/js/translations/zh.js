@@ -157,7 +157,7 @@
     "result.retry": "尚未平衡",
     "result.retryBody": "准备好后，再试一次这道题。",
     "result.solution": "已显示解法",
-    "result.solutionBody": "这道题不会影响分数。查看解法后继续。",
+    "result.solutionBody": "此题已被记为答错。请查看解答，然后继续。",
     "aria.changeNumber": "将 {number} 改为 1",
     "aria.restoreNumber": "恢复 {number}",
     "feedback.totals": "当前结果：{left} 和 {right}。",

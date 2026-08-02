@@ -157,7 +157,7 @@
     "result.retry": "Henüz dengeli değil",
     "result.retryBody": "Hazır olduğunuzda aynı bulmacayı yeniden deneyin.",
     "result.solution": "Çözüm gösterildi",
-    "result.solutionBody": "Bu bulmaca puanınızı etkilemez. İnceleyip devam edin.",
+    "result.solutionBody": "Bu bulmaca yanlış olarak kaydedildi. Çözümü gözden geçirdikten sonra devam edin.",
     "aria.changeNumber": "{number} sayısını 1 yap",
     "aria.restoreNumber": "{number} sayısını geri al",
     "feedback.totals": "Toplamlarınız: {left} ve {right}.",
