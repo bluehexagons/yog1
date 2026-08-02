@@ -70,7 +70,7 @@
     "custom.seedHint": "To samo ziarno, ta sama gra",
     "custom.start": "Rozpocznij grę niestandardową",
     "options.wave": "Każdy tryb powtarza ośmiorundową falę rozgrzewek, rund standardowych i łagodniejszych wyzwań.",
-    "options.keyboard": "Klawisze: ←/→ wybierz · Zmiana miejsca lub przywrócenie · Wprowadź kontrole · H otwiera podpowiedź.",
+    "options.keyboard": "Klawisze: ←/→ wybierz · Spacja zmienia lub przywraca · Ctrl/⌘+Enter sprawdza · H otwiera podpowiedź.",
     "action.hint": "Wskazówka",
     "action.reveal": "Pokaż rozwiązanie",
     "action.share": "Udostępnij",

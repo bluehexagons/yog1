@@ -70,7 +70,7 @@
     "custom.seedHint": "相同种子，相同游戏",
     "custom.start": "开始自定义游戏",
     "options.wave": "每种模式都会循环八轮：热身、标准轮和较温和的挑战轮。",
-    "options.keyboard": "按键：←/→ 选择 · 空格改变 · Enter 检查 · H 提示。",
+    "options.keyboard": "按键：←/→ 选择 · 空格改变 · Ctrl/⌘+Enter 检查 · H 提示。",
     "action.hint": "提示",
     "action.reveal": "显示解法",
     "action.share": "分享",

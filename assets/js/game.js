@@ -159,12 +159,17 @@
     let currentLearningConcept = 'balance';
     let forcedLearningConcept = null;
     let lastTimerAnnouncement = null;
+    let announcementTimer = null;
+    let pendingAchievementAnnouncements = [];
+    let problemResizeObserver = null;
 
     function announce(value) {
+        if (announcementTimer) window.clearTimeout(announcementTimer);
         ui.app_status.textContent = '';
-        window.setTimeout(function () {
+        announcementTimer = window.setTimeout(function () {
             ui.app_status.textContent = value;
-        }, 0);
+            announcementTimer = null;
+        }, 50);
     }
 
     function newSession() {
@@ -624,6 +629,7 @@
             if (selectedId === expression.id) button.classList.add('flipped');
             if ((mode === 'tutorial' || hintLevel >= 4) && expression.solution) {
                 button.classList.add('hint-target');
+                if (hintLevel >= 4) button.setAttribute('aria-describedby', 'message');
             }
             parent.appendChild(button);
             return;
@@ -653,12 +659,23 @@
         return 0;
     }
 
+    function updateProblemOverflow() {
+        const canScroll = ui.problem.scrollWidth > ui.problem.clientWidth + 1;
+        ui.problem.classList.toggle('can-scroll', canScroll);
+        ui.problem.classList.toggle('at-scroll-end', !canScroll ||
+            ui.problem.scrollLeft + ui.problem.clientWidth >= ui.problem.scrollWidth - 1);
+    }
+
     function drawProblem() {
         ui.problem.replaceChildren();
         currentProblem.sides.forEach(function (side, index) {
             const wrapper = document.createElement('span');
             wrapper.className = 'equation-side';
-            if (hintLevel >= 3 && index === solutionSide()) wrapper.classList.add('hint-side');
+            if (hintLevel >= 3 && index === solutionSide()) {
+                wrapper.classList.add('hint-side');
+                wrapper.setAttribute('role', 'group');
+                wrapper.setAttribute('aria-describedby', 'message');
+            }
             renderExpression(side, wrapper);
             ui.problem.appendChild(wrapper);
             if (index + 1 < currentProblem.sides.length) {
@@ -687,10 +704,12 @@
         ui.round_kind.className = 'round-kind ' + currentProblem.roundKind;
         ui.score_label.textContent = t('round.score', { target: currentProblem.target, score: currentProblem.score });
         renderLearningGoal();
+        window.requestAnimationFrame(updateProblemOverflow);
     }
 
     function announceProblem() {
-        announce(ui.round_label.textContent + '. ' + ui.problem.getAttribute('aria-label'));
+        announce(ui.message_title.textContent + '. ' + ui.message_text.textContent + '. ' +
+            ui.round_label.textContent + '. ' + ui.problem.getAttribute('aria-label'));
     }
 
     function renderLearningGoal() {
@@ -708,6 +727,25 @@
             (session.phase === 'review' ? 'action.next' : 'action.check'));
     }
 
+    function hintTargetDetail() {
+        if (!currentProblem || !currentMessage) return '';
+        if (currentMessage.messageKey === 'hint.sideBody') {
+            const side = solutionSide();
+            const labels = {};
+            for (const key of Object.keys(core.OPERATIONS)) {
+                labels[key] = t('operation.' + key);
+            }
+            return t(side === 0 ? 'side.left' : 'side.right') + ': ' +
+                core.describe(currentProblem.sides[side], {}, labels) + '.';
+        }
+        if (currentMessage.messageKey === 'hint.numberBody') {
+            return t('aria.changeNumber', {
+                number: core.solutionDetails(currentProblem.sides, {}).solutionValue
+            }) + '.';
+        }
+        return '';
+    }
+
     function renderCatalogMessage() {
         if (!currentMessage) return;
         const values = {};
@@ -719,13 +757,20 @@
         }
         ui.message_title.textContent = t(currentMessage.titleKey, values);
         ui.message_text.textContent = t(currentMessage.messageKey, values);
+        const hintDetail = hintTargetDetail();
+        if (hintDetail) ui.message_text.textContent += ' ' + hintDetail;
     }
 
     function setCatalogMessage(titleKey, messageKey, values) {
         currentMessage = { titleKey: titleKey, messageKey: messageKey, values: values || {} };
         currentPersistentMessage = currentMessage;
         renderCatalogMessage();
-        announce(ui.message_title.textContent + '. ' + ui.message_text.textContent);
+        let announcement = ui.message_title.textContent + '. ' + ui.message_text.textContent;
+        if (pendingAchievementAnnouncements.length) {
+            announcement += '. ' + pendingAchievementAnnouncements.join('. ');
+            pendingAchievementAnnouncements = [];
+        }
+        announce(announcement);
         restartAnimation(ui.message, 'is-updating');
     }
 
@@ -836,7 +881,11 @@
         ui.skip.textContent = t(mode === 'adaptive' ? 'action.skip' : 'action.reveal');
         ui.share.disabled = mode === 'tutorial';
         hideFeedback();
+        ui.workspace.hidden = false;
+        ui.round_bar.hidden = false;
+        if (mode === 'custom') ui.custom_panel.open = false;
         drawProblem();
+        ui.problem.scrollLeft = 0;
         restartAnimation(ui.problem, 'is-new-round');
         updateProgress();
         if (mode === 'tutorial') {
@@ -988,6 +1037,7 @@
         currentAchievementId = id;
         renderAchievementNotice();
         ui.achievement_notice.hidden = false;
+        pendingAchievementAnnouncements.push(ui.achievement_notice.textContent);
         restartAnimation(ui.achievement_notice, 'is-updating');
         playSound('achievement');
         renderAchievements();
@@ -1387,6 +1437,8 @@
             } else if (currentProblem) {
                 ui.problem.focus();
                 announceProblem();
+            } else if (mode === 'custom' && !ui.custom_panel.hidden) {
+                ui.custom_panel.querySelector('summary').focus();
             }
         }
     }
@@ -1455,6 +1507,9 @@
             candidate.setAttribute('aria-pressed', active ? 'true' : 'false');
         }
         ui.custom_panel.hidden = mode !== 'custom';
+        ui.custom_panel.open = mode === 'custom';
+        ui.workspace.hidden = mode === 'custom';
+        ui.round_bar.hidden = mode === 'custom';
         showView('play');
         setSidebarCollapsed(mode !== 'custom' || stackedLayout.matches, !stackedLayout.matches);
         newSession();
@@ -1596,6 +1651,7 @@
         ui.setting_adaptive_style.value =
             ['flow', 'coach'].includes(settings.adaptiveStyle) ? settings.adaptiveStyle : 'flow';
         populateLearningFocus();
+        if (currentProblem) window.requestAnimationFrame(updateProblemOverflow);
     }
 
     function renderVersion() {
@@ -1639,24 +1695,26 @@
     ui.problem.addEventListener('click', function (event) {
         const button = event.target.closest('[data-number-id]');
         if (!button || session.phase !== 'playing' || !currentProblem) return;
-        const keyboardActivation = event.detail === 0;
         const id = button.dataset.numberId;
         selectedId = selectedId === id ? null : id;
         currentValues = valuesWithFlip(selectedId);
         playSound('flip');
         drawProblem();
         const replacement = ui.problem.querySelector('[data-number-id="' + id + '"]');
-        if (keyboardActivation && selectedId) {
-            ui.submit.focus();
-        } else if (replacement) {
-            replacement.focus();
-        }
+        if (replacement) replacement.focus();
         if (mode === 'tutorial') {
             setCatalogMessage(isSolved() ? 'tutorial.good' : 'tutorial.restore',
                 isSolved() ? 'tutorial.goodBody' : 'tutorial.restoreBody');
         }
         persistResume();
     });
+    ui.problem.addEventListener('scroll', updateProblemOverflow);
+    if ('ResizeObserver' in window) {
+        problemResizeObserver = new window.ResizeObserver(updateProblemOverflow);
+        problemResizeObserver.observe(ui.problem);
+    } else {
+        window.addEventListener('resize', updateProblemOverflow);
+    }
     ui.feedback.addEventListener('click', function (event) {
         const button = event.target.closest('[data-copy-learning]');
         if (!button || !currentProblem) return;
@@ -1826,6 +1884,7 @@
         forcedRound = null;
         newSession();
         startRound();
+        ui.problem.focus();
     });
 
     ui.custom_length.addEventListener('input', function () {

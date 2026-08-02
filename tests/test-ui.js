@@ -144,8 +144,12 @@ assert(html.includes('id="play_hud"') &&
     html.includes('grid-template-columns: minmax(0, 1.45fr) minmax(250px, .75fr)') &&
     html.includes('#session_summary_values { display: grid; grid-template-columns: repeat(4'),
     'the play HUD responds to available game-panel width and keeps session context compact');
+assert(html.includes('#session_summary_values { grid-template-columns: repeat(2') &&
+    html.includes('#actions { display: grid; grid-template-columns: repeat(3') &&
+    html.includes('#custom_progress, #submit { grid-column: 1 / -1;'),
+    'narrow game panels recompose statistics and actions instead of shrinking every label');
 assert(html.includes('height: calc(100svh - 48px') &&
-    html.includes('min-height: 600px;') &&
+    html.includes('min-height: min(600px, calc(100svh - 48px') &&
     html.includes('position: absolute; z-index: 30; inset: 0;') &&
     html.includes('height: 58px; padding: 7px 10px;') &&
     html.includes('.mode-group { grid-template-columns: repeat(3, minmax(0, 1fr)); }'),
@@ -161,8 +165,8 @@ assert(game.includes("window.matchMedia('(max-width: 640px)')") &&
     'stacked layouts dismiss navigation and keep active equation terms visible');
 assert(html.includes('class="flip-allowance"') && html.includes('.flip-allowance { white-space: nowrap; }'),
     'the move count and its label cannot split across lines');
-assert(html.includes('<dl class="app-version">') && html.includes('.app-version div { display: flex; flex-wrap: nowrap;'),
-    'About metadata keeps each label, punctuation mark, and value together');
+assert(html.includes('<dl class="app-version">') && html.includes('.app-version div { display: flex; flex-wrap: wrap;'),
+    'About metadata can wrap each label and value cleanly under text expansion');
 assert(html.includes('html.large-text { font-size: 118.75%; }') &&
     html.includes('font: 1rem/1.45') &&
     game.includes("document.documentElement.classList.toggle('large-text'"),
@@ -176,8 +180,11 @@ assert(html.includes('<div id="problem" role="group" dir="ltr" tabindex="-1">') 
     'the interactive equation has a stable direction and generated accessible name');
 assert(html.includes('id="app_status"') && html.includes('aria-atomic="true"') &&
     game.includes('function announceProblem()') &&
-    game.includes("announce(ui.message_title.textContent + '. ' + ui.message_text.textContent)"),
-    'one atomic app status announces puzzle and result changes without making detailed feedback live');
+    game.includes('if (announcementTimer) window.clearTimeout(announcementTimer);') &&
+    game.includes('pendingAchievementAnnouncements.join') &&
+    game.includes('pendingAchievementAnnouncements.push') &&
+    !html.includes('id="achievement_notice" role="status"'),
+    'one coalesced atomic app status announces complete puzzle, result, and achievement changes');
 assert(html.includes('<div id="feedback" hidden></div>') &&
     !html.includes('<div id="feedback" role="status"'),
     'interactive solution details do not compete with concise status announcements');
@@ -212,10 +219,11 @@ assert(game.includes("select.setAttribute('aria-busy', 'true')") &&
     game.includes('select.disabled = true') &&
     game.includes('select.removeAttribute(\'aria-busy\')'),
     'language controls communicate and prevent input while a catalog is loading');
-assert.strictEqual(
-    game.includes("document.activeElement === document.body || ui.problem.contains(document.activeElement)"),
-    false,
-    'the global Enter shortcut does not override native number-button activation');
+assert(game.includes('if (replacement) replacement.focus();') &&
+    game.includes("event.key === 'Enter' && inPuzzle && (event.ctrlKey || event.metaKey)") &&
+    !game.includes("event.key === 'Enter' && event.target.closest('.number')") &&
+    !game.includes('ui.submit.focus();'),
+    'number buttons retain native keyboard activation and puzzle checking has a separate shortcut');
 assert(game.includes("ui.custom_min.setAttribute('aria-invalid', 'true')") &&
     game.includes('ui.custom_min.focus()'),
     'custom target validation identifies and focuses invalid fields');
@@ -260,6 +268,12 @@ assert(game.includes('history = history.filter(function (item)') &&
 assert(game.includes('ui.share.disabled = true') &&
     game.includes("if (mode === 'custom')"),
     'the custom builder disables puzzle actions until a game has started');
+assert(html.includes('<details id="custom_panel" hidden>') &&
+    html.includes('<summary data-i18n="custom.builder">') &&
+    game.includes('ui.workspace.hidden = mode === \'custom\';') &&
+    game.includes("if (mode === 'custom') ui.custom_panel.open = false;") &&
+    game.includes('ui.problem.focus();'),
+    'Custom setup collapses into an editable disclosure and moves focus into active play');
 assert(game.includes('if (Object.prototype.hasOwnProperty.call(dailyResults, date)) return;'),
     'replaying a Daily puzzle cannot overwrite its first recorded outcome');
 assert(game.includes('session.solved >= CURATED.length'),
@@ -329,8 +343,25 @@ assert(html.includes('data-mode="guided"') &&
     'focused practice exposes a learning goal and progress dashboard');
 assert(game.includes('hintLevel >= 4') &&
     game.includes("'hint.compareBody'") &&
-    game.includes("'hint.directionBody'"),
-    'the hint ladder scaffolds comparison and planning before revealing the answer');
+    game.includes("'hint.directionBody'") &&
+    game.includes('function hintTargetDetail()') &&
+    game.includes("currentMessage.messageKey === 'hint.sideBody'") &&
+    game.includes("t('aria.changeNumber'") &&
+    game.includes("button.setAttribute('aria-describedby', 'message')") &&
+    game.includes("wrapper.setAttribute('aria-describedby', 'message')"),
+    'the hint ladder scaffolds reasoning before naming its visual target in text');
+assert(html.includes('--ui-label-font: "Courier New", monospace;') &&
+    html.includes('html[lang^="zh-Hant"]') && html.includes('html[lang^="ja"]') &&
+    html.includes('html[lang^="ko"]') && html.includes('html[lang^="ur"]') &&
+    html.includes('hyphens: auto;') && html.includes('overflow-wrap: anywhere;'),
+    'translated controls use script-aware fonts and expansion-safe wrapping');
+assert(game.includes('function updateProblemOverflow()') &&
+    game.includes('new window.ResizeObserver(updateProblemOverflow)') &&
+    game.includes("ui.problem.addEventListener('scroll', updateProblemOverflow)") &&
+    game.includes('if (currentProblem) window.requestAnimationFrame(updateProblemOverflow);') &&
+    game.includes('ui.problem.scrollLeft = 0;') &&
+    html.includes('#problem.can-scroll:not(.at-scroll-end)'),
+    'long equations reset to their start and keep their overflow affordance synchronized');
 assert(game.includes('core.updateLearningState') &&
     game.includes('core.conceptProgress') &&
     game.includes('core.recommendedConcept'),

@@ -63,6 +63,9 @@ assert.strictEqual(manifestLink.href, 'assets/manifests/manifest.zh.webmanifest'
 i18n.setLocale('ar');
 assert.strictEqual(i18n.getDirection(), 'rtl', 'Arabic selects right-to-left layout support');
 assert.strictEqual(i18n.t('sidebar.right'), 'اليمين', 'Arabic sidebar controls are available');
+assert(i18n.t('round.score', { target: 12, score: 8 }).includes('\u206812\u2069') &&
+    i18n.t('round.score', { target: 12, score: 8 }).includes('\u20688\u2069'),
+    'dynamic values are bidi-isolated in right-to-left prose');
 i18n.setLocale('bn');
 assert.strictEqual(i18n.t('action.check'), 'সমীকরণ পরীক্ষা করুন', 'Bengali controls are available');
 i18n.setLocale('ja');
@@ -145,6 +148,8 @@ for (const locale of i18n.availableLocales) {
         assert.deepStrictEqual(localePlaceholders, englishPlaceholders,
             locale + ' preserves placeholders for ' + key);
     }
+    assert(i18n.locales[locale]['options.keyboard'].includes('Ctrl/'),
+        locale + ' documents the non-conflicting keyboard check shortcut');
 }
 
 for (const phrase of ['practice weaknesses', 'rating was lowered', 'not counted', 'Native-speaker']) {

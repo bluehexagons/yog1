@@ -70,7 +70,7 @@
     "custom.seedHint": "같은 씨앗, 같은 게임",
     "custom.start": "맞춤 게임 시작",
     "options.wave": "각 모드는 8라운드의 워밍업, 표준 라운드, 보다 가벼운 챌린지를 반복합니다.",
-    "options.keyboard": "키: ←/→ 선택 · 공간 변경 또는 복원 · 확인 입력 · H는 힌트를 엽니다.",
+    "options.keyboard": "키: ←/→ 선택 · Space 변경 또는 복원 · Ctrl/⌘+Enter 확인 · H는 힌트를 엽니다.",
     "action.hint": "힌트",
     "action.reveal": "솔루션 표시",
     "action.share": "공유",

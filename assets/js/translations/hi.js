@@ -70,7 +70,7 @@
     "custom.seedHint": "वही बीज, वही गेम",
     "custom.start": "कस्टम गेम शुरू करें",
     "options.wave": "हर मोड में आठ राउंड की लहर दोहरती है: वार्म-अप, सामान्य राउंड और हल्की चुनौतियाँ।",
-    "options.keyboard": "कुंजियाँ: ←/→ चुनें · Space बदलें · Enter जाँचें · H संकेत।",
+    "options.keyboard": "कुंजियाँ: ←/→ चुनें · Space बदलें · Ctrl/⌘+Enter जाँचें · H संकेत।",
     "action.hint": "संकेत",
     "action.reveal": "हल देखें",
     "action.share": "साझा करें",

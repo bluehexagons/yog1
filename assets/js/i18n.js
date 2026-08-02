@@ -79,7 +79,7 @@
     "custom.seedHint": "Same seed, same game",
     "custom.start": "Start custom game",
     "options.wave": "Each mode repeats an eight-round wave of warm-ups, standard rounds, and gentler challenges.",
-    "options.keyboard": "Keys: ←/→ select · Space changes or restores · Enter checks · H opens a hint.",
+    "options.keyboard": "Keys: ←/→ select · Space changes or restores · Ctrl/Command+Enter checks · H opens a hint.",
     "action.hint": "Hint",
     "action.reveal": "Show solution",
     "action.share": "Share",
@@ -388,7 +388,9 @@
         const template = (messages[locale] && messages[locale][key]) ||
             messages.en[key] || key;
         return template.replace(/\{(\w+)\}/g, function (_, name) {
-            return values && values[name] !== undefined ? values[name] : '{' + name + '}';
+            if (!values || values[name] === undefined) return '{' + name + '}';
+            const value = String(values[name]);
+            return RTL_LOCALES.includes(locale) ? '\u2068' + value + '\u2069' : value;
         });
     }
 

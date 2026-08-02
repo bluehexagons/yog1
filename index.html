@@ -92,7 +92,7 @@
                     <strong id="message_title" data-i18n="message.howToPlay">How to play</strong>
                     <span id="message_text"></span>
                 </div>
-                <div id="achievement_notice" role="status" aria-live="polite"></div>
+                <div id="achievement_notice"></div>
                 <div id="learning_goal" hidden>
                     <strong data-i18n="learning.goal">Learning goal</strong>
                     <span><span id="learning_goal_name"></span> · <code id="learning_goal_example"></code></span>
@@ -111,7 +111,8 @@
             </div>
         </div>
 
-        <section id="custom_panel" hidden>
+        <details id="custom_panel" hidden>
+            <summary data-i18n="custom.builder">Build a custom game</summary>
             <form id="custom_form">
                 <fieldset aria-describedby="custom_note">
                     <legend data-i18n="custom.operations">Operations</legend>
@@ -130,7 +131,7 @@
                 </div>
                 <button class="primary" type="submit" data-i18n="custom.start">Start custom game</button>
             </form>
-        </section>
+        </details>
 
         <section id="workspace" aria-label="Current puzzle" data-i18n-aria-label="aria.puzzle">
             <div id="flips"><strong data-i18n="action.yourMove">Your move</strong><span class="flip-allowance"><span id="flip_count">1</span> <span id="flip_text">change remaining</span></span></div>

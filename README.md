@@ -51,8 +51,8 @@ Keyboard controls:
 
 - Left/Right: move between numbers
 - Space: change or restore the focused number
-- Enter: check the equation
-- Ctrl/Command+Enter: check from elsewhere in the game
+- Enter/Space: activate the focused control
+- Ctrl/Command+Enter: check from anywhere in the puzzle
 - H: request a hint
 
 It remains a dependency-free static site. Open `index.html` in a browser to play.

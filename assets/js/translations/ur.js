@@ -70,7 +70,7 @@
     "custom.seedHint": "وہی بیج، وہی گیم",
     "custom.start": "اپنی گیم شروع کریں",
     "options.wave": "ہر موڈ میں آٹھ راؤنڈز کی لہر دہرائی جاتی ہے: وارم اپ، عام راؤنڈز اور نرم چیلنجز۔",
-    "options.keyboard": "کلیدیں: ←/→ انتخاب · Space تبدیلی · Enter جانچ · H اشارہ۔",
+    "options.keyboard": "کلیدیں: ←/→ انتخاب · Space تبدیلی · Ctrl/⌘+Enter جانچ · H اشارہ۔",
     "action.hint": "اشارہ",
     "action.reveal": "حل دکھائیں",
     "action.share": "شیئر کریں",

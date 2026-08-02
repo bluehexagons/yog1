@@ -70,7 +70,7 @@
     "custom.seedHint": "Aynı tohum, aynı oyun",
     "custom.start": "Özel oyunu başlat",
     "options.wave": "Her mod sekiz turluk bir dalgayı tekrarlar: ısınma, standart turlar ve daha yumuşak meydan okumalar.",
-    "options.keyboard": "Tuşlar: ←/→ seçer · Boşluk değiştirir · Enter kontrol eder · H ipucu verir.",
+    "options.keyboard": "Tuşlar: ←/→ seçer · Boşluk değiştirir · Ctrl/⌘+Enter kontrol eder · H ipucu verir.",
     "action.hint": "İpucu",
     "action.reveal": "Çözümü göster",
     "action.share": "Paylaş",

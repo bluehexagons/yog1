@@ -70,7 +70,7 @@
     "custom.seedHint": "同じシード、同じゲーム",
     "custom.start": "カスタムゲームを始める",
     "options.wave": "各モードでは、ウォームアップ、通常ラウンド、やさしめのチャレンジの8ラウンドを繰り返します。",
-    "options.keyboard": "キー：←/→ 選択 · Space 変更 · Enter 確認 · H ヒント。",
+    "options.keyboard": "キー：←/→ 選択 · Space 変更 · Ctrl/⌘+Enter 確認 · H ヒント。",
     "action.hint": "ヒント",
     "action.reveal": "答えを見る",
     "action.share": "共有",

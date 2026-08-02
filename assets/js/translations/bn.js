@@ -70,7 +70,7 @@
     "custom.seedHint": "একই বীজ, একই খেলা",
     "custom.start": "কাস্টম গেম শুরু করুন",
     "options.wave": "প্রতিটি মোডে আট রাউন্ডের ধারা থাকে: ওয়ার্ম-আপ, সাধারণ রাউন্ড ও হালকা চ্যালেঞ্জ।",
-    "options.keyboard": "কী: ←/→ নির্বাচন · Space পরিবর্তন · Enter পরীক্ষা · H ইঙ্গিত।",
+    "options.keyboard": "কী: ←/→ নির্বাচন · Space পরিবর্তন · Ctrl/⌘+Enter পরীক্ষা · H ইঙ্গিত।",
     "action.hint": "ইঙ্গিত",
     "action.reveal": "সমাধান দেখুন",
     "action.share": "শেয়ার করুন",

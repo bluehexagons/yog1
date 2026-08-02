@@ -70,7 +70,7 @@
     "custom.seedHint": "Cùng hạt giống, cùng trò chơi",
     "custom.start": "Bắt đầu trò chơi tùy chỉnh",
     "options.wave": "Mỗi chế độ lặp lại một chuỗi tám vòng: khởi động, vòng thường và thử thách nhẹ nhàng hơn.",
-    "options.keyboard": "Phím: ←/→ chọn · Space thay đổi · Enter kiểm tra · H gợi ý.",
+    "options.keyboard": "Phím: ←/→ chọn · Space thay đổi · Ctrl/⌘+Enter kiểm tra · H gợi ý.",
     "action.hint": "Gợi ý",
     "action.reveal": "Xem lời giải",
     "action.share": "Chia sẻ",

@@ -70,7 +70,7 @@
     "custom.seedHint": "Misma semilla, mismo juego",
     "custom.start": "Iniciar juego personalizado",
     "options.wave": "Cada modo repite una secuencia de ocho rondas: calentamientos, rondas normales y desafíos suaves.",
-    "options.keyboard": "Teclas: ←/→ seleccionan · Espacio cambia · Intro comprueba · H da una pista.",
+    "options.keyboard": "Teclas: ←/→ seleccionan · Espacio cambia · Ctrl/⌘+Intro comprueba · H da una pista.",
     "action.hint": "Pista",
     "action.reveal": "Mostrar solución",
     "action.share": "Compartir",
