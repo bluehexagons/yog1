@@ -15,7 +15,7 @@
     const ui = {};
     for (const id of [
         'game', 'mode_buttons', 'mode_info', 'view_buttons', 'sidebar_toggle', 'sidebar_toggle_play',
-        'round_label', 'round_kind', 'score_label', 'timer_label',
+        'round_bar', 'round_label', 'round_kind', 'score_label', 'timer_label',
         'workspace', 'problem', 'flip_count', 'flip_text', 'submit', 'hint', 'skip', 'share',
         'message', 'message_title', 'message_text', 'feedback', 'custom_panel', 'custom_form',
         'custom_operations', 'custom_length', 'custom_length_value', 'custom_min',

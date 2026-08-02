@@ -15,6 +15,18 @@ const ids = Array.from(html.matchAll(/\bid="([^"]+)"/g)).map(function (match) {
 const uniqueIds = new Set(ids);
 assert.strictEqual(uniqueIds.size, ids.length, 'document IDs are unique');
 
+const uiRegistry = game.match(/for \(const id of \[([\s\S]*?)\]\) \{/);
+assert(uiRegistry, 'game UI registry exists');
+const registeredUiIds = new Set(Array.from(uiRegistry[1].matchAll(/'([^']+)'/g), function (match) {
+    return match[1];
+}));
+for (const id of registeredUiIds) {
+    assert(uniqueIds.has(id), 'registered UI element #' + id + ' exists');
+}
+for (const match of game.matchAll(/\bui\.([A-Za-z0-9_]+)/g)) {
+    assert(registeredUiIds.has(match[1]), 'ui.' + match[1] + ' is registered');
+}
+
 for (const match of html.matchAll(/\b(?:aria-controls|aria-describedby|for)="([^"]+)"/g)) {
     for (const id of match[1].trim().split(/\s+/)) {
         assert(uniqueIds.has(id), match[0] + ' references an existing element');
