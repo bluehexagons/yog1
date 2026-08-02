@@ -150,6 +150,12 @@ for (const locale of i18n.availableLocales) {
     }
     assert(i18n.locales[locale]['options.keyboard'].includes('Ctrl/'),
         locale + ' documents the non-conflicting keyboard check shortcut');
+    if (locale !== 'en') {
+        assert.notStrictEqual(i18n.locales[locale]['about.privacyBody'], i18n.locales.en['about.privacyBody'],
+            locale + ' localizes the project privacy policy');
+        assert.notStrictEqual(i18n.locales[locale]['about.hostingPrivacy'], i18n.locales.en['about.hostingPrivacy'],
+            locale + ' localizes the hosting privacy notice');
+    }
 }
 
 for (const phrase of ['practice weaknesses', 'rating was lowered', 'not counted', 'Native-speaker']) {

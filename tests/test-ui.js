@@ -137,6 +137,10 @@ assert(!html.includes('LD28 / 2013') &&
     (html.match(/Ludum Dare 28/g) || []).length === 1 &&
     html.includes('data-i18n="about.origin"'),
     'the original jam is credited only in the About screen');
+assert(html.includes('class="screen-panel about-copy about-privacy"') &&
+    html.includes('data-i18n="about.privacyBody"') &&
+    html.includes('data-i18n="about.hostingPrivacy"'),
+    'About includes a visible project and hosting privacy policy');
 assert(html.includes('input[type="number"], input[type="text"], select') &&
     html.includes('accent-color: var(--blue)'),
     'text fields and native choice controls participate in every theme');
