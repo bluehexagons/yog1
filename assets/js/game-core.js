@@ -624,44 +624,60 @@
         options = options || {};
         const candidateCount = Math.max(1, Math.min(40, options.candidateCount || 12));
         const requireUnique = options.requireUnique !== false;
-        let best = null;
-        let bestRank = Infinity;
-        let intendedOperationCount = null;
-        function considerCandidate() {
-            const candidate = generateCandidate(options);
-            if (intendedOperationCount === null) {
-                intendedOperationCount = candidate.operationCount;
-            }
-            const analysis = analyzeProblem(candidate.sides);
-            candidate.analysis = analysis;
-            const uniquenessPenalty = requireUnique && !analysis.unique ? 1000 : 0;
-            const safetyPenalty = analysis.safe ? 0 : 10000;
-            const structurePenalty = candidate.operationCount === intendedOperationCount ? 0 : 100;
-            const rank = safetyPenalty + uniquenessPenalty + structurePenalty +
-                Math.abs(candidate.score - candidate.target);
-            if (rank < bestRank) {
-                best = candidate;
-                bestRank = rank;
-            }
-            return rank;
-        }
-        for (let index = 0; index < candidateCount; index++) {
-            if (considerCandidate() === 0) break;
-        }
         const acceptable = function (candidate) {
             return candidate && candidate.analysis.safe &&
                 (!requireUnique || candidate.analysis.unique);
         };
-        // Some operation sets, notably long division-only expressions, produce
-        // many accidental 0 = 0 alternatives. Keep searching rather than
-        // violating the requireUnique contract when the scoring sample misses.
-        for (let index = 0; !acceptable(best) && index < 80; index++) {
-            considerCandidate();
+        function findCandidate(candidateOptions) {
+            let best = null;
+            let bestRank = Infinity;
+            let intendedOperationCount = null;
+            function considerCandidate() {
+                const candidate = generateCandidate(candidateOptions);
+                if (intendedOperationCount === null) {
+                    intendedOperationCount = candidate.operationCount;
+                }
+                const analysis = analyzeProblem(candidate.sides);
+                candidate.analysis = analysis;
+                const uniquenessPenalty = requireUnique && !analysis.unique ? 1000 : 0;
+                const safetyPenalty = analysis.safe ? 0 : 10000;
+                const structurePenalty = candidate.operationCount === intendedOperationCount ? 0 : 100;
+                const rank = safetyPenalty + uniquenessPenalty + structurePenalty +
+                    Math.abs(candidate.score - candidate.target);
+                if (rank < bestRank) {
+                    best = candidate;
+                    bestRank = rank;
+                }
+                return rank;
+            }
+            for (let index = 0; index < candidateCount; index++) {
+                if (considerCandidate() === 0) break;
+            }
+            // Some operation sets, notably long division-only expressions,
+            // produce many accidental 0 = 0 alternatives. Keep searching
+            // rather than violating the requireUnique contract when the
+            // scoring sample misses.
+            for (let index = 0; !acceptable(best) && index < 80; index++) {
+                considerCandidate();
+            }
+            return best;
         }
-        if (!acceptable(best)) {
-            throw new Error('Unable to generate a safe puzzle with the requested solution rules');
+
+        let best = findCandidate(options);
+        if (acceptable(best)) return best;
+
+        // Long division-only expressions can make uniqueness impossible for a
+        // particular seed because truncation creates many equivalent totals.
+        // Custom and guided modes provide an explicit length, so step down one
+        // requested operation at a time instead of failing to start the game.
+        const requestedLength = Number(options.length);
+        if (Number.isSafeInteger(requestedLength) && requestedLength > 2) {
+            for (let length = requestedLength - 1; length >= 2; length--) {
+                best = findCandidate(Object.assign({}, options, { length: length }));
+                if (acceptable(best)) return best;
+            }
         }
-        return best;
+        throw new Error('Unable to generate a safe puzzle with the requested solution rules');
     }
 
     function serialize(expression, values) {

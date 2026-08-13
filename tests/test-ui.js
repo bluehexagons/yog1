@@ -294,6 +294,11 @@ assert.strictEqual(game.includes('generatorVersion'), false,
     'puzzle generation has one current implementation');
 assert(game.includes('candidateCount: 12') && game.includes('requireUnique: true'),
     'the current generator samples for unique solutions');
+assert(game.includes("requested === 'timed' || requested === 'endless'") &&
+    game.includes("url.searchParams.set('difficulty', mode)") &&
+    game.includes("url.searchParams.set('correct', String(activeCustomSettings.correct))") &&
+    game.includes("url.searchParams.set('rate', String(activeCustomSettings.rate))"),
+    'Timed, Endless, and complete Custom settings survive shared links');
 assert(storage.includes('SCHEMA_VERSION') && storage.includes('exportData') &&
     storage.includes('importData'),
     'persistent data has a versioned backup boundary');

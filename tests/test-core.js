@@ -154,6 +154,19 @@ assert.strictEqual(divisionFallback.analysis.unique, true,
     'unique generation searches beyond an ambiguous division-heavy candidate sample');
 assert.strictEqual(divisionFallback.analysis.safe, true,
     'the unique-generation fallback still requires every selectable flip to be safe');
+const longDivisionFallback = core.generateProblem({
+    profile: core.DIFFICULTIES.extreme,
+    operations: ['divide'],
+    length: 8,
+    targetRange: [3, 100],
+    maxNumber: 200,
+    round: 76,
+    random: core.createSeededRandom('custom-divide:75')
+});
+assert.strictEqual(longDivisionFallback.analysis.unique, true,
+    'valid long division-only custom games fall back to a shorter unique puzzle when needed');
+assert.strictEqual(longDivisionFallback.analysis.safe, true,
+    'division-only fallback puzzles keep every selectable flip safe');
 assert.throws(function () {
     core.generateProblem({
         profile: core.DIFFICULTIES.easy,

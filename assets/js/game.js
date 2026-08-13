@@ -1519,12 +1519,16 @@
             } else if (mode === 'guided') {
                 url.searchParams.set('difficulty', 'guided');
                 url.searchParams.set('focus', currentLearningConcept);
+            } else if (mode === 'timed' || mode === 'endless') {
+                url.searchParams.set('difficulty', mode);
             } else if (mode === 'custom') {
                 url.searchParams.set('difficulty', 'custom');
                 url.searchParams.set('ops', activeCustomSettings.operations.join(','));
                 url.searchParams.set('length', String(activeCustomSettings.length));
                 url.searchParams.set('min', String(activeCustomSettings.min));
                 url.searchParams.set('max', String(activeCustomSettings.max));
+                url.searchParams.set('correct', String(activeCustomSettings.correct));
+                url.searchParams.set('rate', String(activeCustomSettings.rate));
             } else {
                 url.searchParams.set('difficulty', modeProfile().id);
             }
@@ -2340,6 +2344,10 @@
                 ui.custom_min.value = Math.max(3, Math.min(100, Number(params.get('min')) || 12));
                 ui.custom_max.value = Math.max(Number(ui.custom_min.value),
                     Math.min(100, Number(params.get('max')) || 35));
+                ui.custom_correct.value = Math.max(1, Math.min(100,
+                    Number(params.get('correct')) || 10));
+                ui.custom_rate.value = Math.max(1, Math.min(100,
+                    Number(params.get('rate')) || 80));
                 ui.custom_form.requestSubmit();
                 if (!activeCustomSettings) return;
                 setCatalogMessage('shared.custom', 'shared.customBody');
@@ -2353,6 +2361,15 @@
                     seed: safeSeed,
                     round: sharedRound(params.get('round')),
                     learningConcept: focus
+                });
+                setCatalogMessage('shared.seeded', 'shared.seededBody');
+                return;
+            }
+            if (requested === 'timed' || requested === 'endless') {
+                const button = ui.mode_buttons.querySelector('[data-mode="' + requested + '"]');
+                activateMode(requested, button, {
+                    seed: safeSeed,
+                    round: sharedRound(params.get('round'))
                 });
                 setCatalogMessage('shared.seeded', 'shared.seededBody');
                 return;
