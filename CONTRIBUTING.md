@@ -1,7 +1,7 @@
 # Contributing
 
 Thanks for improving You Only Get 1s. The shipped game has no runtime
-dependencies. Install development tools with `npm ci` using Node.js 20 or later.
+dependencies. Install development tools with `npm ci` using Node.js 22.12 or later.
 
 ## Before submitting a change
 

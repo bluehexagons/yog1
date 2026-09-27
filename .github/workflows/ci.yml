@@ -18,13 +18,16 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    strategy:
+      matrix:
+        node: [22, 24]
     steps:
       - name: Check out repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Use Node.js 24
+      - name: Use Node.js ${{ matrix.node }}
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: 24
+          node-version: ${{ matrix.node }}
           cache: npm
       - name: Install development tools
         run: npm ci
@@ -34,16 +37,17 @@ jobs:
         run: |
           npm run build
           git diff --exit-code
+          test -z "$(git ls-files --others --exclude-standard)"
       - name: Validate deployment package
         run: |
           npm run package
           node scripts/check-site.js dist
       - name: Create itch.io distributable
-        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') && matrix.node == 24
         working-directory: dist
         run: zip -9 -r "${RUNNER_TEMP}/you-only-get-1s.zip" .
       - name: Upload itch.io distributable
-        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') && matrix.node == 24
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: itch-io-distributable

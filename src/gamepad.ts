@@ -3,12 +3,12 @@ interface GamepadLike {
     id?: string;
     connected?: boolean;
     mapping: string;
-    buttons: ArrayLike<{ pressed: boolean; value: number }>;
-    axes: ArrayLike<number>;
+    buttons?: ArrayLike<{ pressed: boolean; value: number }>;
+    axes?: ArrayLike<number>;
 }
 
 interface GamepadOptions {
-    getGamepads: () => ArrayLike<GamepadLike | null> | null;
+    getGamepads?: () => ArrayLike<GamepadLike | null> | null;
     requestFrame: (callback: () => void) => number;
     cancelFrame: (id: number) => void;
     setTimer: (callback: () => void, delay: number) => number;
