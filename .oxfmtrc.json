@@ -1,0 +1,12 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "singleQuote": true,
+  "ignorePatterns": [
+    "assets/js/gamepad.js",
+    "assets/js/locales.js",
+    "assets/js/version.js",
+    "assets/manifests/**",
+    "package-lock.json",
+    "sw.js"
+  ]
+}

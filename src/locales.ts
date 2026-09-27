@@ -1,6 +1,18 @@
-"use strict";
-(function (root) {
+interface LocaleOption {
+    id: string;
+    tag: string;
+    label: string;
+    direction: 'ltr' | 'rtl';
+}
+
+interface Window {
+    Yog1Locales: LocaleOption[];
+    Yog1ResolveLocale: (value: unknown) => string;
+}
+
+(function (root: Window) {
     'use strict';
+
     // This is the shared source of truth for document metadata, selectors,
     // install manifests, directionality, and the offline asset generator.
     root.Yog1Locales = [
@@ -22,7 +34,8 @@
         { id: 'tr', tag: 'tr', label: 'Türkçe', direction: 'ltr' },
         { id: 'ur', tag: 'ur', label: 'اردو', direction: 'rtl' },
     ];
-    root.Yog1ResolveLocale = function (value) {
+
+    root.Yog1ResolveLocale = function (value: unknown): string {
         const requested = String(value || '')
             .trim()
             .replace(/_/g, '-')
@@ -30,8 +43,8 @@
         const exact = root.Yog1Locales.find(function (item) {
             return item.id.toLowerCase() === requested || item.tag.toLowerCase() === requested;
         });
-        if (exact)
-            return exact.id;
+        if (exact) return exact.id;
+
         const parts = requested.split('-');
         const primary = parts[0];
         if (primary === 'zh') {

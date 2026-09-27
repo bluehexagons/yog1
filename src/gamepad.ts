@@ -1,12 +1,51 @@
-"use strict";
-(function (root, factory) {
+interface GamepadLike {
+    index: number;
+    id?: string;
+    connected?: boolean;
+    mapping: string;
+    buttons?: ArrayLike<{ pressed: boolean; value: number }>;
+    axes?: ArrayLike<number>;
+}
+
+interface GamepadOptions {
+    getGamepads?: () => ArrayLike<GamepadLike | null> | null;
+    requestFrame: (callback: () => void) => number;
+    cancelFrame: (id: number) => void;
+    setTimer: (callback: () => void, delay: number) => number;
+    clearTimer: (id: number) => void;
+    now: () => number;
+    isEnabled?: () => boolean;
+    onConnected?: () => void;
+    onDisconnected?: () => void;
+    onMove?: (direction: number) => void;
+    onActivate?: () => void;
+    onHint?: () => void;
+    onSubmit?: () => void;
+}
+
+interface GamepadController {
+    start: () => void;
+    pause: () => void;
+    resume: () => void;
+    refresh: () => void;
+    destroy: () => void;
+    poll: () => void;
+}
+
+interface GamepadApi {
+    create: (options: GamepadOptions) => GamepadController;
+}
+
+declare const module: { exports: GamepadApi } | undefined;
+
+(function (root: typeof globalThis & { Yog1Gamepad?: GamepadApi }, factory: () => GamepadApi) {
     const api = factory();
-    if (typeof module === 'object' && module.exports)
-        module.exports = api;
+    if (typeof module === 'object' && module.exports) module.exports = api;
     root.Yog1Gamepad = api;
 })(globalThis, function () {
     'use strict';
-    function create(options) {
+
+    function create(options: GamepadOptions): GamepadController {
         const getGamepads = options.getGamepads;
         const requestFrame = options.requestFrame;
         const cancelFrame = options.cancelFrame;
@@ -14,49 +53,50 @@
         const clearTimer = options.clearTimer;
         const now = options.now;
         let running = false;
-        let frameId = null;
-        let timerId = null;
-        let activeIndex = null;
-        let activeId = null;
+        let frameId: number | null = null;
+        let timerId: number | null = null;
+        let activeIndex: number | null = null;
+        let activeId: string | null = null;
         let armed = false;
         let previous = { activate: false, hint: false, submit: false };
         let direction = 0;
         let repeatAt = 0;
-        function button(pad, index) {
+
+        function button(pad: GamepadLike, index: number): boolean {
             const value = pad.buttons && pad.buttons[index];
             return !!value && (value.pressed || value.value >= 0.75);
         }
-        function horizontalDirection(pad) {
+
+        function horizontalDirection(pad: GamepadLike): number {
             const left = button(pad, 14);
             const right = button(pad, 15);
-            if (left !== right)
-                return left ? -1 : 1;
+            if (left !== right) return left ? -1 : 1;
             const axis = pad.axes && Number.isFinite(pad.axes[0]) ? pad.axes[0] : 0;
-            if (axis <= -0.65)
-                return -1;
-            if (axis >= 0.65)
-                return 1;
-            if (direction && axis * direction > 0 && Math.abs(axis) > 0.35)
-                return direction;
+            if (axis <= -0.65) return -1;
+            if (axis >= 0.65) return 1;
+            if (direction && axis * direction > 0 && Math.abs(axis) > 0.35) return direction;
             return 0;
         }
-        function pads() {
+
+        function pads(): Array<GamepadLike | null> {
             try {
                 return typeof getGamepads === 'function' ? Array.from(getGamepads() || []) : [];
-            }
-            catch (error) {
+            } catch (error) {
                 return [];
             }
         }
-        function supportedPad() {
+
+        function supportedPad(): GamepadLike | null {
             const available = pads();
             let lostActive = false;
             if (activeIndex !== null) {
                 const active = available[activeIndex];
-                if (active &&
+                if (
+                    active &&
                     active.connected !== false &&
                     active.mapping === 'standard' &&
-                    (active.id || '') === activeId)
+                    (active.id || '') === activeId
+                )
                     return active;
                 activeIndex = null;
                 activeId = null;
@@ -70,37 +110,32 @@
                     armed = false;
                     previous = { activate: false, hint: false, submit: false };
                     direction = 0;
-                    if (options.onConnected)
-                        options.onConnected();
+                    if (options.onConnected) options.onConnected();
                     return pad;
                 }
             }
-            if (lostActive && options.onDisconnected)
-                options.onDisconnected();
+            if (lostActive && options.onDisconnected) options.onDisconnected();
             return null;
         }
+
         function cancelScheduled() {
-            if (frameId !== null)
-                cancelFrame(frameId);
-            if (timerId !== null)
-                clearTimer(timerId);
+            if (frameId !== null) cancelFrame(frameId);
+            if (timerId !== null) clearTimer(timerId);
             frameId = null;
             timerId = null;
         }
-        function schedule(hasPad) {
-            if (!running)
-                return;
+
+        function schedule(hasPad: boolean): void {
+            if (!running) return;
             cancelScheduled();
-            if (hasPad)
-                frameId = requestFrame(poll);
-            else
-                timerId = setTimer(poll, 750);
+            if (hasPad) frameId = requestFrame(poll);
+            else timerId = setTimer(poll, 750);
         }
+
         function poll() {
             frameId = null;
             timerId = null;
-            if (!running)
-                return;
+            if (!running) return;
             const pad = supportedPad();
             if (!pad) {
                 schedule(false);
@@ -116,54 +151,48 @@
             const enabled = !options.isEnabled || options.isEnabled();
             if (!enabled) {
                 armed = false;
-            }
-            else if (!armed) {
-                if (neutral)
-                    armed = true;
-            }
-            else {
+            } else if (!armed) {
+                if (neutral) armed = true;
+            } else {
                 const time = now();
                 if (nextDirection && nextDirection !== direction) {
-                    if (options.onMove)
-                        options.onMove(nextDirection);
+                    if (options.onMove) options.onMove(nextDirection);
                     repeatAt = time + 400;
-                }
-                else if (nextDirection && time >= repeatAt) {
-                    if (options.onMove)
-                        options.onMove(nextDirection);
+                } else if (nextDirection && time >= repeatAt) {
+                    if (options.onMove) options.onMove(nextDirection);
                     repeatAt = time + 140;
                 }
                 if (current.activate && !previous.activate && options.onActivate)
                     options.onActivate();
-                if (current.hint && !previous.hint && options.onHint)
-                    options.onHint();
-                if (current.submit && !previous.submit && options.onSubmit)
-                    options.onSubmit();
+                if (current.hint && !previous.hint && options.onHint) options.onHint();
+                if (current.submit && !previous.submit && options.onSubmit) options.onSubmit();
             }
             previous = current;
             direction = nextDirection;
             schedule(true);
         }
+
         function start() {
-            if (running)
-                return;
+            if (running) return;
             running = true;
             poll();
         }
+
         function pause() {
             running = false;
             armed = false;
             cancelScheduled();
         }
+
         function refresh() {
-            if (!running)
-                return;
+            if (!running) return;
             cancelScheduled();
             activeIndex = null;
             activeId = null;
             armed = false;
             poll();
         }
+
         return {
             start: start,
             pause: pause,
@@ -173,5 +202,6 @@
             poll: poll,
         };
     }
+
     return { create: create };
 });

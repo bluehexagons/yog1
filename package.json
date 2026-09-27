@@ -2,19 +2,29 @@
   "name": "you-only-get-1s",
   "private": true,
   "description": "Balance integer equations by changing exactly one number into a 1.",
-  "license": "MIT",
   "homepage": "https://bluehexagons.github.io/yog1/",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/bluehexagons/yog1.git"
   },
-  "engines": {
-    "node": ">=20"
-  },
   "scripts": {
-    "build": "node scripts/update-assets.js",
+    "build": "npm run build:ts && node scripts/update-assets.js",
+    "build:ts": "tsc --project tsconfig.json",
+    "typecheck": "tsc --project tsconfig.json --noEmit",
+    "format": "oxfmt --write src package.json tsconfig.json .oxfmtrc.json .oxlintrc.json",
+    "format:check": "oxfmt --check src package.json tsconfig.json .oxfmtrc.json .oxlintrc.json",
+    "lint": "oxlint --deny-warnings src assets/js scripts tests sw.js",
     "package": "node scripts/build-site.js",
     "test": "node scripts/test-all.js",
-    "check": "npm test && node scripts/check-site.js"
+    "check": "npm run format:check && npm run lint && npm run typecheck && npm run build:ts && npm test && node scripts/check-site.js"
+  },
+  "devDependencies": {
+    "oxfmt": "0.70.0",
+    "oxlint": "1.85.0",
+    "typescript": "7.0.2"
+  },
+  "engines": {
+    "node": ">=22.12.0"
   }
 }
