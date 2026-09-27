@@ -86,17 +86,21 @@ generated text.
 Run the complete test, syntax, and site audit with:
 
 ```sh
+npm ci
 npm run check
 ```
 
 ## Development
 
-The shipped game remains a dependency-free static site. Runtime code lives in
+The shipped game remains a dependency-free static site. Development uses
+TypeScript, oxfmt, and oxlint installed with `npm ci`. `src/gamepad.ts` and
+`src/locales.ts` compile to their namesakes in `assets/js/`; edit the TypeScript
+sources and commit the generated JavaScript. Other runtime code lives in
 `assets/js/`: `game-core.js` owns arithmetic generation and analysis,
 `game-content.js` owns handcrafted content, `storage.js` owns versioned
 persistence and backup data, `theme.js` applies the saved color scheme before
-the page renders, `locales.js` owns locale metadata, and `game.js`
-coordinates session state and rendering. Install manifests and icons live in
+the page renders, and `game.js` coordinates session state and rendering.
+Install manifests and icons live in
 `assets/manifests/` and `assets/icons/`; the stylesheet lives in `assets/css/`,
 and tests live in `tests/`.
 Pre-release builds intentionally support only the current saved-data, backup,
@@ -108,6 +112,12 @@ metadata, regenerate localized manifests and the content-hashed offline cache:
 ```sh
 npm run build
 ```
+
+`npm run build` compiles TypeScript before updating the offline cache. Run
+`npm run format` to format TypeScript and tooling configuration. `npm run check`
+checks that formatting, lints JavaScript and TypeScript, typechecks the sources,
+compiles them, runs tests, and audits the site. Existing JavaScript is linted but
+keeps its current formatting until it is migrated.
 
 `npm run package` creates the exact Pages artifact in `dist/`. Pull requests run
 the same checks in CI. Pushes to `main` are validated, packaged, and deployed
