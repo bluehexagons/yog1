@@ -20,7 +20,7 @@
     "check": "npm run format:check && npm run lint && npm run typecheck && npm run build:ts && npm test && node scripts/check-site.js"
   },
   "devDependencies": {
-    "oxfmt": "0.70.0",
+    "oxfmt": "0.71.0",
     "oxlint": "1.85.0",
     "typescript": "7.0.2"
   },
