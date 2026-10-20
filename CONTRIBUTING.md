@@ -1,7 +1,19 @@
 # Contributing
 
 Thanks for improving You Only Get 1s. The shipped game has no runtime
-dependencies. Install development tools with `npm ci` using Node.js 22.12 or later.
+dependencies. Use Node.js 24 from `.nvmrc` for development, then install tools
+with `npm ci`. Node.js 22.12 or later remains supported and CI checks both
+Node.js 22 and 24. With nvm installed, `nvm install` and `nvm use` select the pin.
+
+## Development environment
+
+Basaltwater on Debian is the reference development environment. Native Node.js
+and npm commands also work without Basaltwater; no managed service is required.
+On a managed machine, `basaltw node exec -- npm run check` uses the project pin
+without changing the account's default Node.js version. Use the installed
+project-development and web-gateway skills for shared environment support; the
+[Basaltwater project standards](https://github.com/bluehexagons/basaltwater/blob/main/docs/agents/project-standards.md)
+describe the shared conventions. Project commands and file layout remain local.
 
 ## Before submitting a change
 
@@ -10,8 +22,10 @@ dependencies. Install development tools with `npm ci` using Node.js 22.12 or lat
 3. Confirm `git diff --check` reports no whitespace errors.
 4. Keep generated JavaScript, manifests, and `sw.js` in the same commit as their source changes.
 
-`npm run package` creates the exact publishable site in `dist/`. This directory is
-generated and should not be committed.
+After building, `npm run package` creates the exact publishable site in `dist/`.
+Packaging does not run the build. This directory is generated and should not be
+committed. Preserve source artwork, tracked generated runtime assets, and player
+save backups when reviewing cleanup candidates.
 
 ## Project conventions
 

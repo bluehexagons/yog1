@@ -119,9 +119,11 @@ checks that formatting, lints JavaScript and TypeScript, typechecks the sources,
 compiles them, runs tests, and audits the site. Existing JavaScript is linted but
 keeps its current formatting until it is migrated.
 
-`npm run package` creates the exact Pages artifact in `dist/`. Pull requests run
-the same checks in CI. Pushes to `main` are validated, packaged, and deployed
-through the pinned GitHub Pages workflow; only runtime files are published.
+Run `npm run build` followed by `npm run package` to create the exact Pages
+artifact in `dist/`; packaging alone does not regenerate runtime assets.
+Pull requests run the same checks in CI. Pushes to `main` are validated,
+packaged, and deployed through the pinned GitHub Pages workflow; only runtime
+files are published.
 When a version tag matching `v*.*.*` is pushed, CI also uploads an
 `itch-io-distributable` artifact containing `you-only-get-1s.zip`. Extract the
 downloaded GitHub artifact once, then upload that inner ZIP as an HTML5 game on
@@ -129,7 +131,29 @@ itch.io; its `index.html` is at the archive root, so no repackaging is needed.
 GitHub Actions updates are grouped into weekly Dependabot pull requests.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for repository conventions and the
-pre-submission checklist.
+pre-submission checklist, including native and Basaltwater development setup.
+
+### Preview the packaged site
+
+After building and packaging, serve only `dist/` for a release-like preview:
+
+```sh
+python3 -m http.server 5173 --bind 127.0.0.1 --directory dist
+```
+
+Open `http://localhost:5173/`. For a shared HTTPS preview on Basaltwater, follow
+the installed web-gateway skill and publish the already staged output:
+
+```sh
+basaltwater-web publish site yog1 --project . --output dist --no-build --no-install
+basaltwater-web site verify yog1 --project . --output dist --json
+basaltwater-web site url yog1
+```
+
+The managed URL has a nested site prefix; assets and localized install manifests
+support that layout. Each browser origin keeps separate progress, so use
+**Options → Save data** to export a backup before moving between preview and
+production. Keep save backups outside generated `dist/`.
 
 ## Versioning and releases
 
