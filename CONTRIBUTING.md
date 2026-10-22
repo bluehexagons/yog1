@@ -2,8 +2,7 @@
 
 Thanks for improving You Only Get 1s. The shipped game has no runtime
 dependencies. Use Node.js 24 from `.nvmrc` for development, then install tools
-with `npm ci`. Node.js 22.12 or later remains supported and CI checks both
-Node.js 22 and 24. With nvm installed, `nvm install` and `nvm use` select the pin.
+with `npm ci`. Supported runtimes are Node.js 24.22.1+ within 24.x (LTS) or 26.12.1+ within 26.x (Current); CI checks both Node.js 24 and 26. With nvm installed, `nvm install` and `nvm use` select the pin.
 
 ## Development environment
 
