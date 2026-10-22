@@ -20,7 +20,7 @@ jobs:
     timeout-minutes: 5
     strategy:
       matrix:
-        node: [24, 26]
+        node: ['24.22.1', '26.12.1']
     steps:
       - name: Check out repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -43,11 +43,11 @@ jobs:
           npm run package
           node scripts/check-site.js dist
       - name: Create itch.io distributable
-        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') && matrix.node == 24
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') && matrix.node == '24.22.1'
         working-directory: dist
         run: zip -9 -r "${RUNNER_TEMP}/you-only-get-1s.zip" .
       - name: Upload itch.io distributable
-        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') && matrix.node == 24
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') && matrix.node == '24.22.1'
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: itch-io-distributable
