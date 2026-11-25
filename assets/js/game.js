@@ -144,7 +144,7 @@
         settings.historyPage >= 0 ? settings.historyPage : 0;
     let forcedSeed = null;
     let forcedRound = null;
-    let dailyDateOverride = null;
+    let dailyPuzzleDate = null;
     let timerId = null;
     let timerDeadline = 0;
     let timeRemaining = TIMED_SECONDS;
@@ -156,6 +156,7 @@
     let currentFeedback = null;
     let currentAchievementId = null;
     let adaptiveProblemState = null;
+    let adaptiveProblemStyle = null;
     let currentLearningConcept = 'balance';
     let forcedLearningConcept = null;
     let lastTimerAnnouncement = null;
@@ -212,6 +213,7 @@
                 }) : null,
             adaptive: mode === 'adaptive' && adaptiveProblemState
                 ? core.normalizeAdaptiveState(adaptiveProblemState) : null,
+            adaptiveStyle: adaptiveProblemStyle,
             learningConcept: mode === 'guided' ? currentLearningConcept : null,
             selectedId: resumedSelection || null,
             hintLevel: hintLevel,
@@ -371,11 +373,12 @@
             ui.setting_learning_focus.appendChild(option);
         }
         ui.setting_learning_focus.value =
-            selected === 'recommended' || core.LEARNING_CONCEPTS[selected] ? selected : 'recommended';
+            Object.prototype.hasOwnProperty.call(core.LEARNING_CONCEPTS, selected)
+                ? selected : 'recommended';
     }
 
     function selectedLearningConcept() {
-        return core.LEARNING_CONCEPTS[settings.learningFocus]
+        return Object.prototype.hasOwnProperty.call(core.LEARNING_CONCEPTS, settings.learningFocus)
             ? settings.learningFocus : core.recommendedConcept(learningState);
     }
 
@@ -399,7 +402,7 @@
     }
 
     function utcDate() {
-        return dailyDateOverride || new Date().toISOString().slice(0, 10);
+        return dailyPuzzleDate || new Date().toISOString().slice(0, 10);
     }
 
     function validDate(value) {
@@ -507,8 +510,7 @@
         if (mode === 'tutorial') return tutorialProblem();
         if (mode === 'challenges') return curatedProblem(round - 1);
         if (mode === 'guided') {
-            currentLearningConcept = core.LEARNING_CONCEPTS[forcedLearningConcept]
-                ? forcedLearningConcept : selectedLearningConcept();
+            currentLearningConcept = forcedLearningConcept || selectedLearningConcept();
             forcedLearningConcept = null;
         }
         const adaptiveModel = adaptiveProblemState || adaptiveState;
@@ -524,7 +526,7 @@
         if (mode === 'adaptive') {
             options.target = Math.round(6 + adaptiveModel.rating * 25);
             options.operationWeights =
-                core.adaptiveOperationWeights(adaptiveModel, selectedProfile, settings.adaptiveStyle);
+                core.adaptiveOperationWeights(adaptiveModel, selectedProfile, adaptiveProblemStyle);
         }
         if (mode === 'guided') {
             const concept = core.LEARNING_CONCEPTS[currentLearningConcept];
@@ -811,7 +813,7 @@
         restartAnimation(ui.feedback, 'is-updating');
     }
 
-    function startRound() {
+    function startRound(adaptiveStyle) {
         selectedId = null;
         gamepadFocusId = null;
         currentValues = {};
@@ -822,6 +824,9 @@
         currentSeed = problemSeed();
         adaptiveProblemState = mode === 'adaptive'
             ? core.normalizeAdaptiveState(adaptiveState) : null;
+        adaptiveProblemStyle = mode === 'adaptive'
+            ? (['flow', 'coach'].includes(adaptiveStyle) ? adaptiveStyle : settings.adaptiveStyle)
+            : null;
         currentProblem = generateCurrentProblem();
         session.puzzleStartedAt = Date.now();
         renderSubmitLabel();
@@ -847,7 +852,7 @@
         } else if (mode === 'endless') {
             setCatalogMessage('message.endless', 'message.endlessBody');
         } else if (mode === 'adaptive') {
-            setCatalogMessage('mode.adaptive', settings.adaptiveStyle === 'coach'
+            setCatalogMessage('mode.adaptive', adaptiveProblemStyle === 'coach'
                 ? 'modeDescription.adaptiveCoach' : 'modeDescription.adaptive');
         } else if (mode === 'guided') {
             setCatalogMessage('mode.guided', 'modeDescription.guided');
@@ -916,6 +921,7 @@
                 ? Object.assign({}, activeCustomSettings) : null,
             adaptive: mode === 'adaptive' && adaptiveProblemState
                 ? core.normalizeAdaptiveState(adaptiveProblemState) : null,
+            adaptiveStyle: adaptiveProblemStyle,
             learningConcept: mode === 'guided' ? currentLearningConcept : null,
             at: new Date().toISOString()
         });
@@ -1445,11 +1451,12 @@
         round = options.round || 1;
         forcedSeed = options.seed || null;
         forcedRound = options.round || null;
-        dailyDateOverride = options.date || null;
-        forcedLearningConcept = options.learningConcept || null;
+        dailyPuzzleDate = null;
+        if (mode === 'daily') dailyPuzzleDate = options.date || utcDate();
+        forcedLearningConcept = Object.prototype.hasOwnProperty.call(core.LEARNING_CONCEPTS,
+            options.learningConcept) ? options.learningConcept : null;
         if (mode === 'guided') {
-            currentLearningConcept = core.LEARNING_CONCEPTS[forcedLearningConcept]
-                ? forcedLearningConcept : selectedLearningConcept();
+            currentLearningConcept = forcedLearningConcept || selectedLearningConcept();
         }
         if (mode === 'adaptive' && options.adaptiveState) {
             adaptiveState = core.normalizeAdaptiveState(options.adaptiveState);
@@ -1479,7 +1486,7 @@
             hideFeedback();
             setCatalogMessage('custom.builder', 'custom.builderBody');
         } else {
-            startRound();
+            startRound(options.adaptiveStyle);
             if (mode === 'timed') startTimer();
         }
         if (moveFocus) {
@@ -1512,6 +1519,7 @@
             if (mode === 'adaptive') {
                 const sharedModel = adaptiveProblemState || adaptiveState;
                 url.searchParams.set('difficulty', 'adaptive');
+                url.searchParams.set('style', adaptiveProblemStyle);
                 url.searchParams.set('rating', String(sharedModel.rating));
                 url.searchParams.set('comfort', Object.keys(core.OPERATIONS).map(function (operation) {
                     return sharedModel.operations[operation];
@@ -1606,8 +1614,8 @@
         ui.setting_color_scheme.value = colorScheme;
         ui.quick_color_scheme.value = colorScheme;
         ui.setting_sidebar_side.value = requestedSide;
-        ui.setting_adaptive_style.value =
-            ['flow', 'coach'].includes(settings.adaptiveStyle) ? settings.adaptiveStyle : 'flow';
+        settings.adaptiveStyle = settings.adaptiveStyle === 'coach' ? 'coach' : 'flow';
+        ui.setting_adaptive_style.value = settings.adaptiveStyle;
         populateLearningFocus();
         if (currentProblem) window.requestAnimationFrame(updateProblemOverflow);
     }
@@ -1891,6 +1899,7 @@
                 round: item.round,
                 date: item.dailyDate,
                 adaptiveState: item.adaptive,
+                adaptiveStyle: item.adaptiveStyle,
                 learningConcept: item.learningConcept
             });
         }
@@ -2190,6 +2199,7 @@
                 round: saved.round,
                 date: saved.dailyDate,
                 adaptiveState: saved.adaptive,
+                adaptiveStyle: saved.adaptiveStyle,
                 learningConcept: saved.learningConcept
             });
         }
@@ -2317,6 +2327,7 @@
                 activateMode('adaptive', button, {
                     seed: safeSeed,
                     round: sharedRound(params.get('round')),
+                    adaptiveStyle: params.get('style'),
                     adaptiveState: {
                         rating: Number(params.get('rating')),
                         operations: operations
@@ -2354,8 +2365,9 @@
                 return;
             }
             if (requested === 'guided') {
-                const focus = core.LEARNING_CONCEPTS[params.get('focus')]
-                    ? params.get('focus') : 'balance';
+                const requestedFocus = params.get('focus');
+                const focus = Object.prototype.hasOwnProperty.call(core.LEARNING_CONCEPTS,
+                    requestedFocus) ? requestedFocus : 'balance';
                 const button = ui.mode_buttons.querySelector('[data-mode="guided"]');
                 activateMode('guided', button, {
                     seed: safeSeed,
@@ -2374,7 +2386,8 @@
                 setCatalogMessage('shared.seeded', 'shared.seededBody');
                 return;
             }
-            const difficulty = core.DIFFICULTIES[requested] ? requested : 'normal';
+            const difficulty = Object.prototype.hasOwnProperty.call(core.DIFFICULTIES, requested)
+                ? requested : 'normal';
             const button = ui.mode_buttons.querySelector('[data-mode="' + difficulty + '"]');
             activateMode(difficulty, button, {
                 seed: safeSeed,

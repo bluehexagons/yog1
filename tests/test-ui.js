@@ -299,6 +299,15 @@ assert(game.includes("requested === 'timed' || requested === 'endless'") &&
     game.includes("url.searchParams.set('correct', String(activeCustomSettings.correct))") &&
     game.includes("url.searchParams.set('rate', String(activeCustomSettings.rate))"),
     'Timed, Endless, and complete Custom settings survive shared links');
+assert(game.includes("url.searchParams.set('style', adaptiveProblemStyle)") &&
+    game.includes("adaptiveStyle: params.get('style')") &&
+    game.includes('adaptiveStyle: item.adaptiveStyle') &&
+    game.includes('adaptiveStyle: saved.adaptiveStyle') &&
+    game.includes('core.adaptiveOperationWeights(adaptiveModel, selectedProfile, adaptiveProblemStyle)'),
+    'Adaptive links, replay, and resume restore the style used to generate the equation');
+assert(game.includes("if (mode === 'daily') dailyPuzzleDate = options.date || utcDate();") &&
+    game.includes('return dailyPuzzleDate || new Date()'),
+    'an active Daily round keeps its date past UTC midnight');
 assert(storage.includes('SCHEMA_VERSION') && storage.includes('exportData') &&
     storage.includes('importData'),
     'persistent data has a versioned backup boundary');
