@@ -31,6 +31,7 @@
         'setting_color_scheme', 'quick_color_scheme', 'setting_sidebar_side',
         'setting_adaptive_style', 'setting_learning_focus', 'learning_goal',
         'learning_goal_name', 'learning_goal_example', 'learning_recommendation',
+        'practice_focus_form', 'play_learning_focus', 'apply_learning_focus',
         'learning_rows', 'learning_practice', 'install_app', 'export_data', 'import_data',
         'import_file', 'app_version', 'app_version_date', 'app_status'
     ]) {
@@ -294,7 +295,8 @@
             for (const scheme of window.Yog1Theme.schemes) {
                 const option = document.createElement('option');
                 option.value = scheme;
-                option.dataset.i18n = 'theme.' + scheme;
+                option.dataset.i18n = select === ui.quick_color_scheme && scheme === 'auto'
+                    ? 'theme.autoShort' : 'theme.' + scheme;
                 option.textContent = t(option.dataset.i18n);
                 select.appendChild(option);
             }
@@ -369,25 +371,29 @@
 
     function populateLearningFocus() {
         const selected = settings.learningFocus;
-        ui.setting_learning_focus.replaceChildren();
-        const recommended = document.createElement('option');
-        recommended.value = 'recommended';
-        recommended.textContent = t('learning.recommended');
-        ui.setting_learning_focus.appendChild(recommended);
-        for (const id of Object.keys(core.LEARNING_CONCEPTS)) {
-            const option = document.createElement('option');
-            option.value = id;
-            option.textContent = conceptLabel(id);
-            ui.setting_learning_focus.appendChild(option);
-        }
-        ui.setting_learning_focus.value =
-            Object.prototype.hasOwnProperty.call(core.LEARNING_CONCEPTS, selected)
+        for (const select of [ui.setting_learning_focus, ui.play_learning_focus]) {
+            select.replaceChildren();
+            for (const id of ['recommended', ...Object.keys(core.LEARNING_CONCEPTS)]) {
+                const option = document.createElement('option');
+                option.value = id;
+                option.textContent = id === 'recommended' ? t('learning.recommended') : conceptLabel(id);
+                select.appendChild(option);
+            }
+            select.value = Object.prototype.hasOwnProperty.call(core.LEARNING_CONCEPTS, selected)
                 ? selected : 'recommended';
+        }
     }
 
-    function selectedLearningConcept() {
-        return Object.prototype.hasOwnProperty.call(core.LEARNING_CONCEPTS, settings.learningFocus)
-            ? settings.learningFocus : core.recommendedConcept(learningState);
+    function selectedLearningConcept(focus = settings.learningFocus) {
+        return Object.prototype.hasOwnProperty.call(core.LEARNING_CONCEPTS, focus)
+            ? focus : core.recommendedConcept(learningState);
+    }
+
+    function setLearningFocus(focus) {
+        settings.learningFocus = focus;
+        ui.setting_learning_focus.value = ui.play_learning_focus.value = focus;
+        save(KEYS.settings, settings);
+        renderLearningGoal();
     }
 
     function tutorialProblem() {
@@ -705,6 +711,9 @@
         const concept = core.LEARNING_CONCEPTS[currentProblem.learningConcept];
         ui.learning_goal_name.textContent = conceptLabel(concept.id);
         ui.learning_goal_example.textContent = concept.example;
+        const focus = ui.play_learning_focus.value;
+        ui.apply_learning_focus.disabled = focus === settings.learningFocus &&
+            selectedLearningConcept(focus) === concept.id;
     }
 
     function renderSubmitLabel() {
@@ -1024,6 +1033,7 @@
         });
         save(KEYS.learning, learningState);
         updateProgress();
+        renderLearningGoal();
         renderLearning();
         updateModeInfo();
     }
@@ -1729,6 +1739,7 @@
         settings.adaptiveStyle = settings.adaptiveStyle === 'coach' ? 'coach' : 'flow';
         ui.setting_adaptive_style.value = settings.adaptiveStyle;
         populateLearningFocus();
+        renderLearningGoal();
         if (currentProblem) window.requestAnimationFrame(updateProblemOverflow);
     }
 
@@ -2134,12 +2145,23 @@
         updateModeInfo();
     });
     ui.setting_learning_focus.addEventListener('change', function () {
-        settings.learningFocus = ui.setting_learning_focus.value;
-        save(KEYS.settings, settings);
+        setLearningFocus(ui.setting_learning_focus.value);
+    });
+    ui.play_learning_focus.addEventListener('change', renderLearningGoal);
+    ui.practice_focus_form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        if (mode !== 'guided' || ui.apply_learning_focus.disabled) return;
+        setLearningFocus(ui.play_learning_focus.value);
+        if (selectedLearningConcept() === currentProblem.learningConcept) {
+            ui.play_learning_focus.focus();
+            return;
+        }
+        if (session.phase === 'review') advanceRound();
+        else startRound();
+        ui.problem.focus();
     });
     ui.learning_practice.addEventListener('click', function () {
-        settings.learningFocus = 'recommended';
-        save(KEYS.settings, settings);
+        setLearningFocus('recommended');
         const button = ui.mode_buttons.querySelector('[data-mode="guided"]');
         activateMode('guided', button);
     });

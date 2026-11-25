@@ -115,7 +115,7 @@ assert(theme.includes("STORAGE_KEY = 'yog1.v2.settings'") &&
     theme.includes("media.addEventListener('change'") &&
     game.includes('window.Yog1Theme.apply(settings.colorScheme)') &&
     game.includes('for (const scheme of window.Yog1Theme.schemes)') &&
-    game.includes("option.dataset.i18n = 'theme.' + scheme") &&
+    game.includes("? 'theme.autoShort' : 'theme.' + scheme") &&
     game.includes('settings.colorScheme = select.value'),
     'the color scheme is restored early, follows browser changes, and persists');
 for (const id of ['quick_color_scheme', 'setting_color_scheme']) {
@@ -206,6 +206,11 @@ assert(html.includes('id="app_status"') && html.includes('aria-atomic="true"') &
 assert(html.includes('<div id="feedback" hidden></div>') &&
     !html.includes('<div id="feedback" role="status"'),
     'interactive solution details do not compete with concise status announcements');
+assert(html.includes('<form id="practice_focus_form">') &&
+    html.includes('<select id="play_learning_focus"></select>') &&
+    game.includes("ui.practice_focus_form.addEventListener('submit'") &&
+    game.includes('ui.setting_learning_focus.value = ui.play_learning_focus.value = focus;'),
+    'Guided Practice can apply an explicit new focus and keeps its saved option in sync');
 assert(html.includes('id="timer_label" role="timer"') &&
     game.includes('[30, 10, 5].includes(timeRemaining)'),
     'the timer has semantics and announces only useful countdown milestones');

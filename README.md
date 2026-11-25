@@ -19,7 +19,8 @@ Additional modes include Adaptive difficulty, a shared Daily puzzle, a 60-second
 Timed sprint, a three-life Endless run, ten handcrafted Challenges, and Guided
 Practice for focused learning. Guided Practice tracks confidence-aware progress
 across balancing, multiplication, division, remainders, powers, and roots. It
-suggests concepts to revisit while allowing learners to choose a focus.
+suggests concepts to revisit, and learners can apply a different focus beside
+the current learning goal.
 Adaptive mode responds to correct and incorrect answers and offers a Flow style
 that follows the learner’s pace or a Coach style that builds fluency with
 less-familiar operations.
