@@ -255,6 +255,10 @@
             } : null
         };
         save(KEYS.resume, resumeState);
+        const entryState = window.history.state;
+        if (entryState?.yog1Session !== session.id) {
+            window.history.replaceState(Object.assign({}, entryState, { yog1Session: session.id }), '');
+        }
     }
 
     function customSettings() {
@@ -2411,6 +2415,10 @@
     }
 
     function bootFromUrl() {
+        // An opened link starts its puzzle. A reload of that same history
+        // entry resumes the session the player has since been playing.
+        if (resumeState && window.history.state?.yog1Session === resumeState.session.id &&
+            restoreLastProblem()) return;
         const params = new URLSearchParams(window.location.search);
         const requestedDaily = params.get('daily');
         function sharedDailyDate(value) {

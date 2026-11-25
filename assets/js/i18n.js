@@ -438,7 +438,7 @@
                 const url = new URL(root.location.href);
                 if (url.searchParams.has('lang')) {
                     url.searchParams.set('lang', locale);
-                    root.history.replaceState(null, '', url.pathname + url.search + url.hash);
+                    root.history.replaceState(root.history.state, '', url.pathname + url.search + url.hash);
                 }
             } catch (error) {
                 // Locale persistence still works when URL history is unavailable.

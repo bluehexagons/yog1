@@ -14,6 +14,7 @@ const document = {
 };
 const storage = new Map();
 let replacedUrl = null;
+let replacedState = null;
 const context = {
     URL: URL,
     URLSearchParams: URLSearchParams,
@@ -29,7 +30,11 @@ const context = {
             href: 'https://example.test/?lang=es&seed=test#play'
         },
         history: {
-            replaceState: function (_, __, value) { replacedUrl = value; }
+            state: { yog1Session: 'active-session' },
+            replaceState: function (state, _, value) {
+                replacedState = state;
+                replacedUrl = value;
+            }
         }
     }
 };
@@ -56,6 +61,8 @@ i18n.setLocale('en');
 assert.strictEqual(i18n.getLocale(), 'en', 'the selected locale can be changed and persisted');
 assert.strictEqual(replacedUrl, '/?lang=en&seed=test#play',
     'changing a shared-link language updates its URL so refresh preserves the choice');
+assert.strictEqual(replacedState.yog1Session, 'active-session',
+    'changing a shared-link language preserves the resume marker');
 i18n.setLocale('zh');
 assert.strictEqual(i18n.t('action.check'), '检查等式', 'Simplified Chinese controls are available');
 assert.strictEqual(manifestLink.href, 'assets/manifests/manifest.zh.webmanifest',
