@@ -26,6 +26,7 @@
     "action.menu": "選單",
     "action.reset": "重置",
     "action.check": "檢查方程式",
+    "action.startSprint": "開始限時挑戰",
     "action.next": "下一個謎題",
     "action.again": "再玩一次",
     "action.finished": "本次遊戲結束",

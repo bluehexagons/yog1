@@ -26,6 +26,7 @@
     "action.menu": "مینو",
     "action.reset": "ری سیٹ",
     "action.check": "مساوات چیک کریں",
+    "action.startSprint": "وقت کی دوڑ شروع کریں",
     "action.next": "اگلا سوال",
     "action.again": "دوبارہ کھیلیں",
     "action.finished": "سیشن ختم ہو گیا",

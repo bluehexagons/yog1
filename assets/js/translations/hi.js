@@ -26,6 +26,7 @@
     "action.menu": "मेनू",
     "action.reset": "रीसेट",
     "action.check": "समीकरण जाँचें",
+    "action.startSprint": "समयबद्ध दौड़ शुरू करें",
     "action.next": "अगली पहेली",
     "action.again": "फिर खेलें",
     "action.finished": "सत्र समाप्त",

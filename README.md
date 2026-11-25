@@ -24,6 +24,8 @@ Adaptive mode responds to correct and incorrect answers and offers a Flow style
 that follows the learner’s pace or a Coach style that builds fluency with
 less-familiar operations.
 Daily results include a seven-day grid plus current and best streaks.
+Timed starts when you choose **Start sprint**. Correct answers and skips advance
+immediately, and the results screen has an arithmetic review and **Play again**.
 
 Generated puzzles are sampled for a unique, safe solution and selected near the
 round's displayed complexity target. Every generated puzzle has a reproducible

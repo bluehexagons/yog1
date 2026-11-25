@@ -252,7 +252,8 @@ assert(game.includes("drawProblem('.hint-target, .hint-side')") &&
     game.includes("event.animationName === 'equation-enter'") &&
     game.includes('if (event.repeat) return;'),
     'hints remain visible and one-shot interactions do not repeat or replay round motion');
-assert(game.includes("session.phase === 'finished' ? 'action.finished'") &&
+assert(game.includes("else if (session.phase === 'finished') action = 'action.finished';") &&
+    game.includes("timedFinished || replayingChallenges) action = 'action.again';") &&
     game.includes('selectedId = null;\n        currentValues = {};\n        gamepadFocusId = null;') &&
     html.includes('data-i18n="action.replayIncorrect"'),
     'finished and revealed states expose accurate labels and clear stale moves');

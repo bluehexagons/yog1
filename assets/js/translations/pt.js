@@ -26,6 +26,7 @@
     "action.menu": "Menu",
     "action.reset": "Redefinir",
     "action.check": "Verificar equação",
+    "action.startSprint": "Iniciar desafio cronometrado",
     "action.next": "Próximo problema",
     "action.again": "Jogar novamente",
     "action.finished": "Sessão encerrada",

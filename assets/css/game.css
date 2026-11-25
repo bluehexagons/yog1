@@ -285,6 +285,7 @@ h1 { margin: 4px 0; font: bold 1.45rem/1 "Courier New", monospace; letter-spacin
 .equation-side.hint-side { background: var(--hint); outline: 2px dashed var(--warm); outline-offset: 4px; }
 .operator, .equals { font-weight: bold; }
 #actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 9px; border-top: 1px solid var(--line); padding-top: 13px; }
+#workspace:has(#problem[hidden]) #actions { border-top: 0; padding-top: 0; }
 #custom_progress { flex-basis: 100%; text-align: center; font-family: var(--ui-label-font); font-size: .78rem; font-weight: bold; }
 #actions .primary:not(:disabled) { background: var(--blue); color: var(--workspace); }
 #feedback { margin-top: 14px; padding: 10px; border: 1px solid var(--line); background: var(--soft); font-size: .78rem; }

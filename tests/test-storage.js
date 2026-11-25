@@ -272,10 +272,25 @@ const finishedTimedResume = {
 };
 assert.strictEqual(storage.validResume(finishedTimedResume), true,
     'finished Timed sessions do not need a live deadline');
+assert.strictEqual(storage.validResume({ ...finishedTimedResume, phase: 'ready' }), true,
+    'an unstarted sprint restores without starting its clock');
+assert.strictEqual(storage.validResume({ ...finishedTimedResume, phase: 'ready', timerDeadline: 100 }), false,
+    'an unstarted sprint cannot have a live deadline');
+assert.strictEqual(storage.validResume({ ...resumeSnapshot, phase: 'ready' }), false,
+    'only Timed mode has a ready screen');
 assert.strictEqual(storage.validResume({ ...finishedTimedResume, phase: 'playing' }), false,
     'active Timed sessions must keep their deadline');
 assert.strictEqual(storage.validResume({ ...finishedTimedResume, phase: 'review' }), false,
     'Timed review screens must keep counting down after reload');
+const timedReview = { round: 1, seed: 'timed-v2:example', moveId: 'n1' };
+const runningSprint = { ...finishedTimedResume, phase: 'playing', round: 2, timerDeadline: 100 };
+assert.strictEqual(storage.validResume({ ...runningSprint, timedReview }), true,
+    'a running sprint can keep its last solved puzzle for review');
+assert.strictEqual(storage.validResume({
+    ...runningSprint, timedReview: { ...timedReview, round: 3 }
+}), false, 'Timed review cannot come from a later round');
+assert.strictEqual(storage.validResume({ ...resumeSnapshot, timedReview }), false,
+    'only Timed mode stores a sprint review');
 assert.strictEqual(storage.validResume({
     ...resumeSnapshot,
     message: { titleKey: 'x', messageKey: 'y', values: { unsafe: {} } }

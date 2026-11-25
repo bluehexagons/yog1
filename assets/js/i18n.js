@@ -35,6 +35,7 @@
     "action.menu": "Menu",
     "action.reset": "Reset",
     "action.check": "Check equation",
+    "action.startSprint": "Start sprint",
     "action.next": "Next puzzle",
     "action.again": "Play again",
     "action.finished": "Session finished",

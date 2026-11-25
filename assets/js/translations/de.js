@@ -26,6 +26,7 @@
     "action.menu": "Menü",
     "action.reset": "Zurücksetzen",
     "action.check": "Gleichung überprüfen",
+    "action.startSprint": "Sprint starten",
     "action.next": "Nächstes Problem",
     "action.again": "nochmal spielen",
     "action.finished": "Sitzung beendet",

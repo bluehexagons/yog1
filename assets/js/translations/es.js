@@ -26,6 +26,7 @@
     "action.menu": "Menú",
     "action.reset": "Restablecer",
     "action.check": "Comprobar ecuación",
+    "action.startSprint": "Iniciar contrarreloj",
     "action.next": "Siguiente problema",
     "action.again": "Jugar de nuevo",
     "action.finished": "Sesión terminada",

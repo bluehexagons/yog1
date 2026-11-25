@@ -26,6 +26,7 @@
     "action.menu": "Menu",
     "action.reset": "Zresetuj",
     "action.check": "Sprawdź równanie",
+    "action.startSprint": "Rozpocznij sprint",
     "action.next": "Następna zagadka",
     "action.again": "Zagraj ponownie",
     "action.finished": "Sesja zakończona",

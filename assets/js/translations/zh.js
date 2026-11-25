@@ -26,6 +26,7 @@
     "action.menu": "菜单",
     "action.reset": "重置",
     "action.check": "检查等式",
+    "action.startSprint": "开始限时挑战",
     "action.next": "下一题",
     "action.again": "再玩一次",
     "action.finished": "本次游戏结束",

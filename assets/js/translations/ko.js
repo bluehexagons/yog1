@@ -26,6 +26,7 @@
     "action.menu": "메뉴",
     "action.reset": "재설정",
     "action.check": "방정식 확인",
+    "action.startSprint": "타임 어택 시작",
     "action.next": "다음 퍼즐",
     "action.again": "다시 플레이",
     "action.finished": "세션 종료",

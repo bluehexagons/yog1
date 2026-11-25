@@ -145,8 +145,18 @@
             validSession(value.session) &&
             (value.mode !== 'custom' || validCustomRun(value.customRun)) &&
             Number.isSafeInteger(value.timerDeadline) && value.timerDeadline >= 0 &&
-            (value.mode !== 'timed' || value.phase === 'finished' || value.timerDeadline > 0) &&
-            ['playing', 'review', 'finished'].includes(value.phase) &&
+            (value.phase === 'ready'
+                ? value.mode === 'timed' && value.timerDeadline === 0
+                : ['playing', 'review', 'finished'].includes(value.phase) &&
+                    (value.mode !== 'timed' || value.phase === 'finished' || value.timerDeadline > 0)) &&
+            (value.timedReview === null || value.timedReview === undefined ||
+                (value.mode === 'timed' && value.timedReview &&
+                    Number.isSafeInteger(value.timedReview.round) &&
+                    value.timedReview.round >= 1 && value.timedReview.round <= value.round &&
+                    typeof value.timedReview.seed === 'string' &&
+                    value.timedReview.seed.length > 0 && value.timedReview.seed.length <= 160 &&
+                    typeof value.timedReview.moveId === 'string' &&
+                    value.timedReview.moveId.length > 0 && value.timedReview.moveId.length <= 32)) &&
             (value.message === null || value.message === undefined ||
                 validResumeMessage(value.message)) &&
             (value.feedback === null ||

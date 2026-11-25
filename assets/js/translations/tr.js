@@ -26,6 +26,7 @@
     "action.menu": "Menü",
     "action.reset": "Sıfırla",
     "action.check": "Denklemi kontrol et",
+    "action.startSprint": "Süreli oyunu başlat",
     "action.next": "Sonraki soru",
     "action.again": "Tekrar oyna",
     "action.finished": "Oturum sona erdi",

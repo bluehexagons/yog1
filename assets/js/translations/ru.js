@@ -26,6 +26,7 @@
     "action.menu": "Меню",
     "action.reset": "Сбросить",
     "action.check": "Проверить равенство",
+    "action.startSprint": "Начать забег",
     "action.next": "Следующая задача",
     "action.again": "Играть снова",
     "action.finished": "Сеанс завершён",

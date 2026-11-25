@@ -12,12 +12,13 @@
     const PAGE_SIZE = 10;
     const TIMED_SECONDS = 60;
     const PRACTICE_SEED_PREFIX = 'guided-v2:';
+    const TIMED_SEED_PREFIX = 'timed-v2:';
 
     const ui = {};
     for (const id of [
         'game', 'mode_buttons', 'mode_info', 'view_buttons', 'sidebar_toggle', 'sidebar_toggle_play',
         'round_bar', 'round_label', 'round_kind', 'score_label', 'timer_label',
-        'workspace', 'problem', 'flip_count', 'flip_text', 'submit', 'hint', 'skip', 'share',
+        'workspace', 'problem', 'flips', 'flip_count', 'flip_text', 'submit', 'hint', 'skip', 'share',
         'message', 'message_title', 'message_text', 'feedback', 'custom_panel', 'custom_form',
         'custom_operations', 'custom_length', 'custom_length_value', 'custom_min',
         'custom_max', 'custom_correct', 'custom_rate', 'custom_seed', 'custom_progress',
@@ -149,6 +150,7 @@
     let timerId = null;
     let timerDeadline = 0;
     let timeRemaining = TIMED_SECONDS;
+    let timedReview = null;
     let installPrompt = null;
     let audioContext = null;
     let session = null;
@@ -236,6 +238,7 @@
             },
             customRun: mode === 'custom' ? Object.assign({}, customRun) : null,
             timerDeadline: mode === 'timed' ? timerDeadline : 0,
+            timedReview: mode === 'timed' ? timedReview : null,
             phase: session.phase,
             message: currentPersistentMessage ? {
                 titleKey: currentPersistentMessage.titleKey,
@@ -482,7 +485,13 @@
                 core.LEARNING_CONCEPTS.balance;
             return core.DIFFICULTIES[concept.profile];
         }
-        if (mode === 'timed') return core.DIFFICULTIES.hard;
+        if (mode === 'timed') {
+            if (currentSeed.startsWith(TIMED_SEED_PREFIX)) {
+                if (round === 1) return core.DIFFICULTIES.easy;
+                if (round === 2) return core.DIFFICULTIES.normal;
+            }
+            return core.DIFFICULTIES.hard;
+        }
         if (mode === 'endless') {
             const choices = Object.values(core.DIFFICULTIES);
             return choices[Math.min(choices.length - 1, Math.floor((round - 1) / 8))];
@@ -505,7 +514,9 @@
             return activeCustomSettings.seed + ':' + round;
         }
         const sessionSeed = session.id + ':' + mode + ':' + round;
-        return mode === 'guided' ? PRACTICE_SEED_PREFIX + sessionSeed : sessionSeed;
+        if (mode === 'guided') return PRACTICE_SEED_PREFIX + sessionSeed;
+        if (mode === 'timed') return TIMED_SEED_PREFIX + sessionSeed;
+        return sessionSeed;
     }
 
     function generateCurrentProblem() {
@@ -687,15 +698,22 @@
     }
 
     function renderSubmitLabel() {
+        const timedReady = mode === 'timed' && session.phase === 'ready';
+        const timedFinished = mode === 'timed' && session.phase === 'finished';
         const dailyReview = mode === 'daily' && session.phase === 'review';
         const replayingChallenges = mode === 'challenges' &&
             round === CURATED.length && session.phase === 'review';
-        ui.submit.textContent = t(dailyReview ? 'action.shareResult' :
-            (session.phase === 'finished' ? 'action.finished' :
-            (replayingChallenges ? 'action.again' :
-            (session.phase === 'review' ? 'action.next' : 'action.check'))));
-        ui.share.hidden = mode === 'tutorial' || dailyReview;
-        ui.hint.hidden = ui.skip.hidden = mode === 'tutorial' || dailyReview;
+        let action = 'action.check';
+        if (timedReady) action = 'action.startSprint';
+        else if (timedFinished || replayingChallenges) action = 'action.again';
+        else if (dailyReview) action = 'action.shareResult';
+        else if (session.phase === 'finished') action = 'action.finished';
+        else if (session.phase === 'review') action = 'action.next';
+        ui.submit.textContent = t(action);
+        ui.problem.hidden = ui.flips.hidden = timedReady;
+        if (mode === 'timed') ui.round_bar.hidden = timedReady;
+        ui.share.hidden = mode === 'tutorial' || dailyReview || timedReady;
+        ui.hint.hidden = ui.skip.hidden = mode === 'tutorial' || dailyReview || timedReady || timedFinished;
     }
 
     function renderHintLabel() {
@@ -839,14 +857,14 @@
         restartAnimation(ui.feedback, 'is-updating');
     }
 
-    function startRound(adaptiveStyle) {
+    function startRound(adaptiveStyle, phase = 'playing') {
         selectedId = null;
         gamepadFocusId = null;
         currentValues = {};
         hintLevel = 0;
         hintsOnPuzzle = 0;
         attemptsOnPuzzle = 0;
-        session.phase = 'playing';
+        session.phase = phase;
         currentSeed = problemSeed();
         adaptiveProblemState = mode === 'adaptive'
             ? core.normalizeAdaptiveState(adaptiveState) : null;
@@ -855,16 +873,15 @@
             : null;
         currentProblem = generateCurrentProblem();
         session.puzzleStartedAt = Date.now();
-        renderSubmitLabel();
-        ui.submit.disabled = session.phase === 'finished';
-        ui.hint.disabled = mode === 'tutorial' || session.phase === 'finished';
+        ui.submit.disabled = false;
+        ui.hint.disabled = ui.skip.disabled = mode === 'tutorial' || phase === 'ready';
         renderHintLabel();
-        ui.skip.disabled = mode === 'tutorial' || session.phase === 'finished';
-        ui.skip.textContent = t(mode === 'adaptive' ? 'action.skip' : 'action.reveal');
+        ui.skip.textContent = t(['adaptive', 'timed'].includes(mode) ? 'action.skip' : 'action.reveal');
         ui.share.disabled = mode === 'tutorial';
         hideFeedback();
         ui.workspace.hidden = false;
         ui.round_bar.hidden = false;
+        renderSubmitLabel();
         if (mode === 'custom') ui.custom_panel.open = false;
         drawProblem();
         ui.problem.scrollLeft = 0;
@@ -875,7 +892,9 @@
         } else if (mode === 'daily') {
             setCatalogMessage('message.daily', 'message.dailyBody');
         } else if (mode === 'timed') {
-            setCatalogMessage('message.timed', 'message.timedBody');
+            const justSolved = timedReview && timedReview.round === round - 1;
+            setCatalogMessage(justSolved ? 'result.balanced' : 'message.timed',
+                justSolved ? 'message.standardBody' : 'message.timedBody');
         } else if (mode === 'endless') {
             setCatalogMessage('message.endless', 'message.endlessBody');
         } else if (mode === 'adaptive') {
@@ -894,7 +913,8 @@
                     kind: { catalogKey: 'round.' + currentProblem.roundKind }
                 });
         }
-        announceProblem();
+        if (phase === 'ready') announce(ui.message_text.textContent);
+        else announceProblem();
         persistResume();
     }
 
@@ -1061,6 +1081,11 @@
         recordLearning(true);
         updateAchievements();
         playSound('correct');
+        if (mode === 'timed') {
+            timedReview = { seed: currentSeed, round: round, moveId: selectedId };
+            advanceTimedRound();
+            return;
+        }
         showExplanation(true, undefined, alternate, selectedId);
         session.phase = 'review';
         gamepadFocusId = null;
@@ -1146,11 +1171,16 @@
         startRound();
     }
 
+    function advanceTimedRound() {
+        advanceRound();
+        ui.problem.querySelector('.number')?.focus();
+    }
+
     function finishSession(titleKey, messageKey, values) {
         session.phase = 'finished';
         clearTimer();
         renderSubmitLabel();
-        ui.submit.disabled = true;
+        ui.submit.disabled = mode !== 'timed';
         ui.hint.disabled = true;
         ui.skip.disabled = true;
         if (currentProblem) drawProblem();
@@ -1160,7 +1190,7 @@
         renderStats();
         renderSession();
         setCatalogMessage(titleKey, messageKey, values);
-        persistResume(null);
+        persistResume(mode === 'timed' ? selectedId : null);
     }
 
     function updateProgress() {
@@ -1438,6 +1468,46 @@
         ui.timer_label.hidden = true;
     }
 
+    function beginSprint() {
+        session.phase = 'playing';
+        session.startedAt = session.puzzleStartedAt = Date.now();
+        ui.hint.disabled = ui.skip.disabled = false;
+        renderSubmitLabel();
+        drawProblem();
+        restartAnimation(ui.problem, 'is-new-round');
+        startTimer();
+        ui.problem.querySelector('.number')?.focus();
+        announceProblem();
+    }
+
+    function finishSprint() {
+        if (session.phase === 'finished') return;
+        const focusedPuzzle = ui.workspace.contains(document.activeElement);
+        if (timedReview) {
+            currentSeed = timedReview.seed;
+            round = timedReview.round;
+            currentProblem = generateCurrentProblem();
+            selectedId = timedReview.moveId;
+            currentValues = valuesWithFlip(selectedId);
+            if (!isSolved()) {
+                selectedId = null;
+                currentValues = {};
+            }
+            hintLevel = 0;
+        }
+        const attemptedValues = currentValues;
+        const attemptedId = selectedId;
+        if (!selectedId || !isSolved()) {
+            selectedId = null;
+            currentValues = {};
+        }
+        gamepadFocusId = null;
+        showExplanation(true, attemptedValues, false, attemptedId);
+        finishSession('timed.complete', 'timed.result', { count: session.solved });
+        if (focusedPuzzle) ui.submit.focus({ preventScroll: true });
+        playSound('finish');
+    }
+
     function startTimer(deadline) {
         clearTimer();
         timerDeadline = deadline || Date.now() + TIMED_SECONDS * 1000;
@@ -1456,8 +1526,7 @@
                 announce(ui.timer_label.getAttribute('aria-label'));
             }
             if (timeRemaining <= 0) {
-                finishSession('timed.complete', 'timed.result', { count: session.solved });
-                playSound('finish');
+                finishSprint();
             }
         }
         if (timeRemaining <= 0) {
@@ -1472,6 +1541,7 @@
         options = options || {};
         const moveFocus = !!button && document.activeElement === button;
         clearTimer();
+        timedReview = null;
         mode = nextMode;
         if (core.DIFFICULTIES[mode]) profile = core.DIFFICULTIES[mode];
         round = options.round || 1;
@@ -1512,11 +1582,12 @@
             hideFeedback();
             setCatalogMessage('custom.builder', 'custom.builderBody');
         } else {
-            startRound(options.adaptiveStyle);
-            if (mode === 'timed') startTimer();
+            startRound(options.adaptiveStyle, mode === 'timed' ? 'ready' : 'playing');
         }
         if (moveFocus) {
-            (mode === 'custom' ? ui.custom_operations.querySelector('input') : ui.problem).focus();
+            const target = mode === 'custom' ? ui.custom_operations.querySelector('input') :
+                (mode === 'timed' ? ui.submit : ui.problem);
+            target.focus();
         }
     }
 
@@ -1670,7 +1741,7 @@
         renderAchievements();
         renderSession();
         if (currentProblem) drawProblem();
-        ui.skip.textContent = t(mode === 'adaptive' ? 'action.skip' : 'action.reveal');
+        ui.skip.textContent = t(['adaptive', 'timed'].includes(mode) ? 'action.skip' : 'action.reveal');
         renderExplanation();
         renderAchievementNotice();
         if (timerId) ui.timer_label.textContent = t('timer.seconds', { seconds: timeRemaining });
@@ -1726,6 +1797,20 @@
     });
 
     ui.submit.addEventListener('click', function () {
+        if (mode === 'timed') {
+            if (session.phase === 'ready') {
+                beginSprint();
+                return;
+            }
+            if (session.phase === 'finished') {
+                activateMode('timed', ui.mode_buttons.querySelector('[data-mode="timed"]'));
+                return;
+            }
+            if (Date.now() >= timerDeadline) {
+                finishSprint();
+                return;
+            }
+        }
         if (session.phase === 'review') {
             if (mode === 'daily') sharePuzzle();
             else advanceRound();
@@ -1787,9 +1872,17 @@
 
     ui.skip.addEventListener('click', function () {
         if (!currentProblem || session.phase !== 'playing') return;
+        if (mode === 'timed' && Date.now() >= timerDeadline) {
+            finishSprint();
+            return;
+        }
         adapt('skip');
         recordAttempt(false);
         recordLearning(false);
+        if (mode === 'timed') {
+            advanceTimedRound();
+            return;
+        }
         const intendedId = core.solutionDetails(currentProblem.sides, {}).solutionId;
         showExplanation(true, {}, false, intendedId);
         session.phase = 'review';
@@ -2236,6 +2329,7 @@
         if (mode === 'timed') {
             clearTimer();
             timerDeadline = saved.timerDeadline;
+            timedReview = saved.timedReview || null;
         }
         session = Object.assign({}, saved.session, {
             durations: saved.session.durations.slice(),
@@ -2261,6 +2355,9 @@
         if (session.phase !== 'playing' && selectedId && !isSolved()) {
             selectedId = null;
             currentValues = {};
+        }
+        if (mode === 'timed' && session.phase === 'review' && selectedId && !timedReview) {
+            timedReview = { seed: currentSeed, round: round, moveId: selectedId };
         }
         currentFeedback = saved.feedback ? {
             revealSolution: saved.feedback.revealSolution,
@@ -2288,9 +2385,11 @@
         if (session.phase !== 'playing') {
             ui.hint.disabled = true;
             ui.skip.disabled = true;
-            ui.submit.disabled = session.phase === 'finished' || (mode === 'custom' && customRun.won);
+            ui.submit.disabled = (session.phase === 'finished' && mode !== 'timed') ||
+                (mode === 'custom' && customRun.won);
         } else {
             ui.hint.disabled = mode === 'tutorial' || hintLevel >= 4;
+            ui.skip.disabled = mode === 'tutorial';
         }
         drawProblem();
         renderSession();
@@ -2298,7 +2397,7 @@
         renderExplanation();
         renderCatalogMessage();
         persistResume();
-        if (mode === 'timed' && session.phase !== 'finished') {
+        if (mode === 'timed' && session.phase !== 'finished' && timerDeadline > 0) {
             startTimer(saved.timerDeadline);
         }
 

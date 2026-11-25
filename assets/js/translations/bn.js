@@ -26,6 +26,7 @@
     "action.menu": "মেনু",
     "action.reset": "রিসেট",
     "action.check": "সমীকরণ পরীক্ষা করুন",
+    "action.startSprint": "সময়ের দৌড় শুরু করুন",
     "action.next": "পরের প্রশ্ন",
     "action.again": "আবার খেলুন",
     "action.finished": "সেশন শেষ",

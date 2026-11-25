@@ -26,6 +26,7 @@
     "action.menu": "القائمة",
     "action.reset": "إعادة ضبط",
     "action.check": "تحقق من المعادلة",
+    "action.startSprint": "ابدأ السباق",
     "action.next": "المسألة التالية",
     "action.again": "العب مجددًا",
     "action.finished": "انتهت الجلسة",

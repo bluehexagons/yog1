@@ -26,6 +26,7 @@
     "action.menu": "Menu",
     "action.reset": "Đặt lại",
     "action.check": "Kiểm tra phương trình",
+    "action.startSprint": "Bắt đầu tính giờ",
     "action.next": "Câu tiếp theo",
     "action.again": "Chơi lại",
     "action.finished": "Phiên đã kết thúc",

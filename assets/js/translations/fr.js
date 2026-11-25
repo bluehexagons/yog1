@@ -26,6 +26,7 @@
     "action.menu": "Menus",
     "action.reset": "Réinitialiser",
     "action.check": "Vérifier l'équation",
+    "action.startSprint": "Lancer le chrono",
     "action.next": "Problème suivant",
     "action.again": "rejouer",
     "action.finished": "Session terminée",

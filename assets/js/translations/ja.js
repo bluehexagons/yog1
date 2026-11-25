@@ -26,6 +26,7 @@
     "action.menu": "メニュー",
     "action.reset": "リセット",
     "action.check": "式を確認",
+    "action.startSprint": "タイムアタック開始",
     "action.next": "次の問題",
     "action.again": "もう一度プレイ",
     "action.finished": "セッション終了",
