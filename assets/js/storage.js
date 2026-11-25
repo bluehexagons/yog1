@@ -129,6 +129,8 @@
             Number.isSafeInteger(value.round) && value.round >= 1 && value.round <= 100000 &&
             typeof value.seed === 'string' && value.seed.length <= 160 &&
             (value.mode !== 'daily' || validDate(value.dailyDate)) &&
+            (value.dailyReplay === undefined || value.dailyReplay === false ||
+                (value.mode === 'daily' && value.dailyReplay === true)) &&
             (value.mode !== 'custom' || validCustomSettings(value.custom)) &&
             (value.customOpen === undefined || typeof value.customOpen === 'boolean') &&
             (value.adaptive === null || value.adaptive === undefined ||

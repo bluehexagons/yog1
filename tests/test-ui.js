@@ -340,8 +340,10 @@ assert(html.includes('<details id="custom_panel" hidden>') &&
     game.includes("if (mode === 'custom') ui.custom_panel.open = false;") &&
     game.includes('ui.problem.focus();'),
     'Custom setup collapses into an editable disclosure and moves focus into active play');
-assert(game.includes('if (Object.prototype.hasOwnProperty.call(dailyResults, date)) return;'),
-    'replaying a Daily puzzle cannot overwrite its first recorded outcome');
+assert(game.includes('if (Object.prototype.hasOwnProperty.call(dailyResults, date)) return false;') &&
+    game.includes('if (savedDaily && !dailyReplay && !options.restoring) restoreDailyResult(savedDaily);') &&
+    game.includes("dailyReplay ? 'action.share' : 'action.shareResult'"),
+    'the first Daily outcome stays visible and practice only shares the puzzle');
 assert(game.includes('session.solved >= CURATED.length'),
     'the handcrafted-set achievement requires completing the whole set');
 assert(storage.includes("resume: STORAGE_PREFIX + 'resume'") &&

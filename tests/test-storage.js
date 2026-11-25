@@ -270,6 +270,11 @@ const finishedTimedResume = {
     timerDeadline: 0,
     phase: 'finished'
 };
+assert.strictEqual(storage.validResume({
+    ...resumeSnapshot, mode: 'daily', dailyDate: validDailyDate, dailyReplay: true
+}), true, 'Daily practice can resume with its original date');
+assert.strictEqual(storage.validResume({ ...resumeSnapshot, dailyReplay: true }), false,
+    'the Daily practice flag is only valid in Daily mode');
 assert.strictEqual(storage.validResume(finishedTimedResume), true,
     'finished Timed sessions do not need a live deadline');
 assert.strictEqual(storage.validResume({ ...finishedTimedResume, phase: 'ready' }), true,

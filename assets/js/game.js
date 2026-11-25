@@ -146,6 +146,7 @@
         settings.historyPage >= 0 ? settings.historyPage : 0;
     let forcedSeed = null;
     let dailyPuzzleDate = null;
+    let dailyReplay = false;
     let timerId = null;
     let timerDeadline = 0;
     let timeRemaining = TIMED_SECONDS;
@@ -209,6 +210,7 @@
             round: round,
             seed: currentSeed,
             dailyDate: mode === 'daily' ? utcDate() : null,
+            dailyReplay: mode === 'daily' && dailyReplay,
             custom: mode === 'custom' && activeCustomSettings
                 ? Object.assign({}, activeCustomSettings, {
                     operations: activeCustomSettings.operations.slice()
@@ -438,8 +440,9 @@
     }
 
     function recordDailyResult(success) {
+        syncDailyResults();
         const date = utcDate();
-        if (Object.prototype.hasOwnProperty.call(dailyResults, date)) return;
+        if (Object.prototype.hasOwnProperty.call(dailyResults, date)) return false;
         dailyResults[date] = {
             attempts: session.attempts,
             hints: session.hints,
@@ -447,6 +450,15 @@
             at: Date.now()
         };
         save(KEYS.daily, dailyResults);
+        return true;
+    }
+
+    function syncDailyResults() {
+        const stored = load(KEYS.daily, null);
+        if (!stored || typeof stored !== 'object' || Array.isArray(stored)) return;
+        for (const [date, result] of Object.entries(stored)) {
+            if (validDailyResult(date, result)) dailyResults[date] = result;
+        }
     }
 
     function shiftDate(value, days) {
@@ -724,7 +736,7 @@
         let action = 'action.check';
         if (timedReady) action = 'action.startSprint';
         else if (timedFinished || replayingChallenges) action = 'action.again';
-        else if (dailyReview) action = 'action.shareResult';
+        else if (dailyReview) action = dailyReplay ? 'action.share' : 'action.shareResult';
         else if (session.phase === 'finished') action = 'action.finished';
         else if (session.phase === 'review') action = 'action.next';
         ui.submit.textContent = t(action);
@@ -1089,7 +1101,6 @@
         if (session.streak >= 5) unlock('streak5');
         if (achievementState.solved >= 20) unlock('twenty');
         if (achievementState.operations.length === Object.keys(core.OPERATIONS).length) unlock('explorer');
-        if (mode === 'daily') unlock('daily');
         if (currentProblem.roundKind === 'challenge' && hintLevel === 0) unlock('nohint');
         if (mode === 'challenges' && round === CURATED.length &&
             session.solved >= CURATED.length) {
@@ -1120,13 +1131,7 @@
         ui.skip.disabled = true;
 
         if (mode === 'daily') {
-            recordDailyResult(true);
-            updateProgress();
-            updateModeInfo();
-            setCatalogMessage('daily.complete', 'daily.completeBody', {
-                attempts: session.attempts, hints: session.hints
-            });
-            persistResume();
+            finishDaily(true);
             return;
         }
         if (mode === 'custom') {
@@ -1152,6 +1157,56 @@
             setCatalogMessage(alternate ? 'result.alternate' : 'result.balanced',
                 alternate ? 'result.alternateBody' : 'result.balancedBody');
         }
+        persistResume();
+    }
+
+    function showDailyOutcome(success) {
+        if (dailyReplay) {
+            setCatalogMessage(success ? 'result.balanced' : 'result.solution', 'daily.completeBody', {
+                attempts: session.attempts, hints: session.hints
+            });
+        } else if (success) {
+            setCatalogMessage('daily.complete', 'daily.completeBody', {
+                attempts: session.attempts, hints: session.hints
+            });
+        } else {
+            setCatalogMessage('daily.revealed', 'daily.revealedBody');
+        }
+    }
+
+    function restoreDailyResult(result) {
+        session.phase = 'review';
+        session.attempts = attemptsOnPuzzle = Math.max(result.attempts, Number(result.success));
+        session.hints = hintsOnPuzzle = result.hints;
+        session.correct = session.solved = session.streak = session.bestStreak = result.success ? 1 : 0;
+        session.hardest = result.success ? currentProblem.score : 0;
+        session.durations = [];
+        hintLevel = 0;
+        gamepadFocusId = null;
+        const solutionId = core.solutionDetails(currentProblem.sides, {}).solutionId;
+        selectedId = result.success ? solutionId : null;
+        currentValues = valuesWithFlip(selectedId);
+        showExplanation(true, currentValues, false, solutionId);
+        drawProblem();
+        renderSession();
+        renderSubmitLabel();
+        renderHintLabel();
+        ui.submit.disabled = false;
+        ui.hint.disabled = ui.skip.disabled = true;
+        updateModeInfo();
+        showDailyOutcome(result.success);
+        persistResume();
+    }
+
+    function finishDaily(success) {
+        if (!dailyReplay && !recordDailyResult(success)) {
+            restoreDailyResult(dailyResults[utcDate()]);
+            return;
+        }
+        if (!dailyReplay && success) unlock('daily');
+        updateProgress();
+        updateModeInfo();
+        showDailyOutcome(success);
         persistResume();
     }
 
@@ -1572,6 +1627,9 @@
         forcedSeed = options.seed || null;
         dailyPuzzleDate = null;
         if (mode === 'daily') dailyPuzzleDate = options.date || utcDate();
+        if (mode === 'daily') syncDailyResults();
+        const savedDaily = mode === 'daily' && dailyResults[utcDate()];
+        dailyReplay = !!(savedDaily && options.dailyReplay);
         forcedLearningConcept = Object.prototype.hasOwnProperty.call(core.LEARNING_CONCEPTS,
             options.learningConcept) ? options.learningConcept : null;
         if (mode === 'guided') {
@@ -1608,6 +1666,7 @@
             else setCatalogMessage('custom.builder', 'custom.builderBody');
         } else {
             startRound(options.adaptiveStyle, mode === 'timed' ? 'ready' : 'playing');
+            if (savedDaily && !dailyReplay && !options.restoring) restoreDailyResult(savedDaily);
         }
         if (moveFocus) {
             const target = mode === 'custom' && !currentProblem ? ui.custom_operations.querySelector('input') :
@@ -1632,7 +1691,7 @@
         let shareText = 'You Only Get 1s';
         if (mode === 'daily') {
             url.searchParams.set('daily', utcDate());
-            shareText = dailyShareText();
+            shareText = dailyReplay ? t('share.dailyDefault', { date: utcDate() }) : dailyShareText();
         } else if (mode === 'challenges') {
             url.searchParams.set('challenge', String(round));
             shareText += ' · ' + t('share.challenge', { round: round });
@@ -1923,11 +1982,7 @@
         ui.hint.disabled = true;
         ui.skip.disabled = true;
         if (mode === 'daily') {
-            recordDailyResult(false);
-            updateProgress();
-            updateModeInfo();
-            setCatalogMessage('daily.revealed', 'daily.revealedBody');
-            persistResume(null);
+            finishDaily(false);
             return;
         }
         if (mode === 'endless') {
@@ -2034,6 +2089,7 @@
             round: item.round,
             custom: item.custom,
             date: item.dailyDate,
+            dailyReplay: item.mode === 'daily',
             adaptiveState: item.adaptive,
             adaptiveStyle: item.adaptiveStyle,
             learningConcept: item.learningConcept
@@ -2330,6 +2386,8 @@
             round: saved.round,
             custom: saved.custom,
             date: saved.dailyDate,
+            dailyReplay: saved.dailyReplay,
+            restoring: true,
             adaptiveState: saved.adaptive,
             adaptiveStyle: saved.adaptiveStyle,
             learningConcept: saved.learningConcept
@@ -2404,12 +2462,19 @@
             ui.hint.disabled = mode === 'tutorial' || hintLevel >= 4;
             ui.skip.disabled = mode === 'tutorial';
         }
-        drawProblem();
-        renderSession();
-        renderSubmitLabel();
-        renderExplanation();
-        renderCatalogMessage();
-        persistResume();
+        const recordedDaily = mode === 'daily' && !dailyReplay && dailyResults[utcDate()];
+        if (recordedDaily && (session.phase !== 'review' ||
+            !!selectedId !== recordedDaily.success || session.hints !== recordedDaily.hints ||
+            session.attempts !== Math.max(recordedDaily.attempts, Number(recordedDaily.success)))) {
+            restoreDailyResult(recordedDaily);
+        } else {
+            drawProblem();
+            renderSession();
+            renderSubmitLabel();
+            renderExplanation();
+            renderCatalogMessage();
+            persistResume();
+        }
         if (mode === 'timed' && session.phase !== 'finished' && timerDeadline > 0) {
             startTimer(saved.timerDeadline);
         }
