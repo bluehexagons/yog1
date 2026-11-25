@@ -329,7 +329,7 @@ assert(storage.includes('localStorage.removeItem(key)') &&
     storage.includes('Could not restore YOG1 backup'),
     'imports replace the complete save and roll back failed writes');
 assert(game.includes('history = history.filter(function (item)') &&
-    game.includes('Array.isArray(item.custom.operations)'),
+    game.includes('storage.validCustomSettings(item.custom)'),
     'corrupt history is ignored and malformed custom entries cannot crash replay');
 assert(game.includes('ui.share.disabled = true') &&
     game.includes("if (mode === 'custom')"),

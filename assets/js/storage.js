@@ -130,6 +130,7 @@
             typeof value.seed === 'string' && value.seed.length <= 160 &&
             (value.mode !== 'daily' || validDate(value.dailyDate)) &&
             (value.mode !== 'custom' || validCustomSettings(value.custom)) &&
+            (value.customOpen === undefined || typeof value.customOpen === 'boolean') &&
             (value.adaptive === null || value.adaptive === undefined ||
                 (value.adaptive && typeof value.adaptive === 'object' &&
                     !Array.isArray(value.adaptive))) &&
@@ -280,6 +281,7 @@
         save: save,
         exportData: exportData,
         importData: importData,
-        validResume: validResume
+        validResume: validResume,
+        validCustomSettings: validCustomSettings
     };
 }(window));

@@ -104,8 +104,7 @@
             typeof item.seed === 'string' &&
             validTimestamp(item.at) &&
             (item.mode !== 'daily' || validDate(item.dailyDate)) &&
-            (item.mode !== 'custom' || !item.custom ||
-                Array.isArray(item.custom.operations));
+            (item.mode !== 'custom' || storage.validCustomSettings(item.custom));
     }).slice(0, HISTORY_LIMIT);
     if (!stats || typeof stats !== 'object' || Array.isArray(stats)) stats = {};
     if (!achievementState || typeof achievementState !== 'object' ||
@@ -146,7 +145,6 @@
     let historyPage = Number.isSafeInteger(settings.historyPage) &&
         settings.historyPage >= 0 ? settings.historyPage : 0;
     let forcedSeed = null;
-    let forcedRound = null;
     let dailyPuzzleDate = null;
     let timerId = null;
     let timerDeadline = 0;
@@ -215,6 +213,7 @@
                 ? Object.assign({}, activeCustomSettings, {
                     operations: activeCustomSettings.operations.slice()
                 }) : null,
+            customOpen: mode === 'custom' && ui.custom_panel.open,
             adaptive: mode === 'adaptive' && adaptiveProblemState
                 ? core.normalizeAdaptiveState(adaptiveProblemState) : null,
             adaptiveStyle: adaptiveProblemStyle,
@@ -1571,7 +1570,6 @@
         if (core.DIFFICULTIES[mode]) profile = core.DIFFICULTIES[mode];
         round = options.round || 1;
         forcedSeed = options.seed || null;
-        forcedRound = options.round || null;
         dailyPuzzleDate = null;
         if (mode === 'daily') dailyPuzzleDate = options.date || utcDate();
         forcedLearningConcept = Object.prototype.hasOwnProperty.call(core.LEARNING_CONCEPTS,
@@ -1598,6 +1596,7 @@
         newSession();
         updateModeInfo();
         if (mode === 'custom') {
+            activeCustomSettings = options.custom || null;
             currentProblem = null;
             ui.submit.disabled = true;
             ui.hint.disabled = true;
@@ -1605,12 +1604,13 @@
             ui.share.disabled = true;
             ui.problem.replaceChildren();
             hideFeedback();
-            setCatalogMessage('custom.builder', 'custom.builderBody');
+            if (activeCustomSettings) startRound();
+            else setCatalogMessage('custom.builder', 'custom.builderBody');
         } else {
             startRound(options.adaptiveStyle, mode === 'timed' ? 'ready' : 'playing');
         }
         if (moveFocus) {
-            const target = mode === 'custom' ? ui.custom_operations.querySelector('input') :
+            const target = mode === 'custom' && !currentProblem ? ui.custom_operations.querySelector('input') :
                 (mode === 'timed' ? ui.submit : ui.problem);
             target.focus();
         }
@@ -1659,6 +1659,7 @@
                 url.searchParams.set('max', String(activeCustomSettings.max));
                 url.searchParams.set('correct', String(activeCustomSettings.correct));
                 url.searchParams.set('rate', String(activeCustomSettings.rate));
+                if (activeCustomSettings.seed) url.searchParams.set('gameSeed', activeCustomSettings.seed);
             } else {
                 url.searchParams.set('difficulty', modeProfile().id);
             }
@@ -2000,8 +2001,7 @@
         save(KEYS.custom, chosen);
         activeCustomSettings = chosen;
         customRun = { attempts: 0, correct: 0, won: false };
-        round = forcedRound || 1;
-        forcedRound = null;
+        round = 1;
         newSession();
         startRound();
         ui.problem.focus();
@@ -2009,6 +2009,9 @@
 
     ui.custom_length.addEventListener('input', function () {
         ui.custom_length_value.textContent = ui.custom_length.value;
+    });
+    ui.custom_panel.addEventListener('toggle', function () {
+        if (mode === 'custom' && activeCustomSettings) persistResume();
     });
     ui.custom_form.addEventListener('input', function () {
         for (const input of ui.custom_form.querySelectorAll('[aria-invalid="true"]')) {
@@ -2026,30 +2029,15 @@
         if (!item) return;
         const modeButton = ui.mode_buttons.querySelector('[data-mode="' + item.mode + '"]');
         if (!modeButton) return;
-        if (item.mode === 'custom' && item.custom &&
-            Array.isArray(item.custom.operations)) {
-            activateMode('custom', modeButton, {
-                seed: item.seed,
-                round: item.round
-            });
-            for (const input of ui.custom_operations.querySelectorAll('input')) {
-                input.checked = item.custom.operations.includes(input.value);
-            }
-            for (const key of ['length', 'min', 'max', 'correct', 'rate', 'seed']) {
-                if (item.custom[key] !== undefined) ui['custom_' + key].value = item.custom[key];
-            }
-            ui.custom_length_value.textContent = ui.custom_length.value;
-            ui.custom_form.requestSubmit();
-        } else {
-            activateMode(item.mode, modeButton, {
-                seed: item.seed,
-                round: item.round,
-                date: item.dailyDate,
-                adaptiveState: item.adaptive,
-                adaptiveStyle: item.adaptiveStyle,
-                learningConcept: item.learningConcept
-            });
-        }
+        activateMode(item.mode, modeButton, {
+            seed: item.seed,
+            round: item.round,
+            custom: item.custom,
+            date: item.dailyDate,
+            adaptiveState: item.adaptive,
+            adaptiveStyle: item.adaptiveStyle,
+            learningConcept: item.learningConcept
+        });
         setCatalogMessage('history.replaying', 'history.replayingBody');
         persistResume();
     });
@@ -2337,30 +2325,15 @@
         if (!button) return false;
         const latestAdaptiveState = adaptiveState;
 
-        if (saved.mode === 'custom') {
-            activateMode('custom', button, {
-                seed: saved.seed,
-                round: saved.round
-            });
-            for (const input of ui.custom_operations.querySelectorAll('input')) {
-                input.checked = saved.custom.operations.includes(input.value);
-            }
-            for (const key of ['length', 'min', 'max', 'correct', 'rate', 'seed']) {
-                ui['custom_' + key].value = saved.custom[key];
-            }
-            ui.custom_length_value.textContent = ui.custom_length.value;
-            ui.custom_form.requestSubmit();
-            if (!currentProblem) return false;
-        } else {
-            activateMode(saved.mode, button, {
-                seed: saved.seed,
-                round: saved.round,
-                date: saved.dailyDate,
-                adaptiveState: saved.adaptive,
-                adaptiveStyle: saved.adaptiveStyle,
-                learningConcept: saved.learningConcept
-            });
-        }
+        activateMode(saved.mode, button, {
+            seed: saved.seed,
+            round: saved.round,
+            custom: saved.custom,
+            date: saved.dailyDate,
+            adaptiveState: saved.adaptive,
+            adaptiveStyle: saved.adaptiveStyle,
+            learningConcept: saved.learningConcept
+        });
         if (saved.mode === 'adaptive') adaptiveState = latestAdaptiveState;
 
         if (mode === 'timed') {
@@ -2374,7 +2347,10 @@
         });
         attemptsOnPuzzle = saved.attemptsOnPuzzle;
         hintsOnPuzzle = saved.hintsOnPuzzle;
-        if (mode === 'custom') customRun = Object.assign({}, saved.customRun);
+        if (mode === 'custom') {
+            customRun = Object.assign({}, saved.customRun);
+            ui.custom_panel.open = !!saved.customOpen;
+        }
         hintLevel = saved.hintLevel;
         renderHintLabel();
         selectedId = null;
@@ -2504,30 +2480,34 @@
             }
             if (requested === 'custom') {
                 const button = ui.mode_buttons.querySelector('[data-mode="custom"]');
+                function sharedNumber(key, min, max, fallback) {
+                    return Math.max(min, Math.min(max, Math.trunc(Number(params.get(key))) || fallback));
+                }
+                const min = sharedNumber('min', 3, 100, 12);
+                const custom = {
+                    operations: Array.from(new Set((params.get('ops') || '').split(',').filter(function (key) {
+                        return Object.prototype.hasOwnProperty.call(core.OPERATIONS, key);
+                    }))),
+                    length: sharedNumber('length', 2, 12, 5),
+                    min: min,
+                    max: sharedNumber('max', min, 100, 35),
+                    correct: sharedNumber('correct', 1, 100, 10),
+                    rate: sharedNumber('rate', 1, 100, 80),
+                    seed: (params.get('gameSeed') || '').trim().slice(0, 80)
+                };
+                if (!storage.validCustomSettings(custom)) {
+                    activateMode('custom', button);
+                    const key = custom.operations.length ? 'custom.chooseIdentity' : 'custom.chooseOperation';
+                    setCatalogMessage(key, key + 'Body');
+                    return;
+                }
                 activateMode('custom', button, {
                     seed: safeSeed,
-                    round: sharedRound(params.get('round'))
+                    round: sharedRound(params.get('round')),
+                    custom: custom
                 });
-                const requestedOperations = Array.from(new Set(
-                    (params.get('ops') || '').split(',').filter(function (key) {
-                        return Object.prototype.hasOwnProperty.call(core.OPERATIONS, key);
-                    })
-                ));
-                for (const input of ui.custom_operations.querySelectorAll('input')) {
-                    input.checked = requestedOperations.includes(input.value);
-                }
-                ui.custom_length.value = Math.max(2, Math.min(12, Number(params.get('length')) || 5));
-                ui.custom_length_value.textContent = ui.custom_length.value;
-                ui.custom_min.value = Math.max(3, Math.min(100, Number(params.get('min')) || 12));
-                ui.custom_max.value = Math.max(Number(ui.custom_min.value),
-                    Math.min(100, Number(params.get('max')) || 35));
-                ui.custom_correct.value = Math.max(1, Math.min(100,
-                    Number(params.get('correct')) || 10));
-                ui.custom_rate.value = Math.max(1, Math.min(100,
-                    Number(params.get('rate')) || 80));
-                ui.custom_form.requestSubmit();
-                if (!activeCustomSettings) return;
                 setCatalogMessage('shared.custom', 'shared.customBody');
+                persistResume();
                 return;
             }
             if (requested === 'guided') {
