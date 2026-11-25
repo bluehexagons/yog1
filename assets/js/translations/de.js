@@ -160,7 +160,7 @@
     "result.balanced": "Ausgewogen",
     "result.balancedBody": "Beide Seiten sind sich einig. Überprüfen und fortfahren.",
     "result.retry": "Es ist noch nicht ausgeglichen",
-    "result.retryBody": "Versuchen Sie das gleiche Problem jederzeit erneut.",
+    "result.retryBody": "Wählen Sie für den nächsten Versuch eine andere Zahl.",
     "result.solution": "Lösung gezeigt",
     "result.solutionBody": "Der Versuch für dieses Rätsel wurde als falsch gewertet. Sehen Sie sich die Lösung an und fahren Sie dann fort.",
     "aria.changeNumber": "Ändern Sie {number} auf 1",

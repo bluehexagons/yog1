@@ -593,7 +593,13 @@
                     ? t('aria.restoreNumber', { number: expression.value })
                     : t('aria.changeNumber', { number: expression.value }));
             }
-            if (selectedId === expression.id) button.classList.add('flipped');
+            if (selectedId === expression.id) {
+                button.classList.add('flipped');
+                if (isRejectedMove()) {
+                    button.classList.add('rejected');
+                    button.setAttribute('aria-describedby', 'feedback');
+                }
+            }
             if ((mode === 'tutorial' || hintLevel >= 4) && expression.solution) {
                 button.classList.add('hint-target');
                 if (hintLevel >= 4) button.setAttribute('aria-describedby', 'message');
@@ -677,7 +683,7 @@
         }
         ui.flip_count.textContent = selectedId ? '0' : '1';
         ui.flip_text.textContent = t(selectedId ? 'flip.many' : 'flip.one');
-        if (session.phase === 'playing') ui.submit.disabled = !selectedId;
+        if (session.phase === 'playing') ui.submit.disabled = !selectedId || isRejectedMove();
         ui.round_label.textContent = mode === 'tutorial' ? t('round.tutorial') :
             (mode === 'daily' ? utcDate() : t('round.number', { round: round }));
         ui.round_kind.textContent = t('round.' + currentProblem.roundKind);
@@ -838,7 +844,7 @@
             const reflection = document.createElement('p');
             reflection.className = 'learning-reflection';
             reflection.append(
-                text('strong', conceptLabel(learning.concept) + ': '),
+                text('strong', conceptLabel(concept.id) + ': '),
                 text('code', concept.example)
             );
             ui.feedback.appendChild(reflection);
@@ -924,6 +930,11 @@
 
     function valuesWithFlip(id) {
         return id ? { [id]: 1 } : {};
+    }
+
+    function isRejectedMove() {
+        return session.phase === 'playing' && selectedId && currentFeedback &&
+            !currentFeedback.revealSolution && currentFeedback.moveId === selectedId;
     }
 
     function isSolved() {
@@ -1138,18 +1149,17 @@
     function incorrectAnswer() {
         const attemptedValues = currentValues;
         const attemptedId = selectedId;
+        const moveFocus = document.activeElement === ui.submit;
         adapt('wrong');
         recordAttempt(false);
         playSound('incorrect');
         showExplanation(false, attemptedValues, false, attemptedId);
-        selectedId = null;
-        currentValues = {};
-        drawProblem();
-        persistResume();
         if (mode === 'endless' && attemptsOnPuzzle === 1) {
             session.lives--;
             renderSession();
             if (session.lives <= 0) {
+                selectedId = null;
+                currentValues = {};
                 recordLearning(false);
                 finishSession('endless.complete', 'endless.completeBody', {
                     count: session.solved
@@ -1158,9 +1168,10 @@
                 persistResume(null);
                 return;
             }
-            persistResume();
         }
         setCatalogMessage('result.retry', 'result.retryBody');
+        drawProblem();
+        if (moveFocus) ui.problem.querySelector('.rejected')?.focus();
         persistResume();
     }
 

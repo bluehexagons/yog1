@@ -160,7 +160,7 @@
     "result.balanced": "متوازن",
     "result.balancedBody": "الطرفان متساويان. راجع ثم تابع.",
     "result.retry": "غير متوازن",
-    "result.retryBody": "جرّب المسألة نفسها مجددًا عندما تكون مستعدًا.",
+    "result.retryBody": "اختر عددًا آخر للمحاولة مجددًا.",
     "result.solution": "تم إظهار الحل",
     "result.solutionBody": "تم تسجيل محاولة هذه المسألة على أنها غير صحيحة. راجع الحل، ثم تابع.",
     "aria.changeNumber": "غيّر {number} إلى 1",

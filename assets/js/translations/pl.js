@@ -160,7 +160,7 @@
     "result.balanced": "Zrównoważony",
     "result.balancedBody": "Obie strony pasują. Przejrzyj i kontynuuj.",
     "result.retry": "Niezrównoważony",
-    "result.retryBody": "Spróbuj ponownie wykonać tę samą łamigłówkę, gdy będziesz gotowy.",
+    "result.retryBody": "Wybierz inną liczbę, aby spróbować ponownie.",
     "result.solution": "Pokazano rozwiązanie",
     "result.solutionBody": "Ta łamigłówka została oznaczona jako rozwiązana nieprawidłowo. Sprawdź rozwiązanie, a następnie kontynuuj.",
     "aria.changeNumber": "Zmień {number} na 1",

@@ -276,6 +276,7 @@ h1 { margin: 4px 0; font: bold 1.45rem/1 "Courier New", monospace; letter-spacin
 }
 #problem .number:not([aria-disabled="true"]):active { transform: translate(1px, 1px); box-shadow: 1px 1px var(--ink); }
 #problem .number.flipped { color: var(--blue); background: var(--flipped); animation: number-flip var(--motion-base) var(--motion-spring); }
+#problem .number.rejected { color: var(--red); border: 2px dashed var(--red); }
 #problem .number[aria-disabled="true"] { cursor: default; opacity: .75; }
 #problem.is-new-round .equation-side { animation: equation-enter var(--motion-slow) var(--motion-ease) both; }
 #problem.is-new-round .equals { animation: equation-enter var(--motion-slow) 60ms var(--motion-ease) both; }

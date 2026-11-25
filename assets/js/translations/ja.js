@@ -160,7 +160,7 @@
     "result.balanced": "つり合いました",
     "result.balancedBody": "両辺が一致しました。確認して続けます。",
     "result.retry": "まだつり合っていません",
-    "result.retryBody": "準備ができたら、同じ問題をもう一度試してみましょう。",
+    "result.retryBody": "別の数を選んで、もう一度試しましょう。",
     "result.solution": "答えを表示しました",
     "result.solutionBody": "この問題は不正解として記録されました。解答を確認してから、続けてください。",
     "aria.changeNumber": "{number}を1に変える",

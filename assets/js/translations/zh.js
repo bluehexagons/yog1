@@ -160,7 +160,7 @@
     "result.balanced": "已平衡",
     "result.balancedBody": "等式两边相等。查看后继续。",
     "result.retry": "尚未平衡",
-    "result.retryBody": "准备好后，再试一次这道题。",
+    "result.retryBody": "选择另一个数再试一次。",
     "result.solution": "已显示解法",
     "result.solutionBody": "此题已被记为答错。请查看解答，然后继续。",
     "aria.changeNumber": "将 {number} 改为 1",

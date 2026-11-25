@@ -160,7 +160,7 @@
     "result.balanced": "Equilibrado",
     "result.balancedBody": "Ambos lados coinciden. Revisa y continúa.",
     "result.retry": "Aún no está equilibrado",
-    "result.retryBody": "Prueba el mismo problema de nuevo cuando quieras.",
+    "result.retryBody": "Elige otro número para volver a intentarlo.",
     "result.solution": "Solución mostrada",
     "result.solutionBody": "Este rompecabezas se marcó como incorrecto. Revisa la solución y luego continúa.",
     "aria.changeNumber": "Cambiar {number} por 1",

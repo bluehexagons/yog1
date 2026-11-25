@@ -160,7 +160,7 @@
     "result.balanced": "Equilibrado",
     "result.balancedBody": "Os dois lados são iguais. Confira e continue.",
     "result.retry": "Ainda não está equilibrado",
-    "result.retryBody": "Tente o mesmo problema novamente quando quiser.",
+    "result.retryBody": "Escolha outro número para tentar novamente.",
     "result.solution": "Solução mostrada",
     "result.solutionBody": "Este quebra-cabeça foi marcado como incorreto. Revise a solução e depois continue.",
     "aria.changeNumber": "Mudar {number} para 1",

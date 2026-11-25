@@ -169,7 +169,7 @@
     "result.balanced": "Balanced",
     "result.balancedBody": "Both sides match. Review, then continue.",
     "result.retry": "Not balanced",
-    "result.retryBody": "Try the same puzzle again when you’re ready.",
+    "result.retryBody": "Choose a different number to try again.",
     "result.solution": "Solution shown",
     "result.solutionBody": "This puzzle was recorded as incorrect. Review the solution, then continue.",
     "aria.changeNumber": "Change {number} to 1",

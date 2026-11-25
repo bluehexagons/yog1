@@ -160,7 +160,7 @@
     "result.balanced": "संतुलित",
     "result.balancedBody": "दोनों पक्ष बराबर हैं। देखें, फिर आगे बढ़ें।",
     "result.retry": "अभी संतुलित नहीं",
-    "result.retryBody": "तैयार होने पर इसी पहेली को फिर आज़माएँ।",
+    "result.retryBody": "फिर से कोशिश करने के लिए कोई दूसरी संख्या चुनें।",
     "result.solution": "हल दिखाया गया",
     "result.solutionBody": "इस पहेली में आपका प्रयास गलत दर्ज किया गया था। हल की समीक्षा करें, फिर आगे बढ़ें।",
     "aria.changeNumber": "{number} को 1 में बदलें",

@@ -160,7 +160,7 @@
     "result.balanced": "Dengeli",
     "result.balancedBody": "İki taraf eşit. İnceleyip devam edin.",
     "result.retry": "Henüz dengeli değil",
-    "result.retryBody": "Hazır olduğunuzda aynı bulmacayı yeniden deneyin.",
+    "result.retryBody": "Yeniden denemek için başka bir sayı seçin.",
     "result.solution": "Çözüm gösterildi",
     "result.solutionBody": "Bu bulmaca yanlış olarak kaydedildi. Çözümü gözden geçirdikten sonra devam edin.",
     "aria.changeNumber": "{number} sayısını 1 yap",

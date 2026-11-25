@@ -245,7 +245,7 @@ assert(game.includes('if (replacement) replacement.focus();') &&
 assert(game.includes("button.setAttribute('aria-disabled', 'true')") &&
     game.includes("button.tabIndex = button.dataset.numberId === activeId ? 0 : -1") &&
     game.includes('if (replacement) replacement.focus();') &&
-    game.includes("if (session.phase === 'playing') ui.submit.disabled = !selectedId;") &&
+    game.includes("if (session.phase === 'playing') ui.submit.disabled = !selectedId || isRejectedMove();") &&
     html.includes('#problem .number[aria-disabled="true"]'),
     'puzzle controls retain focus, use one tab stop, require a move, and become inert during review');
 assert(game.includes("drawProblem('.hint-target, .hint-side')") &&
@@ -354,7 +354,7 @@ assert(game.includes('attemptsOnPuzzle: attemptsOnPuzzle') &&
     game.includes('lives: session.lives') &&
     game.includes('timerDeadline: mode === \'timed\' ? timerDeadline : 0') &&
     game.includes('customRun = Object.assign({}, saved.customRun)') &&
-    game.includes('persistResume();\n        }\n        setCatalogMessage(\'result.retry\'') &&
+    game.includes("if (moveFocus) ui.problem.querySelector('.rejected')?.focus();\n        persistResume();") &&
     game.includes('if (saved.mode === \'adaptive\') adaptiveState = latestAdaptiveState') &&
     game.includes('phase: session.phase') &&
     game.includes('message: currentPersistentMessage ?') &&

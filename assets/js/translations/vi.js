@@ -160,7 +160,7 @@
     "result.balanced": "Đã cân bằng",
     "result.balancedBody": "Hai vế khớp nhau. Xem lại rồi tiếp tục.",
     "result.retry": "Chưa cân bằng",
-    "result.retryBody": "Hãy thử lại câu đố này khi bạn sẵn sàng.",
+    "result.retryBody": "Chọn một số khác để thử lại.",
     "result.solution": "Đã hiện lời giải",
     "result.solutionBody": "Câu đố này đã được ghi nhận là trả lời sai. Hãy xem lại lời giải rồi tiếp tục.",
     "aria.changeNumber": "Đổi {number} thành 1",

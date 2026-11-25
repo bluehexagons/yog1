@@ -160,7 +160,7 @@
     "result.balanced": "برابر ہے",
     "result.balancedBody": "دونوں طرف برابر ہیں۔ دیکھیں، پھر آگے بڑھیں۔",
     "result.retry": "ابھی برابر نہیں",
-    "result.retryBody": "تیار ہونے پر یہی پہیلی دوبارہ آزمائیں۔",
+    "result.retryBody": "دوبارہ کوشش کرنے کے لیے کوئی اور عدد منتخب کریں۔",
     "result.solution": "حل دکھا دیا گیا",
     "result.solutionBody": "اس پہیلی میں آپ کی کوشش غلط ریکارڈ کی گئی تھی۔ حل کا جائزہ لیں، پھر آگے بڑھیں۔",
     "aria.changeNumber": "{number} کو 1 میں بدلیں",

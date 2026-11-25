@@ -160,7 +160,7 @@
     "result.balanced": "Équilibré",
     "result.balancedBody": "Les deux parties sont d’accord. Révisez et continuez.",
     "result.retry": "Ce n'est pas encore équilibré",
-    "result.retryBody": "Réessayez le même problème quand vous le souhaitez.",
+    "result.retryBody": "Choisissez un autre nombre pour réessayer.",
     "result.solution": "Solution affichée",
     "result.solutionBody": "Ce puzzle a été marqué comme incorrect. Consultez la solution, puis continuez.",
     "aria.changeNumber": "Remplacez {number} par 1",
