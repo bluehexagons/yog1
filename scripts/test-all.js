@@ -14,6 +14,7 @@ const commands = [
     ['node', ['tests/test-theme.js']],
     ['node', ['tests/test-gamepad.js']],
     ['node', ['tests/test-version.js']],
+    ['node', ['tests/test-package.js']],
     ['node', ['--check', 'assets/js/theme.js']],
     ['node', ['--check', 'assets/js/game.js']],
     ['node', ['--check', 'assets/js/i18n.js']],

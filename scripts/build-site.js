@@ -5,9 +5,13 @@ const fs = require('fs');
 const path = require('path');
 
 const root = path.resolve(__dirname, '..');
-const destination = path.resolve(root, process.argv[2] || 'dist');
-if (destination === root || !destination.startsWith(root + path.sep)) {
-    throw new Error('The site output must be a directory inside the repository.');
+const destination = path.join(root, 'dist');
+if (process.argv[2] && path.resolve(root, process.argv[2]) !== destination) {
+    throw new Error('The site package can only replace the dist/ output directory.');
+}
+const existingOutput = fs.lstatSync(destination, { throwIfNoEntry: false });
+if (existingOutput && !existingOutput.isDirectory()) {
+    throw new Error('The dist/ output path must be a directory.');
 }
 
 const files = [
