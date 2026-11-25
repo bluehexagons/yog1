@@ -3,7 +3,7 @@
   "private": true,
   "description": "Balance integer equations by changing exactly one number into a 1.",
   "homepage": "https://bluehexagons.github.io/yog1/",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/bluehexagons/yog1.git"
@@ -20,8 +20,8 @@
     "check": "npm run format:check && npm run lint && npm run typecheck && npm run build:ts && npm test && node scripts/check-site.js"
   },
   "devDependencies": {
-    "oxfmt": "0.78.0",
-    "oxlint": "1.93.0",
+    "oxfmt": "0.80.0",
+    "oxlint": "1.95.0",
     "typescript": "7.0.2"
   },
   "engines": {
