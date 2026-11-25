@@ -215,7 +215,8 @@ h1 { margin: 4px 0; font: bold 1.45rem/1 "Courier New", monospace; letter-spacin
 .screen > h2 { margin: 0 0 16px; font-family: var(--ui-label-font); font-size: 1.1rem; font-weight: bold; text-transform: uppercase; }
 #play_screen:not([hidden]) {
     display: grid; min-height: 0; flex: 1;
-    grid-template-rows: auto auto minmax(0, 1fr); gap: 12px;
+    grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto auto;
+    align-content: start; gap: 12px;
 }
 #play_hud { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(250px, .75fr); gap: 12px; }
 #play_hud:has(#round_bar[hidden]) { grid-template-columns: minmax(0, 1fr); }
@@ -245,21 +246,27 @@ h1 { margin: 4px 0; font: bold 1.45rem/1 "Courier New", monospace; letter-spacin
 .round-kind.challenge { color: var(--red); border-color: var(--red); }
 .round-kind.warmup { color: var(--green); border-color: var(--green); }
 #workspace {
-    display: flex; min-height: 0; flex-direction: column; padding: 15px 17px;
+    display: flex; min-width: 0; flex-direction: column; padding: 15px 17px;
     border: 2px solid var(--ink); background: var(--workspace); box-shadow: 4px 4px var(--raised-shadow);
 }
 #flips { display: flex; flex-wrap: wrap; gap: 6px; color: var(--muted); font-size: .78rem; }
 #flips strong { margin-inline-end: auto; color: var(--ink); font-family: var(--ui-label-font); font-size: .75rem; font-weight: bold; letter-spacing: .08em; text-transform: uppercase; }
 .flip-allowance { white-space: nowrap; }
 #flip_count { color: var(--ink); font-weight: bold; }
-#problem { min-height: 82px; display: flex; flex: 1; align-items: center; overflow-x: auto; padding: 8px 2px 13px; white-space: nowrap; font: 1.45rem var(--math-font); }
+#problem {
+    position: relative; min-height: clamp(100px, 18vh, 156px); display: flex; align-items: center;
+    gap: .25em; overflow-x: auto; padding: 10px 8px; white-space: nowrap; font: 1.7rem var(--math-font);
+}
+#problem > :first-child { margin-left: auto; }
+#problem > :last-child { margin-right: auto; }
+#problem > * { flex: none; }
 #problem.can-scroll { scrollbar-width: thin; }
 #problem.can-scroll:not(.at-scroll-end) { box-shadow: inset -12px 0 9px -12px var(--ink); }
 #problem, #feedback code, #history code { direction: ltr; text-align: left; unicode-bidi: isolate; }
 #problem .number {
-    min-width: 2.4rem; min-height: 2.4rem; padding: 1px 6px; border: 1px solid var(--ink);
+    min-width: 2.75rem; min-height: 2.75rem; padding: 1px 6px; border: 1px solid var(--ink);
     background: var(--paper); color: var(--blue); box-shadow: 2px 2px var(--ink);
-    font: 1.65rem var(--math-font); font-variant-numeric: tabular-nums;
+    font: 1.85rem var(--math-font); font-variant-numeric: tabular-nums;
     touch-action: manipulation;
     transition: transform var(--motion-fast) var(--motion-ease), box-shadow var(--motion-fast) var(--motion-ease),
         background-color var(--motion-base) var(--motion-ease), color var(--motion-base) var(--motion-ease);
@@ -277,8 +284,9 @@ h1 { margin: 4px 0; font: bold 1.45rem/1 "Courier New", monospace; letter-spacin
 #problem .number.gamepad-focus { outline: 3px solid var(--focus); outline-offset: 3px; }
 .equation-side.hint-side { background: var(--hint); outline: 2px dashed var(--warm); outline-offset: 4px; }
 .operator, .equals { font-weight: bold; }
-#actions { display: flex; flex-wrap: wrap; align-items: center; gap: 9px; border-top: 1px solid var(--line); padding-top: 13px; }
-#custom_progress { margin-inline-end: auto; font-family: var(--ui-label-font); font-size: .78rem; font-weight: bold; }
+#actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 9px; border-top: 1px solid var(--line); padding-top: 13px; }
+#custom_progress { flex-basis: 100%; text-align: center; font-family: var(--ui-label-font); font-size: .78rem; font-weight: bold; }
+#actions .primary:not(:disabled) { background: var(--blue); color: var(--workspace); }
 #feedback { margin-top: 14px; padding: 10px; border: 1px solid var(--line); background: var(--soft); font-size: .78rem; }
 #feedback.is-updating { animation: feedback-enter var(--motion-slow) var(--motion-ease); transform-origin: top; }
 #feedback p { margin: 0 0 5px; }
@@ -451,13 +459,16 @@ footer { margin-top: 22px; padding-top: 12px; border-top: 1px solid var(--line);
 @container game (max-width: 430px) {
     #message_text { font-size: .78rem; }
     #round_bar { gap: 5px 7px; padding: 7px 8px; }
+    #actions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    #custom_progress, #submit { grid-column: 1 / -1; margin-inline-end: 0; }
+    #actions > button { min-width: 0; padding-inline: 5px; overflow-wrap: anywhere; }
+    #workspace { padding-inline: 11px; }
+    #problem { min-height: 104px; }
+}
+@container game (max-width: 260px) {
     #session_summary_values { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     #session_summary .session-stat:nth-child(odd) { border-inline-start: 0; }
     #session_summary .session-stat:nth-child(n + 3) { border-top: 1px solid var(--line); }
-    #actions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
-    #custom_progress, #submit { grid-column: 1 / -1; margin-inline-end: 0; }
-    #actions > button { min-width: 0; padding-inline: 5px; }
-    #workspace { padding-inline: 11px; }
 }
 @media (max-width: 960px) {
     #game { padding: 16px 13px; }

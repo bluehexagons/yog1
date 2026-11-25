@@ -671,11 +671,21 @@
     }
 
     function renderSubmitLabel() {
+        const dailyReview = mode === 'daily' && session.phase === 'review';
         const replayingChallenges = mode === 'challenges' &&
             round === CURATED.length && session.phase === 'review';
-        ui.submit.textContent = t(session.phase === 'finished' ? 'action.finished' :
+        ui.submit.textContent = t(dailyReview ? 'action.shareResult' :
+            (session.phase === 'finished' ? 'action.finished' :
             (replayingChallenges ? 'action.again' :
-            (session.phase === 'review' ? 'action.next' : 'action.check')));
+            (session.phase === 'review' ? 'action.next' : 'action.check'))));
+        ui.share.hidden = mode === 'tutorial' || dailyReview;
+        ui.hint.hidden = ui.skip.hidden = mode === 'tutorial' || dailyReview;
+    }
+
+    function renderHintLabel() {
+        const numberFormat = new Intl.NumberFormat(i18n.getLanguageTag());
+        const step = numberFormat.format(Math.min(hintLevel + 1, 4));
+        ui.hint.textContent = t('action.hint') + ' ' + step + '/' + numberFormat.format(4);
     }
 
     function hintTargetDetail() {
@@ -832,6 +842,7 @@
         renderSubmitLabel();
         ui.submit.disabled = session.phase === 'finished';
         ui.hint.disabled = mode === 'tutorial' || session.phase === 'finished';
+        renderHintLabel();
         ui.skip.disabled = mode === 'tutorial' || session.phase === 'finished';
         ui.skip.textContent = t(mode === 'adaptive' ? 'action.skip' : 'action.reveal');
         ui.share.disabled = mode === 'tutorial';
@@ -1037,7 +1048,6 @@
         gamepadFocusId = null;
         ui.submit.disabled = false;
         drawProblem();
-        persistResume(null);
         renderSubmitLabel();
         ui.hint.disabled = true;
         ui.skip.disabled = true;
@@ -1046,25 +1056,23 @@
             recordDailyResult(true);
             updateProgress();
             updateModeInfo();
-            ui.submit.disabled = true;
             setCatalogMessage('daily.complete', 'daily.completeBody', {
                 attempts: session.attempts, hints: session.hints
             });
-            persistResume(null);
+            persistResume();
             return;
         }
         if (mode === 'custom') {
             const accuracy = customRun.correct / customRun.attempts * 100;
             if (customRun.correct >= activeCustomSettings.correct && accuracy >= activeCustomSettings.rate) {
                 customRun.won = true;
-                persistResume(null);
                 ui.submit.disabled = true;
                 setCatalogMessage('custom.won', 'custom.wonBody', {
                     correct: customRun.correct,
                     attempts: customRun.attempts,
                     accuracy: Math.round(accuracy)
                 });
-                persistResume(null);
+                persistResume();
                 return;
             }
         }
@@ -1077,7 +1085,7 @@
             setCatalogMessage(alternate ? 'result.alternate' : 'result.balanced',
                 alternate ? 'result.alternateBody' : 'result.balancedBody');
         }
-        persistResume(null);
+        persistResume();
     }
 
     function incorrectAnswer() {
@@ -1649,6 +1657,7 @@
         renderAchievementNotice();
         if (timerId) ui.timer_label.textContent = t('timer.seconds', { seconds: timeRemaining });
         renderSubmitLabel();
+        renderHintLabel();
         renderCatalogMessage();
         setSidebarCollapsed(document.getElementById('wrapper').classList.contains('sidebar-collapsed'), false);
     }
@@ -1700,7 +1709,8 @@
 
     ui.submit.addEventListener('click', function () {
         if (session.phase === 'review') {
-            advanceRound();
+            if (mode === 'daily') sharePuzzle();
+            else advanceRound();
             return;
         }
         if (!currentProblem || session.phase === 'finished') return;
@@ -1734,6 +1744,7 @@
         hintsOnPuzzle++;
         if (hintLevel === 1) adapt('hint');
         ui.hint.disabled = hintLevel >= 4;
+        renderHintLabel();
         drawProblem('.hint-target, .hint-side');
         const learning = core.learningAnalysis(currentProblem.sides);
         if (hintLevel === 1) {
@@ -1777,7 +1788,6 @@
             recordDailyResult(false);
             updateProgress();
             updateModeInfo();
-            ui.submit.disabled = true;
             setCatalogMessage('daily.revealed', 'daily.revealedBody');
             persistResume(null);
             return;
@@ -2217,15 +2227,23 @@
         hintsOnPuzzle = saved.hintsOnPuzzle;
         if (mode === 'custom') customRun = Object.assign({}, saved.customRun);
         hintLevel = saved.hintLevel;
+        renderHintLabel();
         selectedId = null;
-        if (saved.selectedId) {
+        const priorReviewMove = saved.phase !== 'playing' && saved.feedback
+            ? Object.keys(saved.feedback.attemptedValues || {})[0] : null;
+        const savedMove = saved.selectedId || priorReviewMove;
+        if (savedMove) {
             currentProblem.sides.forEach(function (side) {
                 core.visitNumbers(side, function (node) {
-                    if (node.id === saved.selectedId) selectedId = node.id;
+                    if (node.id === savedMove) selectedId = node.id;
                 });
             });
         }
         currentValues = valuesWithFlip(selectedId);
+        if (session.phase !== 'playing' && selectedId && !isSolved()) {
+            selectedId = null;
+            currentValues = {};
+        }
         currentFeedback = saved.feedback ? {
             revealSolution: saved.feedback.revealSolution,
             attemptedValues: Object.assign({}, saved.feedback.attemptedValues || {}),
@@ -2242,9 +2260,6 @@
         }
         if (mode === 'custom' && customRun.won) {
             session.phase = 'review';
-            selectedId = null;
-            currentValues = {};
-            ui.submit.disabled = true;
             setCatalogMessage('custom.won', 'custom.wonBody', {
                 correct: customRun.correct,
                 attempts: customRun.attempts,
@@ -2253,16 +2268,9 @@
             });
         }
         if (session.phase !== 'playing') {
-            selectedId = null;
-            currentValues = {};
             ui.hint.disabled = true;
             ui.skip.disabled = true;
-            if (session.phase === 'finished' || mode === 'daily' ||
-                (mode === 'custom' && customRun.won)) {
-                ui.submit.disabled = true;
-            } else {
-                ui.submit.disabled = false;
-            }
+            ui.submit.disabled = session.phase === 'finished' || (mode === 'custom' && customRun.won);
         } else {
             ui.hint.disabled = mode === 'tutorial' || hintLevel >= 4;
         }
