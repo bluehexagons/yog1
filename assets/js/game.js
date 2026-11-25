@@ -11,6 +11,7 @@
     const HISTORY_LIMIT = 100;
     const PAGE_SIZE = 10;
     const TIMED_SECONDS = 60;
+    const PRACTICE_SEED_PREFIX = 'guided-v2:';
 
     const ui = {};
     for (const id of [
@@ -503,7 +504,8 @@
         if (mode === 'custom' && activeCustomSettings.seed) {
             return activeCustomSettings.seed + ':' + round;
         }
-        return session.id + ':' + mode + ':' + round;
+        const sessionSeed = session.id + ':' + mode + ':' + round;
+        return mode === 'guided' ? PRACTICE_SEED_PREFIX + sessionSeed : sessionSeed;
     }
 
     function generateCurrentProblem() {
@@ -512,6 +514,11 @@
         if (mode === 'guided') {
             currentLearningConcept = forcedLearningConcept || selectedLearningConcept();
             forcedLearningConcept = null;
+            // Existing links and saves still use the original seeded generator.
+            if (currentSeed.startsWith(PRACTICE_SEED_PREFIX)) {
+                return core.generatePracticeProblem(currentLearningConcept, round,
+                    core.createSeededRandom(currentSeed));
+            }
         }
         const adaptiveModel = adaptiveProblemState || adaptiveState;
         const selectedProfile = mode === 'adaptive'
@@ -544,7 +551,15 @@
                 maxNumber: Math.max(30, activeCustomSettings.max * 2)
             });
         }
-        return core.generateProblem(options);
+        const problem = core.generateProblem(options);
+        if (mode === 'guided') {
+            const effect = core.learningAnalysis(problem.sides).intendedEffect;
+            const concept = Object.values(core.LEARNING_CONCEPTS).find(function (item) {
+                return item.solutionOperation === effect.operation;
+            });
+            problem.learningConcept = concept ? concept.id : 'balance';
+        }
+        return problem;
     }
 
     function renderExpression(expression, parent) {
@@ -652,6 +667,7 @@
             (mode === 'daily' ? utcDate() : t('round.number', { round: round }));
         ui.round_kind.textContent = t('round.' + currentProblem.roundKind);
         ui.round_kind.className = 'round-kind ' + currentProblem.roundKind;
+        ui.score_label.hidden = mode === 'guided';
         ui.score_label.textContent = t('round.score', { target: currentProblem.target, score: currentProblem.score });
         renderLearningGoal();
         window.requestAnimationFrame(updateProblemOverflow);
@@ -665,8 +681,8 @@
     function renderLearningGoal() {
         ui.learning_goal.hidden = mode !== 'guided' || !currentProblem;
         if (ui.learning_goal.hidden) return;
-        const concept = core.LEARNING_CONCEPTS[currentLearningConcept];
-        ui.learning_goal_name.textContent = conceptLabel(currentLearningConcept);
+        const concept = core.LEARNING_CONCEPTS[currentProblem.learningConcept];
+        ui.learning_goal_name.textContent = conceptLabel(concept.id);
         ui.learning_goal_example.textContent = concept.example;
     }
 
@@ -796,7 +812,7 @@
             const equation = text('code', details.solvedExpression);
             ui.feedback.append(solution, equation);
             appendSteps(t('feedback.solutionSteps'), details.solvedSteps);
-            const concept = core.LEARNING_CONCEPTS[learning.concept];
+            const concept = core.LEARNING_CONCEPTS[currentProblem.learningConcept || learning.concept];
             const reflection = document.createElement('p');
             reflection.className = 'learning-reflection';
             reflection.append(
@@ -867,6 +883,7 @@
                 ? 'modeDescription.adaptiveCoach' : 'modeDescription.adaptive');
         } else if (mode === 'guided') {
             setCatalogMessage('mode.guided', 'modeDescription.guided');
+            updateModeInfo();
         } else if (mode === 'challenges') {
             setCatalogMessage(currentProblem.titleKey, 'message.curated', {
                 round: round, count: CURATED.length
@@ -963,7 +980,7 @@
 
     function recordLearning(solved) {
         const concept = mode === 'guided'
-            ? currentLearningConcept : core.learningConceptFor(currentProblem.sides);
+            ? currentProblem.learningConcept : core.learningConceptFor(currentProblem.sides);
         learningState = core.updateLearningState(learningState, concept, {
             solved: solved,
             hints: hintsOnPuzzle,
@@ -971,6 +988,7 @@
             durationMs: Date.now() - session.puzzleStartedAt
         });
         save(KEYS.learning, learningState);
+        updateProgress();
         renderLearning();
         updateModeInfo();
     }
@@ -1178,7 +1196,7 @@
                 grid: progress.solved + ' ' + t('history.correct')
             }));
         } else if (mode === 'guided') {
-            const entry = learningState.concepts[currentLearningConcept];
+            const entry = learningState.concepts[currentProblem?.learningConcept || currentLearningConcept];
             ui.custom_progress.textContent = t('learning.progressValue', {
                 progress: core.conceptProgress(entry)
             });
@@ -1332,11 +1350,11 @@
                 }))
             );
         } else if (mode === 'guided') {
-            const concept = core.LEARNING_CONCEPTS[currentLearningConcept];
-            const entry = learningState.concepts[currentLearningConcept];
+            const concept = core.LEARNING_CONCEPTS[currentProblem?.learningConcept || currentLearningConcept];
+            const entry = learningState.concepts[concept.id];
             ui.mode_info.replaceChildren(
                 text('strong', t('mode.guided')),
-                text('span', conceptLabel(currentLearningConcept)),
+                text('span', conceptLabel(concept.id)),
                 text('code', concept.example),
                 text('span', t('learning.progressValue', {
                     progress: core.conceptProgress(entry)

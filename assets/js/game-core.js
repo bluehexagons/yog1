@@ -52,27 +52,27 @@
     const LEARNING_CONCEPTS = {
         balance: {
             id: 'balance', operations: ['add', 'subtract'], profile: 'easy', length: 2,
-            example: '(a + b) − b = a'
+            solutionOperation: 'subtract', example: 'a ± 1'
         },
         multiplication: {
             id: 'multiplication', operations: ['add', 'subtract', 'multiply'],
-            profile: 'normal', length: 3, example: 'a × 1 = a'
+            profile: 'normal', length: 3, solutionOperation: 'multiply', example: 'a × 1 = a'
         },
         division: {
             id: 'division', operations: ['add', 'subtract', 'multiply', 'divide'],
-            profile: 'hard', length: 3, example: 'a ÷ 1 = a'
+            profile: 'hard', length: 3, solutionOperation: 'divide', example: 'a ÷ 1 = a'
         },
         remainder: {
             id: 'remainder', operations: ['add', 'subtract', 'modulo'],
-            profile: 'expert', length: 4, example: 'a % b = remainder'
+            profile: 'expert', length: 4, solutionOperation: 'modulo', example: 'a % 1 = 0'
         },
         powers: {
             id: 'powers', operations: ['add', 'subtract', 'multiply', 'power'],
-            profile: 'expert', length: 4, example: 'a ^ 1 = a'
+            profile: 'expert', length: 4, solutionOperation: 'power', example: 'a ^ 1 = a'
         },
         roots: {
             id: 'roots', operations: ['add', 'subtract', 'multiply', 'root'],
-            profile: 'extreme', length: 4, example: '√(a × a) = a'
+            profile: 'extreme', length: 4, solutionOperation: 'root', example: '√(1) = 1'
         }
     };
 
@@ -680,6 +680,61 @@
         throw new Error('Unable to generate a safe puzzle with the requested solution rules');
     }
 
+    function generatePracticeProblem(conceptId, round, random) {
+        const concept = LEARNING_CONCEPTS[conceptId];
+        const operation = concept.solutionOperation;
+        const scheduled = roundTarget(DIFFICULTIES[concept.profile].target, round);
+        const decoy = randomInt(random, 3, 12);
+        const base = randomInt(random, 3, 9);
+        let value = base;
+        let otherSide;
+        let focusSide;
+        switch (operation) {
+            case 'subtract':
+                value = randomInt(random, 4, 18);
+                focusSide = binary('subtract', number(value + 1),
+                    number(1, true, decoy === value ? decoy + 1 : decoy));
+                break;
+            case 'multiply':
+                focusSide = binary('multiply', number(value),
+                    number(1, true, decoy === value ? decoy + 1 : decoy));
+                break;
+            case 'divide':
+                // Keep the unsolved quotient above 1 so changing the other
+                // side to 1 cannot also balance the equation.
+                value = decoy * base;
+                focusSide = binary('divide', number(value), number(1, true, decoy));
+                break;
+            case 'modulo':
+                value = 0;
+                focusSide = binary('modulo',
+                    number(decoy * base + randomInt(random, 2, decoy - 1)),
+                    number(1, true, decoy));
+                break;
+            case 'power':
+                focusSide = binary('power', number(value),
+                    number(1, true, randomInt(random, 2, 4)));
+                break;
+            case 'root': {
+                const minuend = base + randomInt(random, 3, 10);
+                focusSide = root(number(1, true, base * base));
+                otherSide = binary('subtract', number(minuend), number(minuend - 1));
+                break;
+            }
+        }
+        const sides = random() < 0.5
+            ? [focusSide, otherSide || number(value)]
+            : [otherSide || number(value), focusSide];
+        disguiseOnes(sides, random, DIFFICULTIES[concept.profile].maxNumber);
+        return {
+            sides: sides,
+            score: difficultyScore(sides),
+            target: scheduled.target,
+            roundKind: scheduled.kind,
+            learningConcept: concept.id
+        };
+    }
+
     function serialize(expression, values) {
         if (expression.type === 'number') {
             const value = values && Object.prototype.hasOwnProperty.call(values, expression.id)
@@ -946,6 +1001,7 @@
         updateAdaptiveState: updateAdaptiveState,
         analyzeProblem: analyzeProblem,
         generateProblem: generateProblem,
+        generatePracticeProblem: generatePracticeProblem,
         serialize: serialize,
         evaluationSteps: evaluationSteps,
         describe: describe,

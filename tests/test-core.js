@@ -279,6 +279,21 @@ for (const concept of Object.values(core.LEARNING_CONCEPTS)) {
         concept.id + ' practice generates the intended concept');
     assert.strictEqual(problem.analysis.unique, true,
         concept.id + ' practice has one safe answer');
+
+    for (let round = 1; round <= 80; round++) {
+        const seed = 'focused:' + concept.id + ':' + round;
+        const focused = core.generatePracticeProblem(concept.id, round, core.createSeededRandom(seed));
+        const analysis = core.analyzeProblem(focused.sides);
+        const effect = core.learningAnalysis(focused.sides).intendedEffect;
+        assert(analysis.unique && analysis.safe, seed + ' has one safe answer');
+        assert.strictEqual(effect.operation, concept.solutionOperation,
+            seed + ' exercises the operation the learning goal names');
+        assert.strictEqual(analysis.solutions[0].id, effect.id);
+        assert.notStrictEqual(effect.beforeTotals[0], effect.beforeTotals[1]);
+        assert.deepStrictEqual(focused,
+            core.generatePracticeProblem(concept.id, round, core.createSeededRandom(seed)),
+            seed + ' regenerates the same puzzle for sharing and replay');
+    }
 }
 
 const allOperations = new Set();
